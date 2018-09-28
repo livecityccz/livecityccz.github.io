@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="编程之道,Pyecharts," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="诗和田野" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="纸短情长啊，诉不完当时年少，我的故事还是关于你呀  　　最近在开发web应用过程中，需要用到可视化展示功能，因此找了找Python相关的可视化模块。这里简单记录下pyecharts模块的用法。推荐它主要是因为其功能强大，可视化功能选择比较多，且使用比较简单。 pyecharts介绍　　首先需要了解下pyecharts模块的运行机制，pyecharts是echarts的python-api，而ec">
+<meta name="keywords" content="编程之道,Pyecharts">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Pyecharts 可视化初探">
+<meta property="og:url" content="http://chucz.club/2018/04/09/Pyecharts-可视化初探/index.html">
+<meta property="og:site_name" content="诗和田野">
+<meta property="og:description" content="纸短情长啊，诉不完当时年少，我的故事还是关于你呀  　　最近在开发web应用过程中，需要用到可视化展示功能，因此找了找Python相关的可视化模块。这里简单记录下pyecharts模块的用法。推荐它主要是因为其功能强大，可视化功能选择比较多，且使用比较简单。 pyecharts介绍　　首先需要了解下pyecharts模块的运行机制，pyecharts是echarts的python-api，而ec">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-09-28T08:51:24.508Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Pyecharts 可视化初探">
+<meta name="twitter:description" content="纸短情长啊，诉不完当时年少，我的故事还是关于你呀  　　最近在开发web应用过程中，需要用到可视化展示功能，因此找了找Python相关的可视化模块。这里简单记录下pyecharts模块的用法。推荐它主要是因为其功能强大，可视化功能选择比较多，且使用比较简单。 pyecharts介绍　　首先需要了解下pyecharts模块的运行机制，pyecharts是echarts的python-api，而ec">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://chucz.club/2018/04/09/Pyecharts-可视化初探/"/>
+
+
+
+
+
+  <title>Pyecharts 可视化初探 | 诗和田野</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">诗和田野</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">生活不苟且</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/首页" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/标签/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/分类/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/归档/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://chucz.club/2018/04/09/Pyecharts-可视化初探/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="chucz">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="诗和田野">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Pyecharts 可视化初探</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-09T03:31:39+00:00">
+                2018-04-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>纸短情长啊，诉不完当时年少，我的故事还是关于你呀</p>
+</blockquote>
+<p>　　最近在开发web应用过程中，需要用到可视化展示功能，因此找了找Python相关的可视化模块。这里简单记录下pyecharts模块的用法。推荐它主要是因为其功能强大，可视化功能选择比较多，且使用比较简单。<br><a id="more"></a></p>
+<h3 id="pyecharts介绍"><a href="#pyecharts介绍" class="headerlink" title="pyecharts介绍"></a><a href="#pyecharts介绍" title="pyecharts介绍"></a>pyecharts介绍</h3><p>　　首先需要了解下pyecharts模块的运行机制，pyecharts是echarts的python-api，而echarts是百度开源的可视化框架。echarts是用来操作js文件的，因此pyecharts的出现其实是为了能够让python语言更好的对接echarts。简单来说，pyecharts会帮我们生成js文件。</p>
+<h3 id="安装pyecharts"><a href="#安装pyecharts" class="headerlink" title="安装pyecharts"></a><a href="#安装pyecharts" title="安装pyecharts"></a>安装pyecharts</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">pip install pyecharts</div></pre></td></tr></table></figure>
+
+<p>或者Github下载源码安装：<a href="https://github.com/pyecharts/pyecharts" target="_blank" rel="noopener">https://github.com/pyecharts/pyecharts</a></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">$ git <span class="built_in">clone</span> <a href="https://github.com/pyecharts/pyecharts.git" target="_blank" rel="noopener">https://github.com/pyecharts/pyecharts.git</a></div><div class="line">$ <span class="built_in">cd</span> pyecharts</div><div class="line">$ pip install -r requirements.txt</div><div class="line">$ python setup.py install</div></pre></td></tr></table></figure>
+
+<h3 id="简单使用pyecharts"><a href="#简单使用pyecharts" class="headerlink" title="简单使用pyecharts"></a><a href="#简单使用pyecharts" title="简单使用pyecharts"></a>简单使用pyecharts</h3><p>创建一个test.py文件，写入：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">from pyecharts import Bar <span class="comment"># 柱状图</span></div><div class="line"></div><div class="line">attr = [<span class="string">“Jan”</span>, <span class="string">“Feb”</span>, <span class="string">“Mar”</span>, <span class="string">“Apr”</span>, <span class="string">“May”</span>, <span class="string">“Jun”</span>, <span class="string">“Jul”</span>, <span class="string">“Aug”</span>, <span class="string">“Sep”</span>, <span class="string">“Oct”</span>, <span class="string">“Nov”</span>, <span class="string">“Dec”</span>]</div><div class="line">v1 = [2.0, 4.9, 7.0, 23.2, 25.6, 76.7, 135.6, 162.2, 32.6, 20.0, 6.4, 3.3]</div><div class="line">v2 = [2.6, 5.9, 9.0, 26.4, 28.7, 70.7, 175.6, 182.2, 48.7, 18.8, 6.0, 2.3]</div><div class="line">bar = Bar(<span class="string">“Bar chart”</span>, <span class="string">“precipitation and evaporation one year”</span>)</div><div class="line">bar.add(<span class="string">“precipitation”</span>, attr, v1, mark_line=[<span class="string">“average”</span>], mark_point=[<span class="string">“max”</span>, <span class="string">“min”</span>])</div><div class="line">bar.add(<span class="string">“evaporation”</span>, attr, v2, mark_line=[<span class="string">“average”</span>], mark_point=[<span class="string">“max”</span>, <span class="string">“min”</span>])</div><div class="line">bar.render() <span class="comment"># 生成一个html文件</span></div></pre></td></tr></table></figure>
+
+<p>运行test.py，会在当前目录下生成一个render.html文件，即包含柱状图的网页。查看此html文件，会发现其生成了很多js代码。</p>
+<p>说明：除了柱状图外，pyecharts还支持其他可视化展示，具体可参考官方文档：<a href="http://pyecharts.org/#/zh-cn/charts" target="_blank" rel="noopener">http://pyecharts.org/#/zh-cn/charts</a></p>
+<h3 id="pyecharts-Django"><a href="#pyecharts-Django" class="headerlink" title="pyecharts+Django"></a><a href="#pyecharts-Django" title="pyecharts+Django"></a>pyecharts+Django</h3><p>　　前面介绍的是利用pyecharts生成一个存在可视化图表的html页面，那么怎么在Django或者Flask等Web框架中使用呢？即如何在视图层生成图表代码，传递到模版层渲染展示？这里只介绍如何在Django中使用pyecharts，其他web框架同理，可自行研究。</p>
+<h4 id="view视图层"><a href="#view视图层" class="headerlink" title="view视图层"></a><a href="#view视图层" title="view视图层"></a>view视图层</h4><p>在Django项目的view.py文件内写入:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">from django.http import HttpResponse</div><div class="line">from pyecharts import Pie</div><div class="line"></div><div class="line">REMOTE_HOST = <span class="string">“<a href="https://pyecharts.github.io/assets/js&quot;" target="_blank" rel="noopener">https://pyecharts.github.io/assets/js&quot;</a></span></div><div class="line"></div><div class="line">def Pie_():</div><div class="line">    <span class="comment"># 生成饼图</span></div><div class="line">    attr = [<span class="string">“衬衫”</span>, <span class="string">“羊毛衫”</span>, <span class="string">“雪纺衫”</span>, <span class="string">“裤子”</span>, <span class="string">“高跟鞋”</span>, <span class="string">“袜子”</span>]</div><div class="line">    v1 = [11, 12, 13, 10, 10, 10]</div><div class="line">    pie = Pie(<span class="string">“饼图示例”</span>)</div><div class="line">    pie.add(<span class="string">“”</span>, attr, v1, is_label_show=True)</div><div class="line">    </div><div class="line">    <span class="built_in">return</span> pie</div><div class="line"></div><div class="line">def index(request):</div><div class="line">    <span class="comment"># 可视化展示页面</span></div><div class="line">    pie = Pie_()</div><div class="line">    myechart=pie.render_embed() <span class="comment"># 饼图</span></div><div class="line">    host=REMOTE_HOST <span class="comment"># js文件源地址</span></div><div class="line">    script_list=pie.get_js_dependencies() <span class="comment"># 获取依赖的js文件名称（只获取当前视图需要的js）</span></div><div class="line"></div><div class="line">    <span class="built_in">return</span> render(request,<span class="string">“index.html”</span>,&#123;<span class="string">“myechart”</span>:myechart,<span class="string">“host”</span>:host,<span class="string">“script_list”</span>:script_list&#125;)</div></pre></td></tr></table></figure>
+
+<p>说明：REMOTE_HOST可更换成本地地址，即先前往<a href="https://github.com/pyecharts/assets" target="_blank" rel="noopener">https://github.com/pyecharts/assets</a> clone项目，再将项目中的js目录copy到Django项目的static/js目录下，然后更改代码中的REMOTE_HOST为：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">REMOTE_HOST = <span class="string">“<a href="https://pyecharts.github.io/assets/js&quot;" target="_blank" rel="noopener">https://pyecharts.github.io/assets/js&quot;</a></span></div><div class="line">改为：</div><div class="line">REMOTE_HOST = <span class="string">“../../static/js/js”</span></div></pre></td></tr></table></figure>
+
+<h4 id="Django路由"><a href="#Django路由" class="headerlink" title="Django路由"></a><a href="#Django路由" title="Django路由"></a>Django路由</h4><p>在Django项目的urls.py文件内容写入：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">url(r<span class="string">‘^$’</span>,views.index, name=<span class="string">“index”</span>),</div></pre></td></tr></table></figure>
+
+<h4 id="模版层"><a href="#模版层" class="headerlink" title="模版层"></a><a href="#模版层" title="模版层"></a>模版层</h4><p>在Django项目的templates目录下创建index.html文件，写入：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">&lt;!DOCTYPE html&gt;</div><div class="line">&lt;html&gt;</div><div class="line"></div><div class="line">&lt;head&gt;</div><div class="line">    &lt;meta charset=<span class="string">“utf-8”</span>&gt;</div><div class="line">    &lt;title&gt;Proudly presented by PycCharts&lt;/title&gt;</div><div class="line">    &#123;% <span class="keyword">for</span> jsfile_name <span class="keyword">in</span> script_list %&#125;</div><div class="line">        &lt;script src=<span class="string">“&#123;&#123; host &#125;&#125;/&#123;&#123; jsfile_name &#125;&#125;.js”</span>&gt;&lt;/script&gt; <span class="comment"># 加载js文件</span></div><div class="line">    &#123;% endfor %&#125;</div><div class="line">&lt;/head&gt;</div><div class="line"></div><div class="line">&lt;body&gt;</div><div class="line">  &#123;&#123; myechart|safe &#125;&#125; <span class="comment"># 显示可视化图表，注意要加safe，表示解析视图层传入的html内容</span></div><div class="line">&lt;/body&gt;</div><div class="line"></div><div class="line">&lt;/html&gt;</div></pre></td></tr></table></figure>
+
+<h4 id="运行django"><a href="#运行django" class="headerlink" title="运行django"></a><a href="#运行django" title="运行django"></a>运行django</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">python manage.py runserver</div></pre></td></tr></table></figure>
+
+<p>打开浏览器：<a href="http://127.0.0.1:8000" target="_blank" rel="noopener">http://127.0.0.1:8000</a></p>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a><a href="#参考资料" title="参考资料"></a>参考资料</h3><p>官方文档：<a href="http://pyecharts.org/#/zh-cn/" target="_blank" rel="noopener">http://pyecharts.org/#/zh-cn/</a><br>Github项目地址：<a href="https://github.com/pyecharts/pyecharts" target="_blank" rel="noopener">https://github.com/pyecharts/pyecharts</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/编程之道/" rel="tag"># 编程之道</a>
+          
+            <a href="/tags/Pyecharts/" rel="tag"># Pyecharts</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/02/ELK的一次吞吐量优化/" rel="next" title="ELK的一次吞吐量优化">
+                <i class="fa fa-chevron-left"></i> ELK的一次吞吐量优化
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/04/12/漫谈漏洞扫描器的设计与开发/" rel="prev" title="漫谈漏洞扫描器的设计与开发">
+                漫谈漏洞扫描器的设计与开发 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">chucz</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/归档/">
+              
+                  <span class="site-state-item-count">41</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">37</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/livecityccz" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:livecityccz@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://plus.google.com/livecityccz" target="_blank" title="Google">
+                      
+                        <i class="fa fa-fw fa-google"></i>Google</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://twitter.com/livecityccz" target="_blank" title="Twitter">
+                      
+                        <i class="fa fa-fw fa-twitter"></i>Twitter</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.facebook.com/livecityccz" target="_blank" title="FB Page">
+                      
+                        <i class="fa fa-fw fa-facebook"></i>FB Page</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://youtube.com/livecityccz" target="_blank" title="YouTube">
+                      
+                        <i class="fa fa-fw fa-youtube"></i>YouTube</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#pyecharts介绍"><span class="nav-number">1.</span> <span class="nav-text">pyecharts介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装pyecharts"><span class="nav-number">2.</span> <span class="nav-text">安装pyecharts</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#简单使用pyecharts"><span class="nav-number">3.</span> <span class="nav-text">简单使用pyecharts</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#pyecharts-Django"><span class="nav-number">4.</span> <span class="nav-text">pyecharts+Django</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#view视图层"><span class="nav-number">4.1.</span> <span class="nav-text">view视图层</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Django路由"><span class="nav-number">4.2.</span> <span class="nav-text">Django路由</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#模版层"><span class="nav-number">4.3.</span> <span class="nav-text">模版层</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#运行django"><span class="nav-number">4.4.</span> <span class="nav-text">运行django</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考资料"><span class="nav-number">5.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">chucz</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

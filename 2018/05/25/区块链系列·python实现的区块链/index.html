@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="区块链安全,区块链," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="诗和田野" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="地是床 天是被 流星是眼泪有时醒 有时醉 大雁飞一个来回　　听说现在会点区块链技术的工资都高破天了，抱着对高工资的幻想，我决定也开始学一学区块链吧。那么我想接触区块链的第一步必须得是去交易平台注册个帐号，然后充点钱买0.00001个BTC了。（2333，~!~现在我穷得只剩下币了）  　　老实说区块链技术还是有点难理解的，为此我搜了搜区块链的实现代码，想着结合代码看获许会简单一点，于是我发现有人">
+<meta name="keywords" content="区块链安全,区块链">
+<meta property="og:type" content="article">
+<meta property="og:title" content="区块链系列·python实现的区块链">
+<meta property="og:url" content="http://chucz.club/2018/05/25/区块链系列·python实现的区块链/index.html">
+<meta property="og:site_name" content="诗和田野">
+<meta property="og:description" content="地是床 天是被 流星是眼泪有时醒 有时醉 大雁飞一个来回　　听说现在会点区块链技术的工资都高破天了，抱着对高工资的幻想，我决定也开始学一学区块链吧。那么我想接触区块链的第一步必须得是去交易平台注册个帐号，然后充点钱买0.00001个BTC了。（2333，~!~现在我穷得只剩下币了）  　　老实说区块链技术还是有点难理解的，为此我搜了搜区块链的实现代码，想着结合代码看获许会简单一点，于是我发现有人">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-09-28T08:51:24.508Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="区块链系列·python实现的区块链">
+<meta name="twitter:description" content="地是床 天是被 流星是眼泪有时醒 有时醉 大雁飞一个来回　　听说现在会点区块链技术的工资都高破天了，抱着对高工资的幻想，我决定也开始学一学区块链吧。那么我想接触区块链的第一步必须得是去交易平台注册个帐号，然后充点钱买0.00001个BTC了。（2333，~!~现在我穷得只剩下币了）  　　老实说区块链技术还是有点难理解的，为此我搜了搜区块链的实现代码，想着结合代码看获许会简单一点，于是我发现有人">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://chucz.club/2018/05/25/区块链系列·python实现的区块链/"/>
+
+
+
+
+
+  <title>区块链系列·python实现的区块链 | 诗和田野</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">诗和田野</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">生活不苟且</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/首页" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/标签/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/分类/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/归档/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://chucz.club/2018/05/25/区块链系列·python实现的区块链/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="chucz">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="诗和田野">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">区块链系列·python实现的区块链</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-25T00:16:48+00:00">
+                2018-05-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>地是床 天是被 流星是眼泪<br>有时醒 有时醉 大雁飞一个来回<br>　　听说现在会点区块链技术的工资都高破天了，抱着对高工资的幻想，我决定也开始学一学区块链吧。那么我想接触区块链的第一步必须得是去交易平台注册个帐号，然后充点钱买0.00001个BTC了。（2333，~!~现在我穷得只剩下币了）<br><a id="more"></a></p>
+</blockquote>
+<p>　　老实说区块链技术还是有点难理解的，为此我搜了搜区块链的实现代码，想着结合代码看获许会简单一点，于是我发现有人用python实现了简单的区块链，于是再原作者基础上，我稍微修改了点内容，在此粘贴一下，以供学习。原项目地址：<a href="https://github.com/xilibi2003/blockchain" target="_blank" rel="noopener">https://github.com/xilibi2003/blockchain</a></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div><div class="line">133</div><div class="line">134</div><div class="line">135</div><div class="line">136</div><div class="line">137</div><div class="line">138</div><div class="line">139</div><div class="line">140</div><div class="line">141</div><div class="line">142</div><div class="line">143</div><div class="line">144</div><div class="line">145</div><div class="line">146</div><div class="line">147</div><div class="line">148</div><div class="line">149</div><div class="line">150</div><div class="line">151</div><div class="line">152</div><div class="line">153</div><div class="line">154</div><div class="line">155</div><div class="line">156</div><div class="line">157</div><div class="line">158</div><div class="line">159</div><div class="line">160</div><div class="line">161</div><div class="line">162</div><div class="line">163</div><div class="line">164</div><div class="line">165</div><div class="line">166</div><div class="line">167</div><div class="line">168</div><div class="line">169</div><div class="line">170</div><div class="line">171</div><div class="line">172</div><div class="line">173</div><div class="line">174</div><div class="line">175</div><div class="line">176</div><div class="line">177</div><div class="line">178</div><div class="line">179</div><div class="line">180</div><div class="line">181</div><div class="line">182</div><div class="line">183</div><div class="line">184</div><div class="line">185</div><div class="line">186</div><div class="line">187</div><div class="line">188</div><div class="line">189</div><div class="line">190</div><div class="line">191</div><div class="line">192</div><div class="line">193</div><div class="line">194</div><div class="line">195</div><div class="line">196</div><div class="line">197</div><div class="line">198</div><div class="line">199</div><div class="line">200</div><div class="line">201</div><div class="line">202</div><div class="line">203</div><div class="line">204</div><div class="line">205</div><div class="line">206</div><div class="line">207</div><div class="line">208</div><div class="line">209</div><div class="line">210</div><div class="line">211</div><div class="line">212</div><div class="line">213</div><div class="line">214</div><div class="line">215</div><div class="line">216</div><div class="line">217</div><div class="line">218</div><div class="line">219</div><div class="line">220</div><div class="line">221</div><div class="line">222</div><div class="line">223</div><div class="line">224</div><div class="line">225</div><div class="line">226</div><div class="line">227</div><div class="line">228</div><div class="line">229</div><div class="line">230</div><div class="line">231</div><div class="line">232</div><div class="line">233</div><div class="line">234</div><div class="line">235</div><div class="line">236</div><div class="line">237</div><div class="line">238</div><div class="line">239</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#! -<em>- coding:utf-8 -</em>-</span></div><div class="line"></div><div class="line"></div><div class="line">import hashlib</div><div class="line">import json</div><div class="line">from time import time</div><div class="line"></div><div class="line"></div><div class="line">class Blockchain(object):</div><div class="line">    <span class="string">‘’</span><span class="string">‘ 区块链 </span></div><div class="line">    </div><div class="line">    一个区块结构（每个区块的字典顺序必须一致）：</div><div class="line"></div><div class="line">    block = &#123;</div><div class="line">        ‘index<span class="string">‘: 1, # 区块索引</span></div><div class="line">        ‘timestamp<span class="string">‘: 1506057125.900785, # 时间戳</span></div><div class="line">        ‘transactions<span class="string">‘: [ # 交易列表</span></div><div class="line">            &#123;</div><div class="line">                ‘sender<span class="string">‘: “8527147fe1f5426f9dd545de4b27ee00”,</span></div><div class="line">                ‘recipient<span class="string">‘: “a77f5cdfa2934df3954a5c7c7da5df1f”,</span></div><div class="line">                ‘amount<span class="string">‘: 5,</span></div><div class="line">            &#125;</div><div class="line">        ],</div><div class="line">        ‘proof<span class="string">‘: 324984774000, # 工作量证明</span></div><div class="line">        ‘previous_hash<span class="string">‘: “2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824”</span></div><div class="line">    &#125;</div><div class="line"></div><div class="line">    ‘<span class="string">‘’</span></div><div class="line"></div><div class="line">    def <strong>init</strong>(self):</div><div class="line"></div><div class="line">        self.chain = [] <span class="comment"># 区块列表</span></div><div class="line">        self.current_transactions = [] <span class="comment"># 交易列表</span></div><div class="line">        self.nodes = <span class="built_in">set</span>() <span class="comment"># 节点列表(避免重复)</span></div><div class="line"></div><div class="line">        self.new_block(previous_hash=1, proof=100) <span class="comment"># 创造创世区块</span></div><div class="line"></div><div class="line"></div><div class="line">    def register_node(self,address):</div><div class="line">        <span class="string">‘’</span><span class="string">‘ 注册节点 </span></div><div class="line"></div><div class="line">        Add a new node to the list of nodes</div><div class="line">        :param address: &lt;str&gt; 节点地址 ‘192.168.0.1:5000<span class="string">‘</span></div><div class="line">        :return: None</div><div class="line"></div><div class="line">        ‘<span class="string">‘’</span></div><div class="line"></div><div class="line">        self.nodes.add(address)</div><div class="line"></div><div class="line">    def valid_chain(self,chain):</div><div class="line">        <span class="string">‘’</span><span class="string">‘ 验证区块链的有效性 </span></div><div class="line"></div><div class="line">        :param chain: &lt;list&gt; 一个完整的区块链</div><div class="line">        :return: &lt;bool&gt; True if valid, False if not</div><div class="line"></div><div class="line">        ‘<span class="string">‘’</span></div><div class="line"></div><div class="line">        previous_block = chain[0] <span class="comment"># 前一个区块</span></div><div class="line">        current_index = 1 <span class="comment"># 当前区块索引</span></div><div class="line"></div><div class="line">        <span class="keyword">while</span> current_index &lt; len(chain):</div><div class="line">            block = chain[current_index] <span class="comment"># 当前区块</span></div><div class="line"></div><div class="line">            <span class="keyword">if</span> block[<span class="string">‘previous_hash’</span>] != self.hash(previous_block):</div><div class="line">                <span class="string">‘’</span><span class="string">‘ hash值验证 ‘</span><span class="string">‘’</span></div><div class="line">                <span class="built_in">return</span> False</div><div class="line"></div><div class="line">            <span class="keyword">if</span> not self.valid_proof(previous_block[<span class="string">‘proof’</span>],block[<span class="string">‘proof’</span>]):</div><div class="line">                <span class="string">‘’</span><span class="string">‘ 工作量证明验证 ‘</span><span class="string">‘’</span></div><div class="line">                <span class="built_in">return</span> False</div><div class="line"></div><div class="line">            previous_block = block</div><div class="line">            current_index += 1</div><div class="line"></div><div class="line">        <span class="built_in">return</span> True</div><div class="line"></div><div class="line">    def resolve_conflicts(self):</div><div class="line">        <span class="string">‘’</span><span class="string">‘ 共识算法解决不同节点账本不相同的冲突 </span></div><div class="line"></div><div class="line">        使用网络中最长的有效区块链</div><div class="line">        :return: &lt;bool&gt; True 如果链被取代, 否则为False</div><div class="line">        ‘<span class="string">‘’</span></div><div class="line"></div><div class="line">        neighbours = self.nodes <span class="comment"># 网络中所有节点列表</span></div><div class="line">        new_chain = None</div><div class="line"></div><div class="line">        max_length = len(self.chain) <span class="comment"># 当前节点的区块链长度</span></div><div class="line"></div><div class="line">        <span class="keyword">for</span> node <span class="keyword">in</span> neighbours: <span class="comment"># 遍历所有网络节点，若有比本节点有效区块链长的，则替换掉本地区块链</span></div><div class="line">            </div><div class="line">            <span class="comment"># 通过api获取</span></div><div class="line">            length = 100 <span class="comment"># 某节点区块链长度</span></div><div class="line">            chain = [] <span class="comment"># 某节点区块链列表</span></div><div class="line"></div><div class="line">            <span class="keyword">if</span> length &gt; max_length and self.valid_chain(chain):</div><div class="line">                max_length = length</div><div class="line">                new_chain = chain</div><div class="line"></div><div class="line">        <span class="keyword">if</span> new_chain:</div><div class="line">            self.chain = new_chain</div><div class="line">            <span class="built_in">return</span> True</div><div class="line"></div><div class="line">        <span class="built_in">return</span> False</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">    def new_block(self,proof,previous_hash=None):</div><div class="line">        <span class="string">‘’</span><span class="string">‘ 创建新的区块，添加到区块链中 </span></div><div class="line">        </div><div class="line">        生成新块</div><div class="line">        :param proof: &lt;int&gt; 工作量证明</div><div class="line">        :param previous_hash: 前一个区块的hash值</div><div class="line">        :return: &lt;dict&gt; 新区块</div><div class="line"></div><div class="line">        ‘<span class="string">‘’</span></div><div class="line"></div><div class="line">        block = &#123;</div><div class="line"></div><div class="line">            <span class="string">‘index’</span>: len(self.chain) + 1, <span class="comment"># 确保索引在区块链尾部</span></div><div class="line">            <span class="string">‘timestamp’</span>: time(),</div><div class="line">            <span class="string">‘transactions’</span>: self.current_transactions, <span class="comment"># 交易列表</span></div><div class="line">            <span class="string">‘proof’</span>: proof, <span class="comment"># 工作量证明</span></div><div class="line">            <span class="string">‘previous_hash’</span>: previous_hash or self.hash(self.chain[-1]), <span class="comment"># 此区块前一个区块的hash</span></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="comment"># 对交易的详细内容可以进行操作，比如说增加金币，或者减少金币等等。</span></div><div class="line"></div><div class="line">        self.current_transactions = [] <span class="comment"># 重置交易列表</span></div><div class="line"></div><div class="line">        self.chain.append(block) <span class="comment"># 将新的区块添加到区块链中</span></div><div class="line"></div><div class="line">        <span class="built_in">return</span> block</div><div class="line"></div><div class="line"></div><div class="line">    def new_transactions(self,sender,recipient,amount):</div><div class="line">        <span class="string">‘’</span><span class="string">‘ 添加新的交易到交易列表中 </span></div><div class="line"></div><div class="line">        生成新交易信息，信息将加入到下一个待挖的区块中</div><div class="line">        :param sender: &lt;str&gt; 发送者地址</div><div class="line">        :param recipient: &lt;str&gt; 接收着地址</div><div class="line">        :param amount: &lt;int&gt; 金额或者数量</div><div class="line">        :return: &lt;int&gt; 返回这笔交易的区块链索引（将这笔交易添加到区块链最后面）</div><div class="line"></div><div class="line">        ‘<span class="string">‘’</span></div><div class="line"></div><div class="line">        self.current_transactions.append(&#123;</div><div class="line"></div><div class="line">            <span class="string">“sender”</span>:sender,</div><div class="line">            <span class="string">‘recipient’</span>:recipient,</div><div class="line">            <span class="string">‘amount’</span>:amount,</div><div class="line"></div><div class="line">            &#125;)</div><div class="line"></div><div class="line">        <span class="built_in">return</span> self.last_block[<span class="string">‘index’</span>] + 1</div><div class="line">        </div><div class="line">    @staticmethod</div><div class="line">    def <span class="built_in">hash</span>(block):</div><div class="line">        <span class="string">‘’</span><span class="string">‘ 计算一个区块的hash值 </span></div><div class="line">        </div><div class="line">        生成块的 SHA-256 hash值</div><div class="line">        :param block: &lt;dict&gt; Block</div><div class="line">        :return: &lt;str&gt;</div><div class="line"></div><div class="line">        ‘<span class="string">‘’</span></div><div class="line">        </div><div class="line">        block_string = json.dumps(block, sort_keys=True).encode()</div><div class="line">        <span class="built_in">return</span> hashlib.sha256(block_string).hexdigest()</div><div class="line"></div><div class="line">    @property</div><div class="line">    def last_block(self):</div><div class="line">        <span class="string">‘’</span><span class="string">‘ 区块链中最后一个区块 ‘</span><span class="string">‘’</span></div><div class="line"></div><div class="line">        <span class="built_in">return</span> self.chain[-1] <span class="comment"># 返回区块链中最后一个区块</span></div><div class="line"></div><div class="line"></div><div class="line">    def proof_of_work(self, last_proof):</div><div class="line">        <span class="string">‘’</span><span class="string">‘</span></div><div class="line">        简单的工作量证明:</div><div class="line">         - 查找一个 p’ 使得 <span class="built_in">hash</span>(pp<span class="string">‘) 以4个0开头</span></div><div class="line">         - p 是上一个块的证明,  p’ 是当前的证明</div><div class="line">        :param last_proof: &lt;int&gt;</div><div class="line">        :<span class="built_in">return</span>: &lt;int&gt;</div><div class="line">        <span class="string">‘’</span><span class="string">‘</span></div><div class="line"></div><div class="line">        proof = 0</div><div class="line">        while self.valid_proof(last_proof, proof) is False:</div><div class="line">            proof += 1</div><div class="line"></div><div class="line">        return proof</div><div class="line"></div><div class="line"></div><div class="line">    @staticmethod</div><div class="line">    def valid_proof(last_proof,proof):</div><div class="line">        ‘<span class="string">‘’</span></div><div class="line">        验证证明: 是否<span class="built_in">hash</span>(last_proof, proof)以4个0开头?</div><div class="line">        :param last_proof: &lt;int&gt; 前一个区块的<span class="built_in">hash</span></div><div class="line">        :param proof: &lt;int&gt; 当前区块的<span class="built_in">hash</span></div><div class="line">        :<span class="built_in">return</span>: &lt;bool&gt; True or False</div><div class="line">        <span class="string">‘’</span><span class="string">‘</span></div><div class="line"></div><div class="line">        guess = (str(last_proof)+str(proof)).encode()</div><div class="line">        guess_hash = hashlib.sha256(guess).hexdigest()</div><div class="line"></div><div class="line">        return guess_hash[:4] == “0000”</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">if <strong>name</strong>==”<strong>main</strong>“:</div><div class="line"></div><div class="line">    # 运行这一段脚本就是一个区块链节点，而节点之间可以通过api的方式互相传递信息</div><div class="line"></div><div class="line">    # 每个节点都每隔10分钟运行一次</div><div class="line"></div><div class="line">    blockchain = Blockchain()</div><div class="line"></div><div class="line">    for i in range(2):</div><div class="line"></div><div class="line">        # 同步一下区块</div><div class="line"></div><div class="line">        # 开始挖矿</div><div class="line">        last_block = blockchain.last_block</div><div class="line">        last_proof = last_block[‘proof<span class="string">‘]</span></div><div class="line">        proof = blockchain.proof_of_work(last_proof) </div><div class="line"></div><div class="line">        # 挖矿成功后，生成新的交易（奖励交易）</div><div class="line">        blockchain.new_transactions(sender=”0”,recipient=”000002”,amount=1)</div><div class="line"></div><div class="line">        # 添加新的交易(不是奖励交易，而是普通交易)</div><div class="line">        blockchain.new_transactions(sender=”0000001”,recipient=”000002”,amount=1)</div><div class="line"></div><div class="line">        # 输出当前交易列表</div><div class="line">        print “current_transactions lists is: \n”,blockchain.current_transactions</div><div class="line"></div><div class="line">        # 挖矿成功后，生成新的区块（包含奖励交易信息、新增的交易信息），只有挖矿成功后，才能创造出新的区块。</div><div class="line">        block = blockchain.new_block(proof)</div><div class="line"></div><div class="line">        # 输出当前区块链</div><div class="line">        print “current chain lists is: \n”,blockchain.chain</div></pre></td></tr></table></figure>
+
+<p><code>从本篇开始，我将继续学习一些区块链的技术以及区块链安全相关的技术，并会总结成系列文章在博客发布，技术有限请多包涵！</code></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/区块链安全/" rel="tag"># 区块链安全</a>
+          
+            <a href="/tags/区块链/" rel="tag"># 区块链</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/05/20/ELK-Sentinl/" rel="next" title="ELK Sentinl">
+                <i class="fa fa-chevron-left"></i> ELK Sentinl
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/06/07/利用chrome-remote-interface实现程序化、自动化Web安全测试/" rel="prev" title="利用chrome_remote_interface实现程序化、自动化Web安全测试">
+                利用chrome_remote_interface实现程序化、自动化Web安全测试 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">chucz</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/归档/">
+              
+                  <span class="site-state-item-count">41</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">37</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/livecityccz" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:livecityccz@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://plus.google.com/livecityccz" target="_blank" title="Google">
+                      
+                        <i class="fa fa-fw fa-google"></i>Google</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://twitter.com/livecityccz" target="_blank" title="Twitter">
+                      
+                        <i class="fa fa-fw fa-twitter"></i>Twitter</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.facebook.com/livecityccz" target="_blank" title="FB Page">
+                      
+                        <i class="fa fa-fw fa-facebook"></i>FB Page</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://youtube.com/livecityccz" target="_blank" title="YouTube">
+                      
+                        <i class="fa fa-fw fa-youtube"></i>YouTube</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">chucz</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

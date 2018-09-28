@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Logrotate," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="诗和田野" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="服务器上的nginx使用logrotate来分割日志，设置为每天分割。但是logrotate似乎没有工作，日志并没有分割。服务器是CentOS 6。 为了找到原因，分析可能出错的地方。如果是logrotate未执行，可能是crond没有启动，因为logrotate被/etc/cron.daily/logrotate脚本所启动，可以查看其中代码： 123456789[root@test ~]# ca">
+<meta name="keywords" content="Logrotate">
+<meta property="og:type" content="article">
+<meta property="og:title" content="crontab、anacron、logrotate relationship">
+<meta property="og:url" content="http://chucz.club/2018/08/19/crontab、anacron、logrotate-relationship/index.html">
+<meta property="og:site_name" content="诗和田野">
+<meta property="og:description" content="服务器上的nginx使用logrotate来分割日志，设置为每天分割。但是logrotate似乎没有工作，日志并没有分割。服务器是CentOS 6。 为了找到原因，分析可能出错的地方。如果是logrotate未执行，可能是crond没有启动，因为logrotate被/etc/cron.daily/logrotate脚本所启动，可以查看其中代码： 123456789[root@test ~]# ca">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-09-28T08:25:28.616Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="crontab、anacron、logrotate relationship">
+<meta name="twitter:description" content="服务器上的nginx使用logrotate来分割日志，设置为每天分割。但是logrotate似乎没有工作，日志并没有分割。服务器是CentOS 6。 为了找到原因，分析可能出错的地方。如果是logrotate未执行，可能是crond没有启动，因为logrotate被/etc/cron.daily/logrotate脚本所启动，可以查看其中代码： 123456789[root@test ~]# ca">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://chucz.club/2018/08/19/crontab、anacron、logrotate-relationship/"/>
+
+
+
+
+
+  <title>crontab、anacron、logrotate relationship | 诗和田野</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">诗和田野</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">生活不苟且</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/首页" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/标签/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/分类/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/归档/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://chucz.club/2018/08/19/crontab、anacron、logrotate-relationship/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="chucz">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="诗和田野">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">crontab、anacron、logrotate relationship</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-19T01:55:15+00:00">
+                2018-08-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>服务器上的nginx使用logrotate来分割日志，设置为每天分割。但是logrotate似乎没有工作，日志并没有分割。服务器是CentOS 6。</p>
+<p>为了找到原因，分析可能出错的地方。<br>如果是logrotate未执行，可能是crond没有启动，因为logrotate被/etc/cron.daily/logrotate脚本所启动，可以查看其中代码：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[root@<span class="built_in">test</span> ~]<span class="comment"># cat /etc/cron.daily/logrotate</span></span><br><span class="line"><span class="meta">#!/bin/sh</span></span><br><span class="line"></span><br><span class="line">/usr/sbin/logrotate /etc/logrotate.conf</span><br><span class="line">EXITVALUE=$?</span><br><span class="line"><span class="keyword">if</span> [ <span class="variable">$EXITVALUE</span> != 0 ]; <span class="keyword">then</span></span><br><span class="line">    /usr/bin/logger -t logrotate <span class="string">“ALERT exited abnormally with [<span class="variable">$EXITVALUE</span>]”</span></span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"><span class="built_in">exit</span> 0</span><br></pre></td></tr></table></figure>
+
+<p>可以看到logrotate运行时加载配置文件logrotate.conf，而这个配置文件除了设定一些分割日志相关的选项，还包含分割日志的配置文件目录/etc/logrotate.d。</p>
+<p>nginx的日志分割配置文件就保存在logrotate.d目录：</p>
+<figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">[root@test ~]<span class="meta"># cat !$</span></span><br><span class="line">cat <span class="meta-keyword">/etc/</span>logrotate.d/nginx</span><br><span class="line"><span class="meta-keyword">/root/</span>*.<span class="class">log </span>&#123;</span><br><span class="line">    Daily</span><br><span class="line">    Missingok</span><br><span class="line">    rotate <span class="number">52</span></span><br><span class="line">    compress</span><br><span class="line">    delaycompress</span><br><span class="line">    notifempty</span><br><span class="line">    dateext</span><br><span class="line">    create <span class="number">644</span> nobody nobody</span><br><span class="line">    sharedscripts</span><br><span class="line">    postrotate</span><br><span class="line">    [ -f <span class="meta-keyword">/usr/</span>local<span class="meta-keyword">/nginx/</span>logs/nginx.pid ] &amp;&amp; kill -USR1 <code>cat &lt;span class=&quot;meta-keyword&quot;&gt;/usr/&lt;/span&gt;local&lt;span class=&quot;meta-keyword&quot;&gt;/nginx/&lt;/span&gt;logs/nginx.pid</code></span><br><span class="line">    endscript</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>/root/<em>.log就是需要被分割的日志的目录，通配符</em>表示目录内的所有log文件都被分割，分割的规则就是{…}中的内容。这里把/root/*.log当做nginx日志只是为了测试。<br>在启动crond服务后，发现日志还是没有分割，于是想到会不会是/etc/logrotate.d/nginx配置文件的语法有问题，使用以下命令调试这个文件：</p>
+<figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">logrotate -vfd <span class="meta-keyword">/etc/</span>logrotate.d/nginx  <span class="meta"># -vfd 三个选项分别表示显示详情，强制分割日志，只是调试配置文件而不是真的分割日志</span></span><br></pre></td></tr></table></figure>
+
+<p>输出结果表明有语法错误，Daily，Missingok 都应该是小写。改成daily，missingok。再次调试配置文件，可以正确分割日志：</p>
+<figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@test ~]# ls <span class="number">-1</span> /root/</span><br><span class="line">install<span class="number">-2017</span><span class="number">-5</span><span class="number">-14.</span>log</span><br><span class="line">install<span class="number">-2017</span><span class="number">-5</span><span class="number">-14.</span>log<span class="number">-20170521</span>  #logrotate归档的日志</span><br></pre></td></tr></table></figure>
+
+<p>上面猜测是crond执行/etc/cron.daily/内的脚本，实现定时执行计划任务，包括执行logrotate日志分割。<br>为了验证是否正确，网上搜索一番后找到了答案。如果没有crontab命令，先安装：</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">yum install crontabs  <span class="comment">#安装crond，crond实际上来自cronie包，这个包作为crontabs包的依赖被安装</span></span><br><span class="line">chkconfig –<span class="keyword">add</span><span class="bash"> crond <span class="comment">#添加到开机启动列表</span></span></span><br><span class="line"><span class="bash">chkconfig crond on    <span class="comment">#开机启动crond服务</span></span></span><br><span class="line"><span class="bash">/etc/init.d/crond     <span class="comment">#立即启动crond</span></span></span><br></pre></td></tr></table></figure><a id="more"></a><br><br>以下文件或目录的作用：<br>cron计划任务有两种类型：<br><br><em>   1）系统cron任务：由crond服务执行，/etc/crontab配置系统级别的任务
+</em>   2）用户cron任务：由crond服务执行，用crontab命令编辑用户级别的任务<font color="#DC143C" size="3">属于系统cron任务的文件或目录：</font><br><br><em>   /etc/cron.d             #系统的任务脚本。执行 rpm -ql cronie 可以看到该目录被cronie包安装
+</em>   /etc/cron.hourly     #每小时执行其内脚本。其中的0anacron文件调用anacron来执行任务，它被包cronie-anacron安装<br><em>   /etc/cron.daily        #每天执行其内脚本。也被anacron执行其内脚本，logrotate调用脚本就在该目录内
+</em>   /etc/cron.weekly     #每周执行其内脚本。<br><em>   /etc/cron.monthly   #每月执行其内脚本。<br><br><font color="#DC143C" size="3">控制用户cron任务的执行：</font>
+
+</em>   /etc/cron.allow   #默认不存在，如果这个文件存在，只有用户在这个文件中才能使用crontab命令<br><em>   /etc/cron.deny    #将不可以使用crontab命令的用户写入其中<br><br>注意：cron.allow和cron.deny就是用户名的列表，每行一个用户名。比如 cron.deny中有一行jason，效果是如果当前登录用户是jason，执行 crontab -e会提示不允许使用crontab命令。<br><br>以下三个目录的作用：<br><br>/var/spool/cron/USER_NAME<br><br>#这个文件才是跟crontab -e/-l 关联的，这个文件保存了crontab -e编辑的任务内容<br><br>#比如执行 crontab -u root -e，编辑保存后，就会有/var/spool/cron/root 这个文件<br><br>/var/spool/anacron/{cron.daily,cron.monthly,cron.weekly}<br><br>#这三个文件记录了anacron上一次执行的时间（上一天，上一周或上一月）<br><br>#anacron任务执行时，对照这里的时间，决定是否执行anacron任务<br><br>/var/lib/logrotate.status<br><br>#这个文件记录logrotate执行情况，logrotate参考这个文件来决定是否需要rotate日志<br><br>crontab和anacron和logrotate的关系：<br><figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@test ~]<span class="comment"># cat /etc/cron.d/0hourly     #这个文件指定每小时的01分执行/etc/cron.hourly内的所有脚本</span></span><br><span class="line">SHELL=/bin/bash</span><br><span class="line">PATH=/sbin:/bin:/usr/sbin:/usr/bin</span><br><span class="line">MAILTO=root</span><br><span class="line">HOME=/</span><br><span class="line">01 </span></pre></td></tr></table></figure></em> <em> </em> * root run-parts /etc/cron.hourly  <span class="comment">#这里的root指定执行任务的用户，run-parts其实是一个可执行脚本，在/usr/bin/run-parts，用来执行cron.hourly目录内的所有脚本</span><br>
+
+<p>说明：用crontab -e命令每次编辑完某个用户的cron设置后，cron自动在/var/spool/cron下生成一个与此用户同名的文件，此用户的cron信息都记录在这个文件中。cron启动后每过一份钟读一次这个文件，检查是否要执行里面的命令。因此此文件修改后不需要重新启动cron服务。cron服务每分钟不仅要读一次/var/spool/cron内的所有文件，还需要读一次/etc/crontab，因此我们配置这个文件也能运用cron服务做一些事情。用crontab命令配置是针对某个用户的，而编辑/etc/crontab是针对系统的任务。此文件的文件格式是：</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">SHELL=<span class="regexp">/bin/bash</span></span><br><span class="line">PATH=<span class="regexp">/sbin:/bin</span><span class="symbol">:/usr/sbin</span><span class="symbol">:/usr/bin</span>     <span class="comment">#可执行文件查找路径</span></span><br><span class="line">MAILTO=root      <span class="comment">#如果出现错误，或者有数据输出，数据作为邮件发给这个帐号</span></span><br><span class="line">HOME=<span class="regexp">/           #使用者运行的路径，这里是根目录</span></span><br></pre></td></tr></table></figure><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">[root@<span class="built_in">test</span> ~]<span class="comment"># cat /etc/cron.hourly/0anacron   #cron.hourly目录下的脚本，根据条件执行anacron命令</span></span><br><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"><span class="comment"># Skip excecution unless the date has changed from the previous run</span></span><br><span class="line"><span class="keyword">if</span> <span class="built_in">test</span> -r /var/spool/anacron/cron.daily; <span class="keyword">then</span></span><br><span class="line">    day=<code>cat /var/spool/anacron/cron.daily</code></span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"><span class="keyword">if</span> [ <code>date +%Y%m%d</code> = <span class="string">“<span class="variable">$day</span>“</span> ]; <span class="keyword">then</span></span><br><span class="line">    <span class="built_in">exit</span> 0;</span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Skip excecution unless AC powered</span></span><br><span class="line"><span class="keyword">if</span> <span class="built_in">test</span> -x /usr/bin/on_ac_power; <span class="keyword">then</span></span><br><span class="line">    /usr/bin/on_ac_power &amp;&gt; /dev/null</span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">test</span> $? -eq 1; <span class="keyword">then</span></span><br><span class="line">    <span class="built_in">exit</span> 0</span><br><span class="line">    <span class="keyword">fi</span></span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line">/usr/sbin/anacron -s</span><br></pre></td></tr></table></figure><figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">[root<span class="variable">@test</span> ~]<span class="comment"># cat /etc/anacrontab   #如果执行anacron命令，那么接着查看anacron的配置文件</span></span><br><span class="line"><span class="comment"># /etc/anacrontab: configuration file for anacron</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># See anacron(8) and anacrontab(5) for details.</span></span><br><span class="line"></span><br><span class="line">SHELL=<span class="regexp">/bin/sh</span></span><br><span class="line">PATH=<span class="regexp">/sbin:/bin</span><span class="symbol">:/usr/sbin</span><span class="symbol">:/usr/bin</span></span><br><span class="line">MAILTO=root</span><br><span class="line"><span class="comment"># the maximal random delay added to the base delay of the jobs</span></span><br><span class="line">RANDOM_DELAY=<span class="number">45</span>     <span class="comment">#最大延迟时间</span></span><br><span class="line"><span class="comment"># the jobs will be started during the following hours only</span></span><br><span class="line">START_HOURS_RANGE=<span class="number">3</span>-<span class="number">22</span>     <span class="comment">#只有在3-22点之间执行任务</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#period in days   delay in minutes   job-identifier   command</span></span><br><span class="line"><span class="number">1</span>    <span class="number">5</span>    cron.daily        nice run-parts /etc/cron.daily</span><br><span class="line"><span class="number">7</span>    <span class="number">25</span>    cron.weekly        nice run-parts /etc/cron.weekly</span><br><span class="line"><span class="variable">@monthly</span> <span class="number">45</span>    cron.monthly        nice run-parts /etc/cron.monthly</span><br></pre></td></tr></table></figure>
+
+<p>以上anacrontab配置文件最重要的是最后一部分，以这行为例：</p>
+<p>1    5    cron.daily        nice run-parts /etc/cron.daily</p>
+<p>表示每天都执行/etc/cront.daily/目录下的脚本文件，真实的延迟是RANDOM_DELAY+delay。这里的延迟是5分钟，加上上面的RANDOM_DELAY，所以实际的延迟时间是5-50之间，开始时间为03-22点，如果机器没关，那么一般就是在03:05-03:50之间执行。<font color="#DC143C" size="3">nice命令将该进程设置为nice=10，默认为0，即低优先级进程。</font>如果RANDOM_DELAY=0，那么表示准确延迟5min，即03:05执行cron.daily内的脚本。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[root@<span class="built_in">test</span> ~]<span class="comment"># cat /etc/cron.daily/logrotate  #最后在cron.daily内有logrotate的调用脚本</span></span><br><span class="line"><span class="meta">#!/bin/sh</span></span><br><span class="line"></span><br><span class="line">/usr/sbin/logrotate /etc/logrotate.conf       <span class="comment">#logrotate将会读取配置文件，最终会读取到/etc/logrotate.d/nginx</span></span><br><span class="line">EXITVALUE=$?</span><br><span class="line"><span class="keyword">if</span> [ <span class="variable">$EXITVALUE</span> != 0 ]; <span class="keyword">then</span></span><br><span class="line">    /usr/bin/logger -t logrotate <span class="string">“ALERT exited abnormally with [<span class="variable">$EXITVALUE</span>]”</span></span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"><span class="built_in">exit</span> 0</span><br></pre></td></tr></table></figure>
+
+<p>当logrotate命令加载了/etc/logrotate.d/nginx配置文件时，还要比较nginx日志的归档日期：</p>
+<figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@test ~]# cat /var/lib/logrotate.status | grep /root</span><br><span class="line"><span class="string">“/root/install-2017-5-14.log”</span> <span class="number">2017</span><span class="number">-5</span><span class="number">-21</span>   #如果今天是<span class="number">2017</span><span class="number">-5</span><span class="number">-21</span>，这个文件里也是<span class="number">2017</span><span class="number">-5</span><span class="number">-21</span>，说明今天已经归档过了，否则就会归档（分割）nginx日志</span><br></pre></td></tr></table></figure>
+
+<p>综上，整个逻辑流程为：</p>
+<p>crond服务加载/etc/cron.d/0hourly —&gt;在每小时的01分执行/etc/cront.hourly/0anacron —&gt;执行anacron —&gt;根据/etc/anacrontab的配置执行/etc/cron.daily，/etc/cron.weekly，/etc/cron.monthly —&gt;执行/etc/cron.daily/下的logrotate脚本 —&gt;执行logrotate —&gt;根据/etc/logrotate.conf配置执行脚本/etc/logrotate.d/nginx —&gt;分割nginx日志成功</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Logrotate/" rel="tag"># Logrotate</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/08/19/基于k8s-动态配置及扩容maven-nexus私服/" rel="next" title="基于k8s 动态配置及扩容maven nexus私服">
+                <i class="fa fa-chevron-left"></i> 基于k8s 动态配置及扩容maven nexus私服
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/08/19/ES内置账号密码修改、自定义角色自定义账号、ldap及AD认证/" rel="prev" title="ES内置账号密码修改、自定义角色自定义账号、ldap及AD认证">
+                ES内置账号密码修改、自定义角色自定义账号、ldap及AD认证 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">chucz</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/归档/">
+              
+                  <span class="site-state-item-count">41</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">37</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/livecityccz" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:livecityccz@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://plus.google.com/livecityccz" target="_blank" title="Google">
+                      
+                        <i class="fa fa-fw fa-google"></i>Google</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://twitter.com/livecityccz" target="_blank" title="Twitter">
+                      
+                        <i class="fa fa-fw fa-twitter"></i>Twitter</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.facebook.com/livecityccz" target="_blank" title="FB Page">
+                      
+                        <i class="fa fa-fw fa-facebook"></i>FB Page</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://youtube.com/livecityccz" target="_blank" title="YouTube">
+                      
+                        <i class="fa fa-fw fa-youtube"></i>YouTube</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">chucz</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

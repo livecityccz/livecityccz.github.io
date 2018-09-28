@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="爬虫技术,exp,phantomjs爬虫," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="诗和田野" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="磨刀不误砍柴工  　　最近需要收集一些exp，因此逛了逛exploit-db、国内exp搜索大全、seebug等几个exp收集的网站。由于需要批量获取漏洞信息以及对应的exp内容，因此心想有必要写一款爬虫去自动化收集漏洞exp。 选个target　　前面三个网站都有丰富的exp资源，但是我并不打算从它们身上去爬取，这里介绍另外一个更牛逼的网站：0day.today（需要翻墙）。选取它的原因是ex">
+<meta name="keywords" content="爬虫技术,exp,phantomjs爬虫">
+<meta property="og:type" content="article">
+<meta property="og:title" content="记一次爬虫批量爬取exp">
+<meta property="og:url" content="http://chucz.club/2018/03/26/记一次爬虫批量爬取exp/index.html">
+<meta property="og:site_name" content="诗和田野">
+<meta property="og:description" content="磨刀不误砍柴工  　　最近需要收集一些exp，因此逛了逛exploit-db、国内exp搜索大全、seebug等几个exp收集的网站。由于需要批量获取漏洞信息以及对应的exp内容，因此心想有必要写一款爬虫去自动化收集漏洞exp。 选个target　　前面三个网站都有丰富的exp资源，但是我并不打算从它们身上去爬取，这里介绍另外一个更牛逼的网站：0day.today（需要翻墙）。选取它的原因是ex">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://chucz.club/upload_image/20180327/3.png">
+<meta property="og:image" content="http://chucz.club/upload_image/20180327/4.png">
+<meta property="og:image" content="http://chucz.club/upload_image/20180327/1.png">
+<meta property="og:image" content="http://chucz.club/upload_image/20180327/2.png">
+<meta property="og:updated_time" content="2018-09-28T08:51:24.508Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="记一次爬虫批量爬取exp">
+<meta name="twitter:description" content="磨刀不误砍柴工  　　最近需要收集一些exp，因此逛了逛exploit-db、国内exp搜索大全、seebug等几个exp收集的网站。由于需要批量获取漏洞信息以及对应的exp内容，因此心想有必要写一款爬虫去自动化收集漏洞exp。 选个target　　前面三个网站都有丰富的exp资源，但是我并不打算从它们身上去爬取，这里介绍另外一个更牛逼的网站：0day.today（需要翻墙）。选取它的原因是ex">
+<meta name="twitter:image" content="http://chucz.club/upload_image/20180327/3.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://chucz.club/2018/03/26/记一次爬虫批量爬取exp/"/>
+
+
+
+
+
+  <title>记一次爬虫批量爬取exp | 诗和田野</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">诗和田野</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">生活不苟且</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/首页" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/标签/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/分类/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/归档/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://chucz.club/2018/03/26/记一次爬虫批量爬取exp/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="chucz">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="诗和田野">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">记一次爬虫批量爬取exp</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-26T19:20:08+00:00">
+                2018-03-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>磨刀不误砍柴工</p>
+</blockquote>
+<p>　　最近需要收集一些exp，因此逛了逛<a href="https://www.exploit-db.com/" target="_blank" rel="noopener">exploit-db</a>、<a href="http://expku.com/" target="_blank" rel="noopener">国内exp搜索大全</a>、<a href="https://www.seebug.org/" target="_blank" rel="noopener">seebug</a>等几个exp收集的网站。由于需要批量获取漏洞信息以及对应的exp内容，因此心想有必要写一款爬虫去自动化收集漏洞exp。<br><a id="more"></a></p>
+<h3 id="选个target"><a href="#选个target" class="headerlink" title="选个target"></a><a href="#选个target" title="选个target"></a>选个target</h3><p>　　前面三个网站都有丰富的exp资源，但是我并不打算从它们身上去爬取，这里介绍另外一个更牛逼的网站：<a href="https://cn.0day.today/" target="_blank" rel="noopener">0day.today</a>（需要翻墙）。选取它的原因是exp更新的更快更丰富，且反爬虫策略做的比较一般。</p>
+<h3 id="分析URL结构"><a href="#分析URL结构" class="headerlink" title="分析URL结构"></a><a href="#分析URL结构" title="分析URL结构"></a>分析URL结构</h3><p>选好目标后，先尝试分析下网页结构，比如需要判断是动态还是静态页面等特征。此网站算是动态的，其漏洞列表URL结构如下：</p>
+<ul>
+<li>cn.0day.today/webapps/1（web漏洞列表第一页）</li>
+<li>cn.0day.today/webapps/2（web漏洞列表第二页）</li>
+<li>cn.0day.today/remote/1（远程利用漏洞列表第一页）</li>
+<li>cn.0day.today/local/1（本地利用漏洞列表第一页）</li>
+<li>……</li>
+</ul>
+<p>每个漏洞列表页面内有30个漏洞列表，每个漏洞列表对应一个漏洞URL，结构如下：</p>
+<ul>
+<li>cn.0day.today/exploit/30029</li>
+<li>cn.0day.today/exploit/30030</li>
+</ul>
+<p>说明：此URL内容便是某个漏洞的exp，粗略算一下，web漏洞有600页，每页30个，总数是18000个漏洞exp。</p>
+<h3 id="分析网页内容"><a href="#分析网页内容" class="headerlink" title="分析网页内容"></a><a href="#分析网页内容" title="分析网页内容"></a>分析网页内容</h3><p>　　分析完URL结构，大致可以得出爬虫思路：遍历漏洞列表页数获取全部漏洞URL–&gt;爬取漏洞URL获取漏洞exp。<br>　　那么如何通过爬取漏洞列表页面获取漏洞对应的URL，以及如何爬取漏洞信息页面获取exp？，这里需要分析一下页面结构，可以尝试写正则或者摘取网页元素内容的方式获取目标内容。</p>
+<h4 id="获取漏洞URL"><a href="#获取漏洞URL" class="headerlink" title="获取漏洞URL"></a><a href="#获取漏洞URL" title="获取漏洞URL"></a>获取漏洞URL</h4><p>页面结构：<br><img src="/upload_image/20180327/3.png" alt=""><br>对于此页面我没有使用正则，而是使用了BeautifulSoup模块来获取网页元素内容，代码如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">soup=BeautifulSoup(content,<span class="string">“html.parser”</span>)</div><div class="line">n=soup.find_all(<span class="string">“div”</span>,&#123;<span class="string">“class”</span>:<span class="string">“ExploitTableContent”</span>&#125;)</div><div class="line"><span class="keyword">if</span> n:</div><div class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> n:</div><div class="line">        m=i.find_all(<span class="string">“div”</span>,&#123;<span class="string">“class”</span>:<span class="string">“td allow_tip “</span>&#125;)</div><div class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> m:</div><div class="line">            y=j.find_all(<span class="string">“a”</span>)</div><div class="line">            <span class="keyword">for</span> x <span class="keyword">in</span> y:</div><div class="line">                vul_name=x.text <span class="comment"># 漏洞名称</span></div><div class="line">                vul_url=x.attrs.get(<span class="string">“href”</span>) <span class="comment"># 漏洞url</span></div></pre></td></tr></table></figure>
+
+<h4 id="获取漏洞EXP"><a href="#获取漏洞EXP" class="headerlink" title="获取漏洞EXP"></a><a href="#获取漏洞EXP" title="获取漏洞EXP"></a>获取漏洞EXP</h4><p>页面结构：<br><img src="/upload_image/20180327/4.png" alt=""><br>对于此页面我也没有使用正则，而是使用了BeautifulSoup模块来获取网页元素内容，代码如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">soup=BeautifulSoup(content,<span class="string">“html.parser”</span>)</div><div class="line">m=soup.find_all(<span class="string">“div”</span>,&#123;<span class="string">“class”</span>:<span class="string">“container”</span>&#125;)</div><div class="line">n=m[0].find_all(<span class="string">“div”</span>)</div><div class="line">exp_info=<span class="string">“”</span></div><div class="line"><span class="keyword">for</span> i <span class="keyword">in</span> n:</div><div class="line">    exp_info+=i.text+<span class="string">“\n”</span></div></pre></td></tr></table></figure>
+
+<h3 id="反爬虫策略"><a href="#反爬虫策略" class="headerlink" title="反爬虫策略"></a><a href="#反爬虫策略" title="反爬虫策略"></a>反爬虫策略</h3><p>我在连续访问n次网站后，发现此站有一些反爬虫的策略。而我必须研究解决它，才能进一步获取exp内容。</p>
+<h4 id="cdn防ddos策略"><a href="#cdn防ddos策略" class="headerlink" title="cdn防ddos策略"></a><a href="#cdn防ddos策略" title="cdn防ddos策略"></a>cdn防ddos策略</h4><p>　　首先我发现此网站用了cloudflare加速器，且在用户持续访问一段时间后（应该是基于ip+headers认证），会出现防ddos页面。如果此时用普通的爬虫去访问，获取到的页面源码是防ddos的源码，即：<br><img src="/upload_image/20180327/1.png" alt=""></p>
+<h4 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a><a href="#解决方案" title="解决方案"></a>解决方案</h4><p>　　当我们打开浏览器访问漏洞页面时，会在防ddos页面上等待几秒后，自动跳转到目标漏洞页面。基于这一特性，我决定使用无头浏览器去访问，设置等待时间即可。这里我选用phantomjs做此试验，其他headless同理。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">d=webdriver.PhantomJS()</div><div class="line">d.get(vul_api)</div><div class="line">time.sleep(5) <span class="comment"># 等待5s</span></div><div class="line"><span class="built_in">print</span> d.page_source <span class="comment"># 输出源码</span></div></pre></td></tr></table></figure>
+
+<p>在访问网页5s后，输出的网页源码，便是目标漏洞exp页面的源码。</p>
+<h4 id="用户点击确认"><a href="#用户点击确认" class="headerlink" title="用户点击确认"></a><a href="#用户点击确认" title="用户点击确认"></a>用户点击确认</h4><p>　　在绕过了防ddos策略后，发现网站自身也有一个反爬虫的策略，即需要用户点击确认按钮后，才能继续访问原目标。如果此时用普通的爬虫去访问，获取到的页面源码是用户确认网页的源码，即：<br><img src="/upload_image/20180327/2.png" alt=""></p>
+<h4 id="解决方案-1"><a href="#解决方案-1" class="headerlink" title="解决方案"></a><a href="#解决方案-1" title="解决方案"></a>解决方案</h4><p>　　此网页需要用户点击“确定”按钮后，会跳转到目标页面，因此可以使用无头浏览器访问，操作页面元素，即模拟点击确定按钮。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">d=webdriver.PhantomJS()</div><div class="line">d.get(vul_api)</div><div class="line">time.sleep(5) <span class="comment"># 等待5s（绕过防ddos策略）</span></div><div class="line"></div><div class="line">d.find_element_by_name(<span class="string">“agree”</span>).click() <span class="comment"># 点击确定按钮（绕过用户点击确认策略）</span></div><div class="line">time.sleep(5) <span class="comment"># 等待5s</span></div><div class="line">content=d.page_source <span class="comment"># 输出网页源码</span></div><div class="line">d.quit()</div></pre></td></tr></table></figure>
+
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a><a href="#总结" title="总结"></a>总结</h3><p>　　想要爬取一个网站的内容，必须要分析此网站的URL结构、网页内容、反爬虫策略等。针对此网站而言，复杂点在于如何绕过反爬虫策略，这里用到了无头浏览器去模拟人访问。总之编写爬虫是需要耐心跟细心的，如何一步步去分析整个访问流程，有时候比如何去编程更重要。也许，这就是所谓的：“磨刀不误砍柴工”吧！</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/爬虫技术/" rel="tag"># 爬虫技术</a>
+          
+            <a href="/tags/exp/" rel="tag"># exp</a>
+          
+            <a href="/tags/phantomjs爬虫/" rel="tag"># phantomjs爬虫</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/03/18/hexo使用进阶/" rel="next" title="hexo使用进阶">
+                <i class="fa fa-chevron-left"></i> hexo使用进阶
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/04/02/ELK的一次吞吐量优化/" rel="prev" title="ELK的一次吞吐量优化">
+                ELK的一次吞吐量优化 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">chucz</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/归档/">
+              
+                  <span class="site-state-item-count">41</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">37</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/livecityccz" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:livecityccz@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://plus.google.com/livecityccz" target="_blank" title="Google">
+                      
+                        <i class="fa fa-fw fa-google"></i>Google</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://twitter.com/livecityccz" target="_blank" title="Twitter">
+                      
+                        <i class="fa fa-fw fa-twitter"></i>Twitter</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.facebook.com/livecityccz" target="_blank" title="FB Page">
+                      
+                        <i class="fa fa-fw fa-facebook"></i>FB Page</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://youtube.com/livecityccz" target="_blank" title="YouTube">
+                      
+                        <i class="fa fa-fw fa-youtube"></i>YouTube</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#选个target"><span class="nav-number">1.</span> <span class="nav-text">选个target</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分析URL结构"><span class="nav-number">2.</span> <span class="nav-text">分析URL结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#分析网页内容"><span class="nav-number">3.</span> <span class="nav-text">分析网页内容</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#获取漏洞URL"><span class="nav-number">3.1.</span> <span class="nav-text">获取漏洞URL</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#获取漏洞EXP"><span class="nav-number">3.2.</span> <span class="nav-text">获取漏洞EXP</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#反爬虫策略"><span class="nav-number">4.</span> <span class="nav-text">反爬虫策略</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#cdn防ddos策略"><span class="nav-number">4.1.</span> <span class="nav-text">cdn防ddos策略</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#解决方案"><span class="nav-number">4.2.</span> <span class="nav-text">解决方案</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#用户点击确认"><span class="nav-number">4.3.</span> <span class="nav-text">用户点击确认</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#解决方案-1"><span class="nav-number">4.4.</span> <span class="nav-text">解决方案</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">chucz</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
