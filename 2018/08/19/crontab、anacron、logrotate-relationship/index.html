@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>crontab、anacron、logrotate relationship | chucz&#39;s blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="服务器上的nginx使用logrotate来分割日志，设置为每天分割。但是logrotate似乎没有工作，日志并没有分割。服务器是CentOS 6。 为了找到原因，分析可能出错的地方。如果是logrotate未执行，可能是crond没有启动，因为logrotate被/etc/cron.daily/logrotate脚本所启动，可以查看其中代码： 123456789[root@test ~]# ca">
+<meta name="keywords" content="Logrotate">
+<meta property="og:type" content="article">
+<meta property="og:title" content="crontab、anacron、logrotate relationship">
+<meta property="og:url" content="http://chucz.club/2018/08/19/crontab、anacron、logrotate-relationship/index.html">
+<meta property="og:site_name" content="chucz&#39;s blog">
+<meta property="og:description" content="服务器上的nginx使用logrotate来分割日志，设置为每天分割。但是logrotate似乎没有工作，日志并没有分割。服务器是CentOS 6。 为了找到原因，分析可能出错的地方。如果是logrotate未执行，可能是crond没有启动，因为logrotate被/etc/cron.daily/logrotate脚本所启动，可以查看其中代码： 123456789[root@test ~]# ca">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-09-28T08:25:28.616Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="crontab、anacron、logrotate relationship">
+<meta name="twitter:description" content="服务器上的nginx使用logrotate来分割日志，设置为每天分割。但是logrotate似乎没有工作，日志并没有分割。服务器是CentOS 6。 为了找到原因，分析可能出错的地方。如果是logrotate未执行，可能是crond没有启动，因为logrotate被/etc/cron.daily/logrotate脚本所启动，可以查看其中代码： 123456789[root@test ~]# ca">
+  
+    <link rel="alternate" href="/atom.xml" title="chucz&#39;s blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">chucz&#39;s blog</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://chucz.club"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-crontab、anacron、logrotate-relationship" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/08/19/crontab、anacron、logrotate-relationship/" class="article-date">
+  <time datetime="2018-08-19T09:55:15.000Z" itemprop="datePublished">2018-08-19</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      crontab、anacron、logrotate relationship
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>服务器上的nginx使用logrotate来分割日志，设置为每天分割。但是logrotate似乎没有工作，日志并没有分割。服务器是CentOS 6。</p>
+<p>为了找到原因，分析可能出错的地方。<br>如果是logrotate未执行，可能是crond没有启动，因为logrotate被/etc/cron.daily/logrotate脚本所启动，可以查看其中代码：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[root@<span class="built_in">test</span> ~]<span class="comment"># cat /etc/cron.daily/logrotate</span></span><br><span class="line"><span class="meta">#!/bin/sh</span></span><br><span class="line"></span><br><span class="line">/usr/sbin/logrotate /etc/logrotate.conf</span><br><span class="line">EXITVALUE=$?</span><br><span class="line"><span class="keyword">if</span> [ <span class="variable">$EXITVALUE</span> != 0 ]; <span class="keyword">then</span></span><br><span class="line">    /usr/bin/logger -t logrotate <span class="string">“ALERT exited abnormally with [<span class="variable">$EXITVALUE</span>]”</span></span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"><span class="built_in">exit</span> 0</span><br></pre></td></tr></table></figure>
+
+<p>可以看到logrotate运行时加载配置文件logrotate.conf，而这个配置文件除了设定一些分割日志相关的选项，还包含分割日志的配置文件目录/etc/logrotate.d。</p>
+<p>nginx的日志分割配置文件就保存在logrotate.d目录：</p>
+<figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">[root@test ~]<span class="meta"># cat !$</span></span><br><span class="line">cat <span class="meta-keyword">/etc/</span>logrotate.d/nginx</span><br><span class="line"><span class="meta-keyword">/root/</span>*.<span class="class">log </span>&#123;</span><br><span class="line">    Daily</span><br><span class="line">    Missingok</span><br><span class="line">    rotate <span class="number">52</span></span><br><span class="line">    compress</span><br><span class="line">    delaycompress</span><br><span class="line">    notifempty</span><br><span class="line">    dateext</span><br><span class="line">    create <span class="number">644</span> nobody nobody</span><br><span class="line">    sharedscripts</span><br><span class="line">    postrotate</span><br><span class="line">    [ -f <span class="meta-keyword">/usr/</span>local<span class="meta-keyword">/nginx/</span>logs/nginx.pid ] &amp;&amp; kill -USR1 <code>cat &lt;span class=&quot;meta-keyword&quot;&gt;/usr/&lt;/span&gt;local&lt;span class=&quot;meta-keyword&quot;&gt;/nginx/&lt;/span&gt;logs/nginx.pid</code></span><br><span class="line">    endscript</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>/root/<em>.log就是需要被分割的日志的目录，通配符</em>表示目录内的所有log文件都被分割，分割的规则就是{…}中的内容。这里把/root/*.log当做nginx日志只是为了测试。<br>在启动crond服务后，发现日志还是没有分割，于是想到会不会是/etc/logrotate.d/nginx配置文件的语法有问题，使用以下命令调试这个文件：</p>
+<figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">logrotate -vfd <span class="meta-keyword">/etc/</span>logrotate.d/nginx  <span class="meta"># -vfd 三个选项分别表示显示详情，强制分割日志，只是调试配置文件而不是真的分割日志</span></span><br></pre></td></tr></table></figure>
+
+<p>输出结果表明有语法错误，Daily，Missingok 都应该是小写。改成daily，missingok。再次调试配置文件，可以正确分割日志：</p>
+<figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[root@test ~]# ls <span class="number">-1</span> /root/</span><br><span class="line">install<span class="number">-2017</span><span class="number">-5</span><span class="number">-14.</span>log</span><br><span class="line">install<span class="number">-2017</span><span class="number">-5</span><span class="number">-14.</span>log<span class="number">-20170521</span>  #logrotate归档的日志</span><br></pre></td></tr></table></figure>
+
+<p>上面猜测是crond执行/etc/cron.daily/内的脚本，实现定时执行计划任务，包括执行logrotate日志分割。<br>为了验证是否正确，网上搜索一番后找到了答案。如果没有crontab命令，先安装：</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">yum install crontabs  <span class="comment">#安装crond，crond实际上来自cronie包，这个包作为crontabs包的依赖被安装</span></span><br><span class="line">chkconfig –<span class="keyword">add</span><span class="bash"> crond <span class="comment">#添加到开机启动列表</span></span></span><br><span class="line"><span class="bash">chkconfig crond on    <span class="comment">#开机启动crond服务</span></span></span><br><span class="line"><span class="bash">/etc/init.d/crond     <span class="comment">#立即启动crond</span></span></span><br></pre></td></tr></table></figure><a id="more"></a><br><br>以下文件或目录的作用：<br>cron计划任务有两种类型：<br><br><em>   1）系统cron任务：由crond服务执行，/etc/crontab配置系统级别的任务
+</em>   2）用户cron任务：由crond服务执行，用crontab命令编辑用户级别的任务<font color="#DC143C" size="3">属于系统cron任务的文件或目录：</font><br><br><em>   /etc/cron.d             #系统的任务脚本。执行 rpm -ql cronie 可以看到该目录被cronie包安装
+</em>   /etc/cron.hourly     #每小时执行其内脚本。其中的0anacron文件调用anacron来执行任务，它被包cronie-anacron安装<br><em>   /etc/cron.daily        #每天执行其内脚本。也被anacron执行其内脚本，logrotate调用脚本就在该目录内
+</em>   /etc/cron.weekly     #每周执行其内脚本。<br><em>   /etc/cron.monthly   #每月执行其内脚本。<br><br><font color="#DC143C" size="3">控制用户cron任务的执行：</font>
+
+</em>   /etc/cron.allow   #默认不存在，如果这个文件存在，只有用户在这个文件中才能使用crontab命令<br><em>   /etc/cron.deny    #将不可以使用crontab命令的用户写入其中<br><br>注意：cron.allow和cron.deny就是用户名的列表，每行一个用户名。比如 cron.deny中有一行jason，效果是如果当前登录用户是jason，执行 crontab -e会提示不允许使用crontab命令。<br><br>以下三个目录的作用：<br><br>/var/spool/cron/USER_NAME<br><br>#这个文件才是跟crontab -e/-l 关联的，这个文件保存了crontab -e编辑的任务内容<br><br>#比如执行 crontab -u root -e，编辑保存后，就会有/var/spool/cron/root 这个文件<br><br>/var/spool/anacron/{cron.daily,cron.monthly,cron.weekly}<br><br>#这三个文件记录了anacron上一次执行的时间（上一天，上一周或上一月）<br><br>#anacron任务执行时，对照这里的时间，决定是否执行anacron任务<br><br>/var/lib/logrotate.status<br><br>#这个文件记录logrotate执行情况，logrotate参考这个文件来决定是否需要rotate日志<br><br>crontab和anacron和logrotate的关系：<br><figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@test ~]<span class="comment"># cat /etc/cron.d/0hourly     #这个文件指定每小时的01分执行/etc/cron.hourly内的所有脚本</span></span><br><span class="line">SHELL=/bin/bash</span><br><span class="line">PATH=/sbin:/bin:/usr/sbin:/usr/bin</span><br><span class="line">MAILTO=root</span><br><span class="line">HOME=/</span><br><span class="line">01 </span></pre></td></tr></table></figure></em> <em> </em> * root run-parts /etc/cron.hourly  <span class="comment">#这里的root指定执行任务的用户，run-parts其实是一个可执行脚本，在/usr/bin/run-parts，用来执行cron.hourly目录内的所有脚本</span><br>
+
+<p>说明：用crontab -e命令每次编辑完某个用户的cron设置后，cron自动在/var/spool/cron下生成一个与此用户同名的文件，此用户的cron信息都记录在这个文件中。cron启动后每过一份钟读一次这个文件，检查是否要执行里面的命令。因此此文件修改后不需要重新启动cron服务。cron服务每分钟不仅要读一次/var/spool/cron内的所有文件，还需要读一次/etc/crontab，因此我们配置这个文件也能运用cron服务做一些事情。用crontab命令配置是针对某个用户的，而编辑/etc/crontab是针对系统的任务。此文件的文件格式是：</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">SHELL=<span class="regexp">/bin/bash</span></span><br><span class="line">PATH=<span class="regexp">/sbin:/bin</span><span class="symbol">:/usr/sbin</span><span class="symbol">:/usr/bin</span>     <span class="comment">#可执行文件查找路径</span></span><br><span class="line">MAILTO=root      <span class="comment">#如果出现错误，或者有数据输出，数据作为邮件发给这个帐号</span></span><br><span class="line">HOME=<span class="regexp">/           #使用者运行的路径，这里是根目录</span></span><br></pre></td></tr></table></figure><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">[root@<span class="built_in">test</span> ~]<span class="comment"># cat /etc/cron.hourly/0anacron   #cron.hourly目录下的脚本，根据条件执行anacron命令</span></span><br><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"><span class="comment"># Skip excecution unless the date has changed from the previous run</span></span><br><span class="line"><span class="keyword">if</span> <span class="built_in">test</span> -r /var/spool/anacron/cron.daily; <span class="keyword">then</span></span><br><span class="line">    day=<code>cat /var/spool/anacron/cron.daily</code></span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"><span class="keyword">if</span> [ <code>date +%Y%m%d</code> = <span class="string">“<span class="variable">$day</span>“</span> ]; <span class="keyword">then</span></span><br><span class="line">    <span class="built_in">exit</span> 0;</span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Skip excecution unless AC powered</span></span><br><span class="line"><span class="keyword">if</span> <span class="built_in">test</span> -x /usr/bin/on_ac_power; <span class="keyword">then</span></span><br><span class="line">    /usr/bin/on_ac_power &amp;&gt; /dev/null</span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">test</span> $? -eq 1; <span class="keyword">then</span></span><br><span class="line">    <span class="built_in">exit</span> 0</span><br><span class="line">    <span class="keyword">fi</span></span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line">/usr/sbin/anacron -s</span><br></pre></td></tr></table></figure><figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">[root<span class="variable">@test</span> ~]<span class="comment"># cat /etc/anacrontab   #如果执行anacron命令，那么接着查看anacron的配置文件</span></span><br><span class="line"><span class="comment"># /etc/anacrontab: configuration file for anacron</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># See anacron(8) and anacrontab(5) for details.</span></span><br><span class="line"></span><br><span class="line">SHELL=<span class="regexp">/bin/sh</span></span><br><span class="line">PATH=<span class="regexp">/sbin:/bin</span><span class="symbol">:/usr/sbin</span><span class="symbol">:/usr/bin</span></span><br><span class="line">MAILTO=root</span><br><span class="line"><span class="comment"># the maximal random delay added to the base delay of the jobs</span></span><br><span class="line">RANDOM_DELAY=<span class="number">45</span>     <span class="comment">#最大延迟时间</span></span><br><span class="line"><span class="comment"># the jobs will be started during the following hours only</span></span><br><span class="line">START_HOURS_RANGE=<span class="number">3</span>-<span class="number">22</span>     <span class="comment">#只有在3-22点之间执行任务</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#period in days   delay in minutes   job-identifier   command</span></span><br><span class="line"><span class="number">1</span>    <span class="number">5</span>    cron.daily        nice run-parts /etc/cron.daily</span><br><span class="line"><span class="number">7</span>    <span class="number">25</span>    cron.weekly        nice run-parts /etc/cron.weekly</span><br><span class="line"><span class="variable">@monthly</span> <span class="number">45</span>    cron.monthly        nice run-parts /etc/cron.monthly</span><br></pre></td></tr></table></figure>
+
+<p>以上anacrontab配置文件最重要的是最后一部分，以这行为例：</p>
+<p>1    5    cron.daily        nice run-parts /etc/cron.daily</p>
+<p>表示每天都执行/etc/cront.daily/目录下的脚本文件，真实的延迟是RANDOM_DELAY+delay。这里的延迟是5分钟，加上上面的RANDOM_DELAY，所以实际的延迟时间是5-50之间，开始时间为03-22点，如果机器没关，那么一般就是在03:05-03:50之间执行。<font color="#DC143C" size="3">nice命令将该进程设置为nice=10，默认为0，即低优先级进程。</font>如果RANDOM_DELAY=0，那么表示准确延迟5min，即03:05执行cron.daily内的脚本。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[root@<span class="built_in">test</span> ~]<span class="comment"># cat /etc/cron.daily/logrotate  #最后在cron.daily内有logrotate的调用脚本</span></span><br><span class="line"><span class="meta">#!/bin/sh</span></span><br><span class="line"></span><br><span class="line">/usr/sbin/logrotate /etc/logrotate.conf       <span class="comment">#logrotate将会读取配置文件，最终会读取到/etc/logrotate.d/nginx</span></span><br><span class="line">EXITVALUE=$?</span><br><span class="line"><span class="keyword">if</span> [ <span class="variable">$EXITVALUE</span> != 0 ]; <span class="keyword">then</span></span><br><span class="line">    /usr/bin/logger -t logrotate <span class="string">“ALERT exited abnormally with [<span class="variable">$EXITVALUE</span>]”</span></span><br><span class="line"><span class="keyword">fi</span></span><br><span class="line"><span class="built_in">exit</span> 0</span><br></pre></td></tr></table></figure>
+
+<p>当logrotate命令加载了/etc/logrotate.d/nginx配置文件时，还要比较nginx日志的归档日期：</p>
+<figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@test ~]# cat /var/lib/logrotate.status | grep /root</span><br><span class="line"><span class="string">“/root/install-2017-5-14.log”</span> <span class="number">2017</span><span class="number">-5</span><span class="number">-21</span>   #如果今天是<span class="number">2017</span><span class="number">-5</span><span class="number">-21</span>，这个文件里也是<span class="number">2017</span><span class="number">-5</span><span class="number">-21</span>，说明今天已经归档过了，否则就会归档（分割）nginx日志</span><br></pre></td></tr></table></figure>
+
+<p>综上，整个逻辑流程为：</p>
+<p>crond服务加载/etc/cron.d/0hourly —&gt;在每小时的01分执行/etc/cront.hourly/0anacron —&gt;执行anacron —&gt;根据/etc/anacrontab的配置执行/etc/cron.daily，/etc/cron.weekly，/etc/cron.monthly —&gt;执行/etc/cron.daily/下的logrotate脚本 —&gt;执行logrotate —&gt;根据/etc/logrotate.conf配置执行脚本/etc/logrotate.d/nginx —&gt;分割nginx日志成功</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://chucz.club/2018/08/19/crontab、anacron、logrotate-relationship/" data-id="cjmlreasb0012ljrmux6r96zf" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Logrotate/">Logrotate</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/08/19/ES内置账号密码修改、自定义角色自定义账号、ldap及AD认证/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          ES内置账号密码修改、自定义角色自定义账号、ldap及AD认证
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/08/19/基于k8s-动态配置及扩容maven-nexus私服/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">基于k8s 动态配置及扩容maven nexus私服</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ELK/">ELK</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/K8s/">K8s</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kafka/">Kafka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Logrotate/">Logrotate</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SyncWriteStream/">SyncWriteStream</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/x-pack/">x-pack</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/ELK/" style="font-size: 20px;">ELK</a> <a href="/tags/K8s/" style="font-size: 16.67px;">K8s</a> <a href="/tags/Kafka/" style="font-size: 10px;">Kafka</a> <a href="/tags/Logrotate/" style="font-size: 10px;">Logrotate</a> <a href="/tags/SyncWriteStream/" style="font-size: 10px;">SyncWriteStream</a> <a href="/tags/docker/" style="font-size: 10px;">docker</a> <a href="/tags/hexo/" style="font-size: 13.33px;">hexo</a> <a href="/tags/x-pack/" style="font-size: 10px;">x-pack</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">August 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">February 2018</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/09/28/hello-world/">Hello World</a>
+          </li>
+        
+          <li>
+            <a href="/2018/08/21/生成k8s证书的三种方式/">生成k8s证书的三种方式</a>
+          </li>
+        
+          <li>
+            <a href="/2018/08/19/23种非常有用的ElasticSearch查询例子/">23种非常有用的ElasticSearch查询例子</a>
+          </li>
+        
+          <li>
+            <a href="/2018/08/19/ElasticSearch-索引查询使用指南/">ElasticSearch 索引查询使用指南</a>
+          </li>
+        
+          <li>
+            <a href="/2018/08/19/ES内置账号密码修改、自定义角色自定义账号、ldap及AD认证/">ES内置账号密码修改、自定义角色自定义账号、ldap及AD认证</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 chucz<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

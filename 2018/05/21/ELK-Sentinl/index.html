@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>ELK Sentinl | chucz&#39;s blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Sentinl简介Sentinl 5扩展自Kibi / Kibana 5，具有警报和报告功能，可使用标准查询，可编程验证器和各种可配置操作来监控，通知和报告数据系列更改 - 将其视为一个独立的“观察者” “报告”功能（PNG / PDFs快照）。 SENTINEL还旨在通过直接在Kibana UI中整合来简化在Kibi / Kibana中创建和管理警报和报告的过程。 功能模块WatchersAla">
+<meta name="keywords" content="ELK">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ELK Sentinl">
+<meta property="og:url" content="http://chucz.club/2018/05/21/ELK-Sentinl/index.html">
+<meta property="og:site_name" content="chucz&#39;s blog">
+<meta property="og:description" content="Sentinl简介Sentinl 5扩展自Kibi / Kibana 5，具有警报和报告功能，可使用标准查询，可编程验证器和各种可配置操作来监控，通知和报告数据系列更改 - 将其视为一个独立的“观察者” “报告”功能（PNG / PDFs快照）。 SENTINEL还旨在通过直接在Kibana UI中整合来简化在Kibi / Kibana中创建和管理警报和报告的过程。 功能模块WatchersAla">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-09-28T08:25:28.616Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ELK Sentinl">
+<meta name="twitter:description" content="Sentinl简介Sentinl 5扩展自Kibi / Kibana 5，具有警报和报告功能，可使用标准查询，可编程验证器和各种可配置操作来监控，通知和报告数据系列更改 - 将其视为一个独立的“观察者” “报告”功能（PNG / PDFs快照）。 SENTINEL还旨在通过直接在Kibana UI中整合来简化在Kibi / Kibana中创建和管理警报和报告的过程。 功能模块WatchersAla">
+  
+    <link rel="alternate" href="/atom.xml" title="chucz&#39;s blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">chucz&#39;s blog</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://chucz.club"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-ELK-Sentinl" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/05/21/ELK-Sentinl/" class="article-date">
+  <time datetime="2018-05-21T02:14:12.000Z" itemprop="datePublished">2018-05-21</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      ELK Sentinl
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="Sentinl简介"><a href="#Sentinl简介" class="headerlink" title="Sentinl简介"></a><a href="#Sentinl简介" title="Sentinl简介"></a>Sentinl简介</h3><p>Sentinl 5扩展自Kibi / Kibana 5，具有警报和报告功能，可使用标准查询，可编程验证器和各种可配置操作来监控，通知和报告数据系列更改 - 将其视为一个独立的“观察者” “报告”功能（PNG / PDFs快照）。</p>
+<p>SENTINEL还旨在通过直接在Kibana UI中整合来简化在Kibi / Kibana中创建和管理警报和报告的过程。</p>
+<h3 id="功能模块"><a href="#功能模块" class="headerlink" title="功能模块"></a><a href="#功能模块" title="功能模块"></a>功能模块</h3><p>Watchers<br>Alarms<br>Reports<br>Watchers是Sentinl核心，主要由 input,Condition,Transform,Actions几大块组成，可以和X-Pack一一对应，部分文档可参考X-Pack，但需要注意的是它和X-Pack还有一些区别，主要体现在input只实现了search，其他并未实现，Actions也并未都实现</p>
+<h3 id="安装与配置"><a href="#安装与配置" class="headerlink" title="安装与配置"></a><a href="#安装与配置" title="安装与配置"></a>安装与配置</h3><ul>
+<li>安装</li>
+</ul>
+<p>/usr/share/kibana/bin/kibana-plugin install <a href="https://github.com/sirensolutions/sentinl/releases/download/tag-5.5/sentinl-v5.6.5.zip" target="_blank" rel="noopener">https://github.com/sirensolutions/sentinl/releases/download/tag-5.5/sentinl-v5.6.5.zip</a></p>
+<ul>
+<li>config</li>
+</ul>
+<p>kibana.yml config:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">sentinl:</span></span><br><span class="line"><span class="attr">  es:</span></span><br><span class="line"><span class="attr">    timefield:</span> <span class="string">‘@timestamp’</span></span><br><span class="line"><span class="attr">    default_index:</span> <span class="string">watcher</span></span><br><span class="line"><span class="attr">    type:</span> <span class="string">watch</span></span><br><span class="line"><span class="attr">    alarm_index:</span> <span class="string">watcher_alarms</span></span><br><span class="line"><span class="attr">  sentinl:</span></span><br><span class="line"><span class="attr">    history:</span> <span class="number">20</span></span><br><span class="line"><span class="attr">    results:</span> <span class="number">50</span></span><br><span class="line"><span class="attr">  settings:</span></span><br><span class="line"><span class="attr">    email:</span></span><br><span class="line"><span class="attr">      active:</span> <span class="literal">false</span></span><br><span class="line"><span class="attr">      user:</span> <span class="string">username</span></span><br><span class="line"><span class="attr">      password:</span> <span class="string">password</span></span><br><span class="line"><span class="attr">      host:</span> <span class="string">smtp.server.com</span></span><br><span class="line"><span class="attr">      ssl:</span> <span class="literal">true</span></span><br><span class="line"><span class="attr">      timeout:</span> <span class="number">10000</span>  <span class="comment"># mail server connection timeout</span></span><br><span class="line"><span class="attr">    slack:</span></span><br><span class="line"><span class="attr">      active:</span> <span class="literal">false</span></span><br><span class="line"><span class="attr">      username:</span> <span class="string">username</span></span><br><span class="line"><span class="attr">      hook:</span> <span class="string">‘<a href="https://hooks.slack.com/services/&lt;token&gt;&#39;" target="_blank" rel="noopener">https://hooks.slack.com/services/&lt;token&gt;&#39;</a></span></span><br><span class="line"><span class="attr">      channel:</span> <span class="string">‘#channel’</span></span><br><span class="line"><span class="attr">    report:</span></span><br><span class="line"><span class="attr">      active:</span> <span class="literal">false</span></span><br><span class="line"><span class="attr">      tmp_path:</span> <span class="string">/tmp/</span></span><br><span class="line"><span class="attr">    pushapps:</span></span><br><span class="line"><span class="attr">      active:</span> <span class="literal">false</span></span><br><span class="line"><span class="attr">      api_key:</span> <span class="string">‘&lt;pushapps API Key&gt;’</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>raw<figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">“input”</span>: &#123;</span><br><span class="line">      <span class="string">“search”</span>: &#123;</span><br><span class="line">        <span class="string">“request”</span>: &#123;</span><br><span class="line">          <span class="string">“index”</span>: [</span><br><span class="line">            <span class="string">“&lt;xxx-&#123;now/d&#125;&gt;”</span></span><br><span class="line">          ],</span><br><span class="line">          <span class="string">“body”</span>: &#123;</span><br><span class="line">            <span class="string">“query”</span>: &#123;</span><br><span class="line">              <span class="string">“bool”</span>: &#123;</span><br><span class="line">                <span class="string">“should”</span>: [</span><br><span class="line">                  &#123;</span><br><span class="line">                    <span class="string">“match”</span>: &#123;</span><br><span class="line">                      <span class="string">“status”</span>: <span class="string">“502”</span></span><br><span class="line">                    &#125;</span><br><span class="line">                  &#125;,</span><br><span class="line">                  &#123;</span><br><span class="line">                    <span class="string">“match”</span>: &#123;</span><br><span class="line">                      <span class="string">“status”</span>: <span class="string">“404”</span></span><br><span class="line">                    &#125;</span><br><span class="line">                  &#125;</span><br><span class="line">                ],</span><br><span class="line">                <span class="string">“minimum_should_match”</span>: <span class="number">1</span>,  #must setup</span><br><span class="line">                <span class="string">“filter”</span>: &#123;</span><br><span class="line">                  <span class="string">“range”</span>: &#123;</span><br><span class="line">                    <span class="string">“@timestamp”</span>: &#123;</span><br><span class="line">                      <span class="string">“gte”</span>: <span class="string">“now-60s”</span>,</span><br><span class="line">                      <span class="string">“lte”</span>: <span class="string">“now”</span></span><br><span class="line">                    &#125;</span><br><span class="line">                  &#125;</span><br><span class="line">                &#125;</span><br><span class="line">              &#125;</span><br><span class="line">            &#125;</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="string">“condition”</span>: &#123;</span><br><span class="line">      <span class="string">“script”</span>: &#123;</span><br><span class="line">        <span class="string">“script”</span>: <span class="string">“payload.hits.total &gt; 30”</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;,</span><br></pre></td></tr></table></figure></li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://chucz.club/2018/05/21/ELK-Sentinl/" data-id="cjmlrearn000uljrm0g3w73s9" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ELK/">ELK</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/08/17/kubernetes-jenkins-ci-cd/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          kubernetes-jenkins-ci-cd
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/04/20/hexo修改默认端口/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">hexo修改默认端口</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ELK/">ELK</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/K8s/">K8s</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kafka/">Kafka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Logrotate/">Logrotate</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SyncWriteStream/">SyncWriteStream</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/x-pack/">x-pack</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/ELK/" style="font-size: 20px;">ELK</a> <a href="/tags/K8s/" style="font-size: 16.67px;">K8s</a> <a href="/tags/Kafka/" style="font-size: 10px;">Kafka</a> <a href="/tags/Logrotate/" style="font-size: 10px;">Logrotate</a> <a href="/tags/SyncWriteStream/" style="font-size: 10px;">SyncWriteStream</a> <a href="/tags/docker/" style="font-size: 10px;">docker</a> <a href="/tags/hexo/" style="font-size: 13.33px;">hexo</a> <a href="/tags/x-pack/" style="font-size: 10px;">x-pack</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">August 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">February 2018</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/09/28/hello-world/">Hello World</a>
+          </li>
+        
+          <li>
+            <a href="/2018/08/21/生成k8s证书的三种方式/">生成k8s证书的三种方式</a>
+          </li>
+        
+          <li>
+            <a href="/2018/08/19/23种非常有用的ElasticSearch查询例子/">23种非常有用的ElasticSearch查询例子</a>
+          </li>
+        
+          <li>
+            <a href="/2018/08/19/ElasticSearch-索引查询使用指南/">ElasticSearch 索引查询使用指南</a>
+          </li>
+        
+          <li>
+            <a href="/2018/08/19/ES内置账号密码修改、自定义角色自定义账号、ldap及AD认证/">ES内置账号密码修改、自定义角色自定义账号、ldap及AD认证</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 chucz<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

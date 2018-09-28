@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>chucz&#39;s blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="chucz&#39;s blog">
+<meta property="og:url" content="http://chucz.club/page/2/index.html">
+<meta property="og:site_name" content="chucz&#39;s blog">
+<meta property="og:locale" content="default">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="chucz&#39;s blog">
+  
+    <link rel="alternate" href="/atom.xml" title="chucz&#39;s blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">chucz&#39;s blog</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://chucz.club"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main">
+  
+    <article id="post-Pause容器" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/08/17/Pause容器/" class="article-date">
+  <time datetime="2018-08-17T07:55:14.000Z" itemprop="datePublished">2018-08-17</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/08/17/Pause容器/">Pause容器</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="Pause容器定义"><a href="#Pause容器定义" class="headerlink" title="Pause容器定义"></a><a href="#Pause容器定义" title="Pause容器定义"></a>Pause容器定义</h2><p>Pause容器，又叫Infra容器，本文将探究该容器的作用与原理。</p>
+<p>在kubelet的配置中有这样一个参数：</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">KUBELET_POD_INFRA_CONTAINER=–pod-infra-container-image=registry<span class="selector-class">.access</span><span class="selector-class">.redhat</span><span class="selector-class">.com</span>/rhel7/pod-infrastructure:latest</span><br></pre></td></tr></table></figure>
+
+<p>上面是openshift中的配置参数，kubernetes中默认的配置参数是：</p>
+<figure class="highlight mel"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">KUBELET_POD_INFRA_CONTAINER=–pod-infra-<span class="keyword">container</span>-<span class="keyword">image</span>=gcr.io/google_containers/<span class="keyword">pause</span>-amd64:<span class="number">3.0</span></span><br></pre></td></tr></table></figure>
+
+<p>Pause容器，是可以自己来定义，官方使用的gcr.io/google_containers/pause-amd64:3.0容器的代码见Github，使用C语言编写。</p>
+<h2 id="Pause容器的作用"><a href="#Pause容器的作用" class="headerlink" title="Pause容器的作用"></a><a href="#Pause容器的作用" title="Pause容器的作用"></a>Pause容器的作用</h2><p>检查nod节点的时候会发现每个node上都运行了很多的pause容器，例如如下:</p>
+<figure class="highlight subunit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[root@elk<span class="string">-02</span> bin]# docker ps</span><br><span class="line">CONTAINER ID        IMAGE                                               COMMAND                  CREATED             STATUS              PORTS               NAMES</span><br><span class="line">576c56bd6065        mirrorgooglecontainers/kubernetes-dashboard-amd64   “/dashboard –inse…”   2 hours ago         Up 2 hours                              k8s_kubernetes-dashboard_kubernetes-dashboard<span class="string">-66</span>c9d98865-jdbg8_kube-system_d2406f4f<span class="string">-6</span>de3<span class="string">-11</span>e8<span class="string">-8760</span><span class="string">-5254004</span>f2222_0</span><br><span class="line">c4985381c2b7        d4b7466213fe                                        “/coredns -conf /e…”   2 hours ago         Up 2 hours                              k8s_coredns_coredns<span class="string">-77</span>c989547b-xq4dr_kube-system_d23ef2c4<span class="string">-6</span>de3<span class="string">-11</span>e8<span class="string">-8760</span><span class="string">-5254004</span>f2222_1</span><br><span class="line">ba2fef1cbf00        mirrorgooglecontainers/pause-amd64:3.0              “/pause”                 2 hours ago         Up 2 hours                              k8s_POD_coredns<span class="string">-77</span>c989547b-xq4dr_kube-system_d23ef2c4<span class="string">-6</span>de3<span class="string">-11</span>e8<span class="string">-8760</span><span class="string">-5254004</span>f2222_1</span><br><span class="line">ea6c2994b397        d4b7466213fe                                        “/coredns -conf /e…”   2 hours ago         Up 2 hours                              k8s_coredns_coredns<span class="string">-77</span>c989547b-lcbfw_kube-system_0696926b<span class="string">-6</span>d79<span class="string">-11</span>e8<span class="string">-8760</span><span class="string">-5254004</span>f2222_1</span><br><span class="line">f61476c51230        mirrorgooglecontainers/pause-amd64:3.0              “/pause”                 2 hours ago         Up 2 hours                              k8s_POD_kubernetes-dashboard<span class="string">-66</span>c9d98865-jdbg8_kube-system_d2406f4f<span class="string">-6</span>de3<span class="string">-11</span>e8<span class="string">-8760</span><span class="string">-5254004</span>f2222_0</span><br><span class="line">b6f61200d5ea        mirrorgooglecontainers/pause-amd64:3.0              “/pause”                 2 hours ago         Up 2 hours                              k8s_POD_coredns<span class="string">-77</span>c989547b-lcbfw_kube-system_0696926b<span class="string">-6</span>d79<span class="string">-11</span>e8<span class="string">-8760</span><span class="string">-5254004</span>f2222_1</span><br></pre></td></tr></table></figure>
+
+<p>kubernetes中的pause容器主要为每个业务容器提供以下功能：</p>
+<ul>
+<li>在pod中担任Linux命名空间共享的基础；</li>
+<li>启用pid命名空间，开启init进程。</li>
+</ul>
+<p>pause容器的作用可以从这个例子中看出，首先见下图：<br><img src="https://cos.leiyawu.com/docker/k8s/pause-container.png" alt="map"></p>
+<h2 id="Pause容器测试"><a href="#Pause容器测试" class="headerlink" title="Pause容器测试"></a><a href="#Pause容器测试" title="Pause容器测试"></a>Pause容器测试</h2><p>首先在节点上运行一个pause容器。</p>
+<figure class="highlight fortran"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -d –<span class="keyword">name</span> <span class="keyword">pause</span> -p <span class="number">8880</span>:<span class="number">80</span> martin/<span class="keyword">pause</span>-amd64:<span class="number">3.0</span></span><br></pre></td></tr></table></figure>
+
+<p>然后再运行一个nginx容器，nginx将为localhost:2398创建一个代理。</p>
+<figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="keyword">cat</span> &lt;&lt;EOF &gt;&gt; nginx.conff</span><br><span class="line">error_log stderr;</span><br><span class="line">events &#123; worker_connections  1024; &#125;</span><br><span class="line">http &#123;</span><br><span class="line">    access_log /dev/stdout combined;</span><br><span class="line">    server &#123;</span><br><span class="line">        listen 80 default_server;</span><br><span class="line">        server_name example.com <a href="http://www.example.com" target="_blank" rel="noopener">www.example.com</a>;</span><br><span class="line">        location / &#123;</span><br><span class="line">            proxy_pass http:<span class="comment">//127.0.0.1:2398;</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">EOF</span><br><span class="line">$ docker <span class="keyword">run</span> -<span class="keyword">d</span> –name nginx -v <code>&lt;span class=&quot;keyword&quot;&gt;pwd&lt;/span&gt;</code>/nginx.<span class="keyword">conf</span>:/etc/nginx/nginx.<span class="keyword">conf</span> –<span class="keyword">net</span>=container:<span class="keyword">pause</span> –ipc=container:<span class="keyword">pause</span> –pid=container:<span class="keyword">pause</span> nginx</span><br></pre></td></tr></table></figure>
+
+<p>然后再为ghost创建一个应用容器，这是一款博客软件。</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker <span class="builtin-name">run</span> -d –name ghost <span class="attribute">–net</span>=container:pause <span class="attribute">–ipc</span>=container:pause <span class="attribute">–pid</span>=container:pause ghost</span><br></pre></td></tr></table></figure>
+
+<p>现在访问<a href="http://localhost:8880/就可以看到ghost博客的界面了。" target="_blank" rel="noopener">http://localhost:8880/就可以看到ghost博客的界面了。</a></p>
+<h2 id="Pause容器解析"><a href="#Pause容器解析" class="headerlink" title="Pause容器解析"></a><a href="#Pause容器解析" title="Pause容器解析"></a>Pause容器解析</h2><p>pause容器将内部的80端口映射到宿主机的8880端口，pause容器在宿主机上设置好了网络namespace后，nginx容器加入到该网络namespace中，我们看到nginx容器启动的时候指定了–net=container:pause，ghost容器同样加入到了该网络namespace中，这样三个容器就共享了网络，互相之间就可以使用localhost直接通信，–ipc=contianer:pause –pid=container:pause就是三个容器处于同一个namespace中，init进程为pause，这时我们进入到ghost容器中查看进程情况。</p>
+<figure class="highlight tap"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># ps aux</span></span><br><span class="line">USER       PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND</span><br><span class="line">root        <span class="number"> 1 </span> 0.0  0.0  <span class="number"> 1024 </span>   <span class="number"> 4 </span>?        Ss   13:49   0:00 /pause</span><br><span class="line">root        <span class="number"> 5 </span> 0.0  0.1 <span class="number"> 32432 </span><span class="number"> 5736 </span>?        Ss   13:51   0:00 nginx: master p</span><br><span class="line">systemd+    <span class="number"> 9 </span> 0.0  0.0 <span class="number"> 32980 </span><span class="number"> 3304 </span>?        S    13:51   0:00 nginx: worker p</span><br><span class="line">node       <span class="number"> 10 </span> 0.3  2.0<span class="number"> 1254200 </span>83788 ?       Ssl  13:53   0:03 node current/in</span><br><span class="line">root       <span class="number"> 79 </span> 0.1  0.0  <span class="number"> 4336 </span> <span class="number"> 812 </span>pts/0    Ss   14:09   0:00 sh</span><br><span class="line">root       <span class="number"> 87 </span> 0.0  0.0 <span class="number"> 17500 </span><span class="number"> 2080 </span>pts/0    R+   14:10   0:00 ps aux</span><br></pre></td></tr></table></figure>
+
+<p>在ghost容器中同时可以看到pause和nginx容器的进程，并且pause容器的PID是1。而在kubernetes中容器的PID=1的进程即为容器本身的业务进程。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a><a href="#参考" title="参考"></a>参考</h2><p><a href="https://o-my-chenjian.com/2017/10/17/The-Pause-Container-Of-Kubernetes/" target="_blank" rel="noopener">Kubernetes只Pause容器</a></p>
+<p><a href="https://jimmysong.io/posts/what-is-a-pause-container/" target="_blank" rel="noopener">kubernetes中的infra容器——Pause容器探究</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://chucz.club/2018/08/17/Pause容器/" data-id="cjmlrearr000xljrmtmpxe082" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/K8s/">K8s</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-docker-cicd持续集成部署" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/08/17/docker-cicd持续集成部署/" class="article-date">
+  <time datetime="2018-08-17T07:53:55.000Z" itemprop="datePublished">2018-08-17</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/08/17/docker-cicd持续集成部署/">docker cicd持续集成部署</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="持续集成的概念"><a href="#持续集成的概念" class="headerlink" title="持续集成的概念"></a><a href="#持续集成的概念" title="持续集成的概念"></a>持续集成的概念</h2><p>持续集成，Continuous integration ，简称CI。</p>
+<p>首先，解释下集成：所有的项目代码都是托管在SVN或者GIT服务器上（以下简称代码服务器）。每个项目都有若干个单元测试和集成测试。集成测试是单元测试的逻辑扩展：在单元测试的基础上，将所有模块按照设计要求组装成为子系统或系统进行集成测试。实践表明，一些模块虽然能够单独地工作，但并不能保证连接起来也能正常的工作。一些局部反映不出来的问题，在全局上很可能暴露出来（关于单元测试及集成测试的详述，读者可以查阅相关文档）。</p>
+<p>简单来说，集成测试就是把所有的单元测试跑一遍，以及其它一些能自动完成的测试。只有通过了集成测试的代码才能上传到代码服务器上，确保上传的代码没有问题。集成一般指集成测试。</p>
+<p>持续，显而易见就是长期对代码进行的集成测试。既然是长期进行，那么最好是自动执行，否则人工执行既没保证，而且耗人力。</p>
+<p>基于此种目的，我们需要有一台服务器，它将定期从代码服务器中拉取代码，并进行编译，然后自动运行集成测试；并且每次集成测试的结果都会记录在案。</p>
+<h2 id="持续集成的特点"><a href="#持续集成的特点" class="headerlink" title="持续集成的特点"></a><a href="#持续集成的特点" title="持续集成的特点"></a>持续集成的特点</h2><ul>
+<li>它是一个自动化的周期性的集成测试过程，从拉取代码、编译构建、运行测试、结果记录、测试统计等都是自动完成的，无需人工干预；</li>
+<li>需要有专门的集成服务器来执行集成构建；</li>
+<li>需要有代码托管工具支持；</li>
+</ul>
+<h2 id="持续集成的作用"><a href="#持续集成的作用" class="headerlink" title="持续集成的作用"></a><a href="#持续集成的作用" title="持续集成的作用"></a>持续集成的作用</h2><ul>
+<li>保证团队开发人员提交代码的质量，减轻了软件发布时的压力；</li>
+<li>持续集成中的任何一个环节都是自动完成的，无需太多的人工干预，有利于减少重复过程以节省时间、费用和工作量；</li>
+</ul>
+<p>首先，Docker可以让你非常容易和方便地以“容器化”的方式去部署应用。 它就像集装箱一样，打包了所有依赖，再在其他服务器上部署很容易，不至于换服务器后发现各种配置文件散落一地，这样就解决了编译时依赖和运行时依赖的问题；</p>
+<p>其次，Docker的隔离性使得应用在运行是就像处于沙箱中一样，每个应用都认为自己是在系统中唯一运行的程序，就像刚才例子中，A依赖于Python 2.7，同时A还依赖于B，但B却依赖于Python3， 这样我们可以在系统中部署一个基于python2.7的容器和一个基于python3的容器，这样就可以很方便的在系统中部署多种不同的环境来解决依赖复杂度的问题。这里有些朋友可能会说，虚拟机也可以解决这样的问题！诚然，虚拟化确实可以做到这一点，但是这样需要硬件支持虚拟化及开启BIOS中虚拟化相关的功能，同时还需要在系统中安装2套操作系统，虚拟机的出现是解决了操作系统和物理机的强耦合问题。但是Docker就轻量化很多，只需内核支持，无需硬件和BIOS的强制要求，可以很轻松迅速的在系统上部署多套不同的容器环境，容器的出现解决了应用和操作系统的强耦合问题。</p>
+<p>正以为Docker是以应用为中心，镜像中打包了应用及应用所需的环境，一次构建，处处运行。这种特性完美的解决了传统模式下应用迁移后面临的环境不一致问题。</p>
+<p>同时，Docker 压根不管内部应用怎么启动，你自己爱咋来咋来，我们用 docker start 或 run 作为统一标准。这样我们应用启动就标准化了， 不需要再根据不同应用而记忆一大串不同的启动命令。</p>
+<h2 id="基于Docker的特征，现在常见的利用-Docker-进行持续集成的流程如下："><a href="#基于Docker的特征，现在常见的利用-Docker-进行持续集成的流程如下：" class="headerlink" title="基于Docker的特征，现在常见的利用 Docker 进行持续集成的流程如下："></a><a href="#基于Docker的特征，现在常见的利用-Docker-进行持续集成的流程如下：" title="基于Docker的特征，现在常见的利用 Docker 进行持续集成的流程如下："></a>基于Docker的特征，现在常见的利用 Docker 进行持续集成的流程如下：</h2><ol>
+<li>开发者提交代码</li>
+<li>触发镜像构建</li>
+<li>构建镜像上传至私有仓库</li>
+<li>镜像下载至执行机器</li>
+<li>镜像运行</li>
+</ol>
+<p>其基本拓扑结构如下所示：<br><img src="https://cos.leiyawu.com/docker/img/docker1.png" alt="图1"></p>
+<p>熟悉Docker的都知道，Docker以的启动是非常快的，可以说是秒启。在上述的五步中，1 和 5 的耗时是比较短的，整个持续集成主要耗时集中在中间的3个步骤，也就是 Docker build，Docker push ，Docekr pull 的时间消耗.</p>
+<p>Docker Registry升级到 v2 后加入了很多安全相关检查，在v2中的镜像的存储格式变成了gzip ，镜像在压缩过程中占用的时间也是比较多的。</p>
+<p>Docker pull 镜像的速度对服务的启动速度至关重要，好在 Registry v2 后可以并行 pull 了，速度有了很大的改善。但是依然有一些小的问题影响了启动的速度：</p>
+<ul>
+<li>下载镜像和解压镜像是串行的；</li>
+<li>串行解压，由于 v2 都是 gzip,要解压，尽管并行下载了还是串行解压，内网的话解压时间比网络传输都要长；</li>
+<li>和 Registry 通信， Registry 在 pull的过程中并不提供下载内容只是提供下载URL和鉴权，这一部分加长网络传输而且一些 Metadata还是要去后端存储获取，延时还是有一些的。</li>
+</ul>
+<p>整个持续集成平台架构演进到如下图所示：<br><img src="https://cos.leiyawu.com/docker/img/docker2.png" alt="图2"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://chucz.club/2018/08/17/docker-cicd持续集成部署/" data-id="cjmlreaq80003ljrmwhcuup0z" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/docker/">docker</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-kubernetes-jenkins-ci-cd" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/08/17/kubernetes-jenkins-ci-cd/" class="article-date">
+  <time datetime="2018-08-17T07:53:11.000Z" itemprop="datePublished">2018-08-17</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/08/17/kubernetes-jenkins-ci-cd/">kubernetes-jenkins-ci-cd</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="流程图："><a href="#流程图：" class="headerlink" title="流程图："></a><a href="#流程图：" title="流程图："></a>流程图：</h3><p>基于Jenkins的CI/CD流程如下所示:<br><img src="https://cos.leiyawu.com/docker/k8s/kubernetes-jenkins-ci-cd.png" alt="kubernetes-jenkins-ci-cd"></p>
+<h3 id="流程说明："><a href="#流程说明：" class="headerlink" title="流程说明："></a><a href="#流程说明：" title="流程说明："></a>流程说明：</h3><ol>
+<li>用户向Gitlab提交代码，代码中必须包含Dockerfile</li>
+<li>将代码提交到远程仓库</li>
+<li>用户在发布应用时需要填写git仓库地址和分支、服务类型、服务名称、资源数量、实例个数，确定后触发Jenkins自动构建</li>
+<li>Jenkins的CI流水线自动编译代码并打包成docker镜像推送到Harbor镜像仓库</li>
+<li>Jenkins的CI流水线中包括了自定义脚本，根据我们已准备好的kubernetes的YAML模板，将其中的变量替换成用户输入的选项</li>
+<li>生成应用的kubernetes YAML配置文件</li>
+<li>更新Ingress的配置，根据新部署的应用的名称，在ingress的配置文件中增加一条路由信息</li>
+<li>更新PowerDNS，向其中插入一条DNS记录，IP地址是边缘节点的IP地址。关于边缘节点，请查看<a href="https://jimmysong.io/kubernetes-handbook/practice/edge-node-configuration.html" target="_blank" rel="noopener">边缘节点配置</a></li>
+<li>Jenkins调用kubernetes的API，部署应用</li>
+</ol>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://chucz.club/2018/08/17/kubernetes-jenkins-ci-cd/" data-id="cjmlreaqm000cljrmyxiea3w8" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/K8s/">K8s</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-ELK-Sentinl" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/05/21/ELK-Sentinl/" class="article-date">
+  <time datetime="2018-05-21T02:14:12.000Z" itemprop="datePublished">2018-05-21</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/05/21/ELK-Sentinl/">ELK Sentinl</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="Sentinl简介"><a href="#Sentinl简介" class="headerlink" title="Sentinl简介"></a><a href="#Sentinl简介" title="Sentinl简介"></a>Sentinl简介</h3><p>Sentinl 5扩展自Kibi / Kibana 5，具有警报和报告功能，可使用标准查询，可编程验证器和各种可配置操作来监控，通知和报告数据系列更改 - 将其视为一个独立的“观察者” “报告”功能（PNG / PDFs快照）。</p>
+<p>SENTINEL还旨在通过直接在Kibana UI中整合来简化在Kibi / Kibana中创建和管理警报和报告的过程。</p>
+<h3 id="功能模块"><a href="#功能模块" class="headerlink" title="功能模块"></a><a href="#功能模块" title="功能模块"></a>功能模块</h3><p>Watchers<br>Alarms<br>Reports<br>Watchers是Sentinl核心，主要由 input,Condition,Transform,Actions几大块组成，可以和X-Pack一一对应，部分文档可参考X-Pack，但需要注意的是它和X-Pack还有一些区别，主要体现在input只实现了search，其他并未实现，Actions也并未都实现</p>
+<h3 id="安装与配置"><a href="#安装与配置" class="headerlink" title="安装与配置"></a><a href="#安装与配置" title="安装与配置"></a>安装与配置</h3><ul>
+<li>安装</li>
+</ul>
+<p>/usr/share/kibana/bin/kibana-plugin install <a href="https://github.com/sirensolutions/sentinl/releases/download/tag-5.5/sentinl-v5.6.5.zip" target="_blank" rel="noopener">https://github.com/sirensolutions/sentinl/releases/download/tag-5.5/sentinl-v5.6.5.zip</a></p>
+<ul>
+<li>config</li>
+</ul>
+<p>kibana.yml config:</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">sentinl:</span></span><br><span class="line"><span class="attr">  es:</span></span><br><span class="line"><span class="attr">    timefield:</span> <span class="string">‘@timestamp’</span></span><br><span class="line"><span class="attr">    default_index:</span> <span class="string">watcher</span></span><br><span class="line"><span class="attr">    type:</span> <span class="string">watch</span></span><br><span class="line"><span class="attr">    alarm_index:</span> <span class="string">watcher_alarms</span></span><br><span class="line"><span class="attr">  sentinl:</span></span><br><span class="line"><span class="attr">    history:</span> <span class="number">20</span></span><br><span class="line"><span class="attr">    results:</span> <span class="number">50</span></span><br><span class="line"><span class="attr">  settings:</span></span><br><span class="line"><span class="attr">    email:</span></span><br><span class="line"><span class="attr">      active:</span> <span class="literal">false</span></span><br><span class="line"><span class="attr">      user:</span> <span class="string">username</span></span><br><span class="line"><span class="attr">      password:</span> <span class="string">password</span></span><br><span class="line"><span class="attr">      host:</span> <span class="string">smtp.server.com</span></span><br><span class="line"><span class="attr">      ssl:</span> <span class="literal">true</span></span><br><span class="line"><span class="attr">      timeout:</span> <span class="number">10000</span>  <span class="comment"># mail server connection timeout</span></span><br><span class="line"><span class="attr">    slack:</span></span><br><span class="line"><span class="attr">      active:</span> <span class="literal">false</span></span><br><span class="line"><span class="attr">      username:</span> <span class="string">username</span></span><br><span class="line"><span class="attr">      hook:</span> <span class="string">‘<a href="https://hooks.slack.com/services/&lt;token&gt;&#39;" target="_blank" rel="noopener">https://hooks.slack.com/services/&lt;token&gt;&#39;</a></span></span><br><span class="line"><span class="attr">      channel:</span> <span class="string">‘#channel’</span></span><br><span class="line"><span class="attr">    report:</span></span><br><span class="line"><span class="attr">      active:</span> <span class="literal">false</span></span><br><span class="line"><span class="attr">      tmp_path:</span> <span class="string">/tmp/</span></span><br><span class="line"><span class="attr">    pushapps:</span></span><br><span class="line"><span class="attr">      active:</span> <span class="literal">false</span></span><br><span class="line"><span class="attr">      api_key:</span> <span class="string">‘&lt;pushapps API Key&gt;’</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>raw<figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">“input”</span>: &#123;</span><br><span class="line">      <span class="string">“search”</span>: &#123;</span><br><span class="line">        <span class="string">“request”</span>: &#123;</span><br><span class="line">          <span class="string">“index”</span>: [</span><br><span class="line">            <span class="string">“&lt;xxx-&#123;now/d&#125;&gt;”</span></span><br><span class="line">          ],</span><br><span class="line">          <span class="string">“body”</span>: &#123;</span><br><span class="line">            <span class="string">“query”</span>: &#123;</span><br><span class="line">              <span class="string">“bool”</span>: &#123;</span><br><span class="line">                <span class="string">“should”</span>: [</span><br><span class="line">                  &#123;</span><br><span class="line">                    <span class="string">“match”</span>: &#123;</span><br><span class="line">                      <span class="string">“status”</span>: <span class="string">“502”</span></span><br><span class="line">                    &#125;</span><br><span class="line">                  &#125;,</span><br><span class="line">                  &#123;</span><br><span class="line">                    <span class="string">“match”</span>: &#123;</span><br><span class="line">                      <span class="string">“status”</span>: <span class="string">“404”</span></span><br><span class="line">                    &#125;</span><br><span class="line">                  &#125;</span><br><span class="line">                ],</span><br><span class="line">                <span class="string">“minimum_should_match”</span>: <span class="number">1</span>,  #must setup</span><br><span class="line">                <span class="string">“filter”</span>: &#123;</span><br><span class="line">                  <span class="string">“range”</span>: &#123;</span><br><span class="line">                    <span class="string">“@timestamp”</span>: &#123;</span><br><span class="line">                      <span class="string">“gte”</span>: <span class="string">“now-60s”</span>,</span><br><span class="line">                      <span class="string">“lte”</span>: <span class="string">“now”</span></span><br><span class="line">                    &#125;</span><br><span class="line">                  &#125;</span><br><span class="line">                &#125;</span><br><span class="line">              &#125;</span><br><span class="line">            &#125;</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="string">“condition”</span>: &#123;</span><br><span class="line">      <span class="string">“script”</span>: &#123;</span><br><span class="line">        <span class="string">“script”</span>: <span class="string">“payload.hits.total &gt; 30”</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;,</span><br></pre></td></tr></table></figure></li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://chucz.club/2018/05/21/ELK-Sentinl/" data-id="cjmlrearn000uljrm0g3w73s9" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ELK/">ELK</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-hexo修改默认端口" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/04/20/hexo修改默认端口/" class="article-date">
+  <time datetime="2018-04-20T08:29:31.000Z" itemprop="datePublished">2018-04-20</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/04/20/hexo修改默认端口/">hexo修改默认端口</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>默认使用4000端口，用hexo s -p 80 ，可以暂时修改启动端口。</p>
+<p>但是每次启动都要写”-p 80”才行，过于繁琐。</p>
+<p>修改方法：<br>找到node_modules\hexo-server\index.js文件，可以修改默认的port值！</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://chucz.club/2018/04/20/hexo修改默认端口/" data-id="cjmlreaqh0008ljrm9e2by46m" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/hexo/">hexo</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-logstash吞吐率优化" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/04/13/logstash吞吐率优化/" class="article-date">
+  <time datetime="2018-04-13T09:03:34.000Z" itemprop="datePublished">2018-04-13</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/04/13/logstash吞吐率优化/">logstash吞吐率优化</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="问题一"><a href="#问题一" class="headerlink" title="问题一"></a><a href="#问题一" title="问题一"></a>问题一</h2><p>最近发现kibana的日志传的很慢，常常查不到日志，由于所有的日志收集都只传输到了一个logstash进行收集和过滤，于是怀疑是否是由于logstash的吞吐量存在瓶颈。一看，还真是到了瓶颈。</p>
+<h3 id="优化过程"><a href="#优化过程" class="headerlink" title="优化过程"></a><a href="#优化过程" title="优化过程"></a>优化过程</h3><p>经过查询logstash完整配置文件，有几个参数需要调整</p>
+<figure class="highlight avrasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"># pipeline线程数，官方建议是等于CPU内核数</span></span><br><span class="line"><span class="symbol">pipeline.workers:</span> <span class="number">24</span></span><br><span class="line"><span class="meta"># 实际output时的线程数</span></span><br><span class="line"><span class="symbol">pipeline.output.workers:</span> <span class="number">24</span></span><br><span class="line"><span class="meta"># 每次发送的事件数</span></span><br><span class="line"><span class="symbol">pipeline.batch.size:</span> <span class="number">3000</span></span><br><span class="line"><span class="meta"># 发送延时</span></span><br><span class="line"><span class="symbol">pipeline.batch.delay:</span> <span class="number">5</span></span><br></pre></td></tr></table></figure>
+
+<p>PS:由于我们的ES集群数据量较大（&gt;28T），所以具体配置数值视自身生产环境</p>
+<h3 id="优化结果"><a href="#优化结果" class="headerlink" title="优化结果"></a><a href="#优化结果" title="优化结果"></a>优化结果</h3><p>ES的吞吐由每秒9817/s提升到41183/s,具体可以通过x-pack的monitor查看。</p>
+<h2 id="问题二"><a href="#问题二" class="headerlink" title="问题二"></a><a href="#问题二" title="问题二"></a>问题二</h2><p>在查看logstash日志过程中，我们看到了大量的以下报错</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[<span class="string">2017-03-18T09:46:21,043</span>][<span class="symbol">INFO </span>][<span class="string">logstash.outputs.elasticsearch</span>] retrying failed action with response code: 429 (&#123;”type”=&gt;”es<span class="emphasis"><em>rejected</em></span>execution_exception”, “reason”=&gt;”rejected execution of org.elasticsearch.transport.TransportService$6@6918cf2e on EsThreadPoolExecutor[bulk, queue capacity = 50, org.elasticsearch.common.util.concurrent.EsThreadPoolExecutor@55337655[Running, pool size = 24, active threads = 24, queued tasks = 50, completed tasks = 1767887463]]”&#125;)</span><br><span class="line">[<span class="string">2017-03-18T09:46:21,043</span>][<span class="symbol">ERROR</span>][<span class="string">logstash.outputs.elasticsearch</span>] Retrying individual actions</span><br></pre></td></tr></table></figure>
+
+<p>查询官网，确认为时ES的写入遇到了瓶颈</p>
+<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Make sure <span class="built_in">to</span> watch <span class="keyword">for</span> TOO_MANY_REQUESTS (<span class="number">429</span>) response codes (EsRejectedExecutionException <span class="keyword">with</span> <span class="keyword">the</span> Java client), which is <span class="keyword">the</span> way that Elasticsearch tells you that <span class="keyword">it</span> cannot keep up <span class="keyword">with</span> <span class="keyword">the</span> current indexing rate. When <span class="keyword">it</span> happens, you should pause indexing <span class="keyword">a</span> bit <span class="keyword">before</span> trying again, ideally <span class="keyword">with</span> randomized exponential backoff.</span><br></pre></td></tr></table></figure>
+
+<p>我们首先想到的是来调整ES的线程数，但是官网写到”Don’t Touch There Settings!”, 那怎么办？于是乎官方建议我们修改logstash的参数pipeline.batch.size</p>
+<p>在ES5.0以后，es将bulk、flush、get、index、search等线程池完全分离，自身的写入不会影响其他功能的性能。<br>来查询一下ES当前的线程情况：</p>
+<figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">GET _nodes/stats/thread_pool?pretty</span><br><span class="line">&#123;</span><br><span class="line">  <span class="string">“_nodes”</span>: &#123;</span><br><span class="line">    <span class="string">“total”</span>: <span class="number">6</span>,</span><br><span class="line">    <span class="string">“successful”</span>: <span class="number">6</span>,</span><br><span class="line">    <span class="string">“failed”</span>: <span class="number">0</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="string">“cluster_name”</span>: <span class="string">“dev-elasticstack5.0”</span>,</span><br><span class="line">  <span class="string">“nodes”</span>: &#123;</span><br><span class="line">    <span class="string">“nnfCv8FrSh-p223gsbJVMA”</span>: &#123;</span><br><span class="line">      <span class="string">“timestamp”</span>: <span class="number">1489804973926</span>,</span><br><span class="line">      <span class="string">“name”</span>: <span class="string">“node-3”</span>,</span><br><span class="line">      <span class="string">“transport_address”</span>: <span class="string">“192.168.3.<strong><em>:9301”</em></strong></span>,</span><br><span class="line">      <span class="string">“host”</span>: <span class="string">“192.168.3.“</span>,</span><br><span class="line">      <span class="string">“ip”</span>: <span class="string">“192.168.3.***:9301”</span>,</span><br><span class="line">      <span class="string">“roles”</span>: [</span><br><span class="line">        <span class="string">“master”</span>,</span><br><span class="line">        <span class="string">“data”</span>,</span><br><span class="line">        <span class="string">“ingest”</span></span><br><span class="line">      ],</span><br><span class="line">      <span class="string">“attributes”</span>: &#123;</span><br><span class="line">        <span class="string">“rack”</span>: <span class="string">“r1”</span></span><br><span class="line">      &#125;,</span><br><span class="line">      <span class="string">“thread_pool”</span>: &#123;</span><br><span class="line">        <span class="string">“bulk”</span>: &#123;</span><br><span class="line">          <span class="string">“threads”</span>: <span class="number">24</span>,</span><br><span class="line">          <span class="string">“queue”</span>: <span class="number">214</span>,</span><br><span class="line">          <span class="string">“active”</span>: <span class="number">24</span>,</span><br><span class="line">          <span class="string">“rejected”</span>: <span class="number">30804543</span>,</span><br><span class="line">          <span class="string">“largest”</span>: <span class="number">24</span>,</span><br><span class="line">          <span class="string">“completed”</span>: <span class="number">1047606679</span></span><br><span class="line">        &#125;,</span><br><span class="line"></span><br><span class="line">        ……</span><br><span class="line"></span><br><span class="line">        <span class="string">“watcher”</span>: &#123;</span><br><span class="line">  <span class="string">“threads”</span>: <span class="number">0</span>,</span><br><span class="line">  <span class="string">“queue”</span>: <span class="number">0</span>,</span><br><span class="line">  <span class="string">“active”</span>: <span class="number">0</span>,</span><br><span class="line">  <span class="string">“rejected”</span>: <span class="number">0</span>,</span><br><span class="line">  <span class="string">“largest”</span>: <span class="number">0</span>,</span><br><span class="line">  <span class="string">“completed”</span>: <span class="number">0</span></span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其中：”bulk”模板的线程数24，当前活跃的线程数24，证明所有的线程是busy的状态，queue队列214，rejected为30804543。那么问题就找到了，所有的线程都在忙，队列堵满后再有进程写入就会被拒绝，而当前拒绝数为30804543。</p>
+<h3 id="优化方案"><a href="#优化方案" class="headerlink" title="优化方案"></a><a href="#优化方案" title="优化方案"></a>优化方案</h3><p>问题找到了，如何优化呢。官方的建议是提高每次批处理的数量，调节传输间歇时间。当batch.size增大，es处理的事件数就会变少，写入也就越快了。</p>
+<figure class="highlight avrasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/logstash/logstash.yml</span><br><span class="line"><span class="meta">#</span></span><br><span class="line"><span class="symbol">pipeline.workers:</span> <span class="number">24</span></span><br><span class="line"><span class="symbol">pipeline.output.workers:</span> <span class="number">24</span></span><br><span class="line"><span class="symbol">pipeline.batch.size:</span> <span class="number">10000</span></span><br><span class="line"><span class="symbol">pipeline.batch.delay:</span> <span class="number">10</span></span><br></pre></td></tr></table></figure>
+
+<p>具体的worker/output.workers数量建议等于CPU数，batch.size/batch.delay根据实际的数据量逐渐增大来测试最优值。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://chucz.club/2018/04/13/logstash吞吐率优化/" data-id="cjmlrears000yljrmvbzhgkw5" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ELK/">ELK</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-kafka性能调优" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/04/13/kafka性能调优/" class="article-date">
+  <time datetime="2018-04-13T08:47:49.000Z" itemprop="datePublished">2018-04-13</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/04/13/kafka性能调优/">kafka性能调优</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="Kafka的配置详尽、复杂，想要进行全面的性能调优需要掌握大量信息，这里只记录一下我在日常工作使用中走过的坑和经验来对kafka集群进行优化常用的几点。"><a href="#Kafka的配置详尽、复杂，想要进行全面的性能调优需要掌握大量信息，这里只记录一下我在日常工作使用中走过的坑和经验来对kafka集群进行优化常用的几点。" class="headerlink" title="Kafka的配置详尽、复杂，想要进行全面的性能调优需要掌握大量信息，这里只记录一下我在日常工作使用中走过的坑和经验来对kafka集群进行优化常用的几点。"></a><a href="#Kafka的配置详尽、复杂，想要进行全面的性能调优需要掌握大量信息，这里只记录一下我在日常工作使用中走过的坑和经验来对kafka集群进行优化常用的几点。" title="Kafka的配置详尽、复杂，想要进行全面的性能调优需要掌握大量信息，这里只记录一下我在日常工作使用中走过的坑和经验来对kafka集群进行优化常用的几点。"></a>Kafka的配置详尽、复杂，想要进行全面的性能调优需要掌握大量信息，这里只记录一下我在日常工作使用中走过的坑和经验来对kafka集群进行优化常用的几点。</h2><h3 id="1-JVM的优化"><a href="#1-JVM的优化" class="headerlink" title="1.JVM的优化"></a><a href="#1-JVM的优化" title="1.JVM的优化"></a>1.JVM的优化</h3><p>java相关系统自然离不开JVM的优化。首先想到的肯定是Heap Size的调整。</p>
+<p>vim bin/kafka-server-start.sh   </p>
+<p>调整KAFKA_HEAP_OPTS=”-Xmx16G -Xms16G”的值<br>推荐配置：一般HEAP SIZE的大小不超过主机内存的50%。</p>
+<h3 id="2-网络和ios操作线程配置优化："><a href="#2-网络和ios操作线程配置优化：" class="headerlink" title="2.网络和ios操作线程配置优化："></a><a href="#2-网络和ios操作线程配置优化：" title="2.网络和ios操作线程配置优化："></a>2.网络和ios操作线程配置优化：</h3><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># broker处理消息的最大线程数</span></span><br><span class="line">num.network.<span class="attribute">threads</span>=9</span><br><span class="line"><span class="comment"># broker处理磁盘IO的线程数</span></span><br><span class="line">num.io.<span class="attribute">threads</span>=16</span><br></pre></td></tr></table></figure>
+
+<p>推荐配置：<br>num.network.threads主要处理网络io，读写缓冲区数据，基本没有io等待，配置线程数量为cpu核数加1。</p>
+<p>num.io.threads主要进行磁盘io操作，高峰期可能有些io等待，因此配置需要大些。配置线程数量为cpu核数2倍，最大不超过3倍。</p>
+<h3 id="3-socket-server可接受数据大小-防止OOM异常-："><a href="#3-socket-server可接受数据大小-防止OOM异常-：" class="headerlink" title="3.socket server可接受数据大小(防止OOM异常)："></a><a href="#3-socket-server可接受数据大小-防止OOM异常-：" title="3.socket server可接受数据大小(防止OOM异常)："></a>3.socket server可接受数据大小(防止OOM异常)：</h3><p>socket.request.max.bytes=2147483600</p>
+<p>推荐配置：</p>
+<p>根据自己业务数据包的大小适当调大。这里取值是int类型的，而受限于java int类型的取值范围又不能太大：</p>
+<p>java int的取值范围为（-2147483648~2147483647），占用4个字节（-2的31次方到2的31次方-1，不能超出，超出之后报错：org.apache.kafka.common.config.ConfigException: Invalid value 8589934592 for configuration socket.request.max.bytes: Not a number of type INT。</p>
+<h3 id="4-log数据文件刷盘策略"><a href="#4-log数据文件刷盘策略" class="headerlink" title="4.log数据文件刷盘策略"></a><a href="#4-log数据文件刷盘策略" title="4.log数据文件刷盘策略"></a>4.log数据文件刷盘策略</h3><p>—每当producer写入10000条消息时，刷数据到磁盘—<br>log.flush.interval.messages=10000</p>
+<p>—每间隔1秒钟时间，刷数据到磁盘—<br>log.flush.interval.ms=1000</p>
+<p>推荐配置：</p>
+<p>为了大幅度提高producer写入吞吐量，需要定期批量写文件。一般无需改动，如果topic的数据量较小可以考虑减少log.flush.interval.ms和log.flush.interval.messages来强制刷写数据，减少可能由于缓存数据未写盘带来的不一致。推荐配置分别message 10000，间隔1s。</p>
+<h3 id="5-日志保留策略配置"><a href="#5-日志保留策略配置" class="headerlink" title="5.日志保留策略配置"></a><a href="#5-日志保留策略配置" title="5.日志保留策略配置"></a>5.日志保留策略配置</h3><p>—日志保留时长—<br>log.retention.hours=72</p>
+<p>—段文件配置—<br>log.segment.bytes=1073741824</p>
+<p>推荐配置：</p>
+<p>日志建议保留三天，也可以更短；段文件配置1GB，有利于快速回收磁盘空间，重启kafka加载也会加快（kafka启动时是单线程扫描目录(log.dir)下所有数据文件）。如果文件过小，则文件数量比较多。</p>
+<h3 id="6-replica复制配置"><a href="#6-replica复制配置" class="headerlink" title="6.replica复制配置"></a><a href="#6-replica复制配置" title="6.replica复制配置"></a>6.replica复制配置</h3><figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">num<span class="selector-class">.replica</span><span class="selector-class">.fetchers</span>=<span class="number">3</span></span><br><span class="line">replica<span class="selector-class">.fetch</span><span class="selector-class">.min</span><span class="selector-class">.bytes</span>=<span class="number">1</span></span><br><span class="line">replica<span class="selector-class">.fetch</span><span class="selector-class">.max</span><span class="selector-class">.bytes</span>=<span class="number">5242880</span></span><br></pre></td></tr></table></figure>
+
+<p>推荐配置：</p>
+<p>每个follow从leader拉取消息进行同步数据，follow同步性能由这几个参数决定，分别为:</p>
+<p>拉取线程数(num.replica.fetchers):fetcher配置多可以提高follower的I/O并发度，单位时间内leader持有更多请求，相应负载会增大，需要根据机器硬件资源做权衡，建议适当调大；</p>
+<p>最小字节数(replica.fetch.min.bytes):一般无需更改，默认值即可；</p>
+<p>最大字节数(replica.fetch.max.bytes)：默认为1MB，这个值太小，推荐5M，根据业务情况调整</p>
+<p>最大等待时间(replica.fetch.wait.max.ms):follow拉取频率，频率过高，leader会积压大量无效请求情况，无法进行数据同步，导致cpu飙升。配置时谨慎使用，建议默认值，无需配置。</p>
+<h3 id="7-分区数量配置"><a href="#7-分区数量配置" class="headerlink" title="7.分区数量配置"></a><a href="#7-分区数量配置" title="7.分区数量配置"></a>7.分区数量配置</h3><p>num.partitions=5</p>
+<p>推荐配置：</p>
+<p>默认partition数量1，如果topic在创建时没有指定partition数量，默认使用此值。Partition的数量选取也会直接影响到Kafka集群的吞吐性能，配置过小会影响消费性能，建议改为5。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://chucz.club/2018/04/13/kafka性能调优/" data-id="cjmlreaqj000aljrm27k5v8ey" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Kafka/">Kafka</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-ELK的一次吞吐量优化" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/04/03/ELK的一次吞吐量优化/" class="article-date">
+  <time datetime="2018-04-03T03:48:32.000Z" itemprop="datePublished">2018-04-03</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/04/03/ELK的一次吞吐量优化/">ELK的一次吞吐量优化</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="问题一"><a href="#问题一" class="headerlink" title="问题一"></a><a href="#问题一" title="问题一"></a>问题一</h2><p>  ● 最近发现kibana的日志传的很慢，常常查不到日志，由于所有的日志收集都只传输到了一个logstash进行收集和过滤，于是怀疑是否是由于logstash的吞吐量存在瓶颈。一看，还真是到了瓶颈。</p>
+<p>  ● 优化过程</p>
+<p>  ● 经过查询logstash完整配置文件，有几个参数需要调整</p>
+<figure class="highlight avrasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta"># pipeline线程数，官方建议是等于CPU内核数</span></span><br><span class="line"><span class="symbol">pipeline.workers:</span> <span class="number">24</span></span><br><span class="line"><span class="meta"># 实际output时的线程数</span></span><br><span class="line"><span class="symbol">pipeline.output.workers:</span> <span class="number">24</span></span><br><span class="line"><span class="meta"># 每次发送的事件数</span></span><br><span class="line"><span class="symbol">pipeline.batch.size:</span> <span class="number">3000</span></span><br><span class="line"><span class="meta"># 发送延时</span></span><br><span class="line"><span class="symbol">pipeline.batch.delay:</span> <span class="number">5</span></span><br></pre></td></tr></table></figure>
+
+<p>PS:由于我们的ES集群数据量较大（&gt;28T），所以具体配置数值视自身生产环境</p>
+<h2 id="问题二"><a href="#问题二" class="headerlink" title="问题二"></a><a href="#问题二" title="问题二"></a>问题二</h2><p>  ● 在查看logstash日志过程中，我们看到了大量的以下报错</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[<span class="string">2017-03-18T09:46:21,043</span>][<span class="symbol">INFO </span>][<span class="string">logstash.outputs.elasticsearch</span>] retrying failed action with response code: 429 (&#123;”type”=&gt;”es<span class="emphasis"><em>rejected</em></span>execution_exception”, “reason”=&gt;”rejected execution of org.elasticsearch.transport.TransportService$6@6918cf2e on EsThreadPoolExecutor[bulk, queue capacity = 50, org.elasticsearch.common.util.concurrent.EsThreadPoolExecutor@55337655[Running, pool size = 24, active threads = 24, queued tasks = 50, completed tasks = 1767887463]]”&#125;)</span><br><span class="line">[<span class="string">2017-03-18T09:46:21,043</span>][<span class="symbol">ERROR</span>][<span class="string">logstash.outputs.elasticsearch</span>] Retrying individual actions</span><br></pre></td></tr></table></figure>
+
+<p>  ● 查询官网，确认为时ES的写入遇到了瓶颈</p>
+<p>  ● Make sure to watch for TOO_MANY_REQUESTS (429) response codes (EsRejectedExecutionException with the Java client), which is the way that Elasticsearch tells you that it cannot keep up with the current indexing rate. When it happens, you should pause indexing a bit before trying again, ideally with randomized exponential backoff.</p>
+<p>我们首先想到的是来调整ES的线程数，但是官网写到”Don’t Touch There Settings!”, 那怎么办？于是乎官方建议我们修改logstash的参数pipeline.batch.size</p>
+<p>  ● 在ES5.0以后，es将bulk、flush、get、index、search等线程池完全分离，自身的写入不会影响其他功能的性能。<br>来查询一下ES当前的线程情况：</p>
+<figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line">GET _nodes/stats/thread_pool?pretty</span><br><span class="line"></span><br><span class="line">可以看到：</span><br><span class="line">&#123;</span><br><span class="line">  <span class="string">“_nodes”</span>: &#123;</span><br><span class="line">    <span class="string">“total”</span>: <span class="number">6</span>,</span><br><span class="line">    <span class="string">“successful”</span>: <span class="number">6</span>,</span><br><span class="line">    <span class="string">“failed”</span>: <span class="number">0</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="string">“cluster_name”</span>: <span class="string">“dev-elasticstack5.0”</span>,</span><br><span class="line">  <span class="string">“nodes”</span>: &#123;</span><br><span class="line">    <span class="string">“nnfCv8FrSh-p223gsbJVMA”</span>: &#123;</span><br><span class="line">      <span class="string">“timestamp”</span>: <span class="number">1489804973926</span>,</span><br><span class="line">      <span class="string">“name”</span>: <span class="string">“node-3”</span>,</span><br><span class="line">      <span class="string">“transport_address”</span>: <span class="string">“192.168.3.<strong><em>:9301”</em></strong></span>,</span><br><span class="line">      <span class="string">“host”</span>: <span class="string">“192.168.3.“</span>,</span><br><span class="line">      <span class="string">“ip”</span>: <span class="string">“192.168.3.***:9301”</span>,</span><br><span class="line">      <span class="string">“roles”</span>: [</span><br><span class="line">        <span class="string">“master”</span>,</span><br><span class="line">        <span class="string">“data”</span>,</span><br><span class="line">        <span class="string">“ingest”</span></span><br><span class="line">      ],</span><br><span class="line">      <span class="string">“attributes”</span>: &#123;</span><br><span class="line">        <span class="string">“rack”</span>: <span class="string">“r1”</span></span><br><span class="line">      &#125;,</span><br><span class="line">      <span class="string">“thread_pool”</span>: &#123;</span><br><span class="line">        <span class="string">“bulk”</span>: &#123;</span><br><span class="line">          <span class="string">“threads”</span>: <span class="number">24</span>,</span><br><span class="line">          <span class="string">“queue”</span>: <span class="number">214</span>,</span><br><span class="line">          <span class="string">“active”</span>: <span class="number">24</span>,</span><br><span class="line">          <span class="string">“rejected”</span>: <span class="number">30804543</span>,</span><br><span class="line">          <span class="string">“largest”</span>: <span class="number">24</span>,</span><br><span class="line">          <span class="string">“completed”</span>: <span class="number">1047606679</span></span><br><span class="line">        &#125;,</span><br><span class="line"></span><br><span class="line">        ……</span><br><span class="line"></span><br><span class="line">        <span class="string">“watcher”</span>: &#123;</span><br><span class="line">  <span class="string">“threads”</span>: <span class="number">0</span>,</span><br><span class="line">  <span class="string">“queue”</span>: <span class="number">0</span>,</span><br><span class="line">  <span class="string">“active”</span>: <span class="number">0</span>,</span><br><span class="line">  <span class="string">“rejected”</span>: <span class="number">0</span>,</span><br><span class="line">  <span class="string">“largest”</span>: <span class="number">0</span>,</span><br><span class="line">  <span class="string">“completed”</span>: <span class="number">0</span></span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>其中：”bulk”模板的线程数24，当前活跃的线程数24，证明所有的线程是busy的状态，queue队列214，rejected为30804543。那么问题就找到了，所有的线程都在忙，队列堵满后再有进程写入就会被拒绝，而当前拒绝数为30804543。<br>优化方案<br>问题找到了，如何优化呢。官方的建议是提高每次批处理的数量，调节传输间歇时间。当batch.size增大，es处理的事件数就会变少，写入也就愉快了。</p>
+<figure class="highlight avrasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/logstash/logstash.yml</span><br><span class="line"><span class="meta">#</span></span><br><span class="line"><span class="symbol">pipeline.workers:</span> <span class="number">24</span></span><br><span class="line"><span class="symbol">pipeline.output.workers:</span> <span class="number">24</span></span><br><span class="line"><span class="symbol">pipeline.batch.size:</span> <span class="number">10000</span></span><br><span class="line"><span class="symbol">pipeline.batch.delay:</span> <span class="number">10</span></span><br></pre></td></tr></table></figure>
+
+<p>具体的worker/output.workers数量建议等于CPU数，batch.size/batch.delay根据实际的数据量逐渐增大来测试最优值。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://chucz.club/2018/04/03/ELK的一次吞吐量优化/" data-id="cjmlrearp000vljrm7lvlermz" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-hexo使用进阶" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/03/19/hexo使用进阶/" class="article-date">
+  <time datetime="2018-03-19T06:11:01.000Z" itemprop="datePublished">2018-03-19</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/03/19/hexo使用进阶/">hexo使用进阶</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>hexo</p>
+<p>一、后端管理插件hexo-admin<br>插件可以直接在网页端创建、编辑markdown文章内容，并将内容发布到_posts里。<br>另外，对我而言，最方便的是可以很方便的给文章加标题、分类、打标签。</p>
+<p>参见：</p>
+<p>An Admin Interface for Hexo<br>hexo-admin in github</p>
+<p>1.安装</p>
+<p>(1)npm install –save hexo-admin </p>
+<p>(2)hexo server -d </p>
+<p>(3)open <a href="http://localhost:4000/admin/" target="_blank" rel="noopener">http://localhost:4000/admin/</a></p>
+<p>2.配置</p>
+<p>在_config.yml最后添加类似如下内容：</p>
+<pre><code>admin:      username: myfavoritename      password_hash: be121740bf988b2225a313fa1f107ca1      secret: a secret something
+</code></pre><p>username：后端登录用户名</p>
+<p>password_hash：后端登录用户密码对应的md5 hash值</p>
+<p>secret：用于保证cookie安全</p>
+<p>3.预览</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://chucz.club/2018/03/19/hexo使用进阶/" data-id="cjmlreaqe0007ljrmufl33dzl" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-ELK-x-pack-详细说明" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/02/28/ELK-x-pack-详细说明/" class="article-date">
+  <time datetime="2018-02-28T07:26:19.000Z" itemprop="datePublished">2018-02-28</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2018/02/28/ELK-x-pack-详细说明/">ELK x-pack 详细说明</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>我还能说什么呢？？</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://chucz.club/2018/02/28/ELK-x-pack-详细说明/" data-id="cjmlreapy0000ljrm4pkn49k5" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ELK/">ELK</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/x-pack/">x-pack</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+
+
+  <nav id="page-nav">
+    
+    <a class="extend prev" rel="prev" href="/">&laquo; Prev</a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/3/">Next &raquo;</a>
+  </nav>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ELK/">ELK</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/K8s/">K8s</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kafka/">Kafka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Logrotate/">Logrotate</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SyncWriteStream/">SyncWriteStream</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/x-pack/">x-pack</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/ELK/" style="font-size: 20px;">ELK</a> <a href="/tags/K8s/" style="font-size: 16.67px;">K8s</a> <a href="/tags/Kafka/" style="font-size: 10px;">Kafka</a> <a href="/tags/Logrotate/" style="font-size: 10px;">Logrotate</a> <a href="/tags/SyncWriteStream/" style="font-size: 10px;">SyncWriteStream</a> <a href="/tags/docker/" style="font-size: 10px;">docker</a> <a href="/tags/hexo/" style="font-size: 13.33px;">hexo</a> <a href="/tags/x-pack/" style="font-size: 10px;">x-pack</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">August 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">February 2018</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/09/28/hello-world/">Hello World</a>
+          </li>
+        
+          <li>
+            <a href="/2018/08/21/生成k8s证书的三种方式/">生成k8s证书的三种方式</a>
+          </li>
+        
+          <li>
+            <a href="/2018/08/19/23种非常有用的ElasticSearch查询例子/">23种非常有用的ElasticSearch查询例子</a>
+          </li>
+        
+          <li>
+            <a href="/2018/08/19/ElasticSearch-索引查询使用指南/">ElasticSearch 索引查询使用指南</a>
+          </li>
+        
+          <li>
+            <a href="/2018/08/19/ES内置账号密码修改、自定义角色自定义账号、ldap及AD认证/">ES内置账号密码修改、自定义角色自定义账号、ldap及AD认证</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 chucz<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>
