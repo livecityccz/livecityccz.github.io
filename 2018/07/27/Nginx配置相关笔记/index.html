@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>Nginx配置相关笔记 | chucz&#39;s blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="好久没更，来水一篇～！～　　就在刚刚，我花了四百大洋租了台腾讯云香港的服务器（～心在滴血～），因此我的博客终于可以宣告回国了。PS：之前一直使用github-page，众所周知速度贼慢，后面换成了新加坡的VPS服务器，速度就更慢了，没办法只能花大价钱买国内的云服务器。博客迁移得过程比较简单，无非就是添加nginx解析，因此本篇有点水，主要为了记录一下nginx配置web服务的一些笔记。  htt">
+<meta name="keywords" content="技术研究,nginx">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Nginx配置相关笔记">
+<meta property="og:url" content="http://chucz.club/2018/07/27/Nginx配置相关笔记/index.html">
+<meta property="og:site_name" content="chucz&#39;s blog">
+<meta property="og:description" content="好久没更，来水一篇～！～　　就在刚刚，我花了四百大洋租了台腾讯云香港的服务器（～心在滴血～），因此我的博客终于可以宣告回国了。PS：之前一直使用github-page，众所周知速度贼慢，后面换成了新加坡的VPS服务器，速度就更慢了，没办法只能花大价钱买国内的云服务器。博客迁移得过程比较简单，无非就是添加nginx解析，因此本篇有点水，主要为了记录一下nginx配置web服务的一些笔记。  htt">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-09-28T08:51:24.508Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Nginx配置相关笔记">
+<meta name="twitter:description" content="好久没更，来水一篇～！～　　就在刚刚，我花了四百大洋租了台腾讯云香港的服务器（～心在滴血～），因此我的博客终于可以宣告回国了。PS：之前一直使用github-page，众所周知速度贼慢，后面换成了新加坡的VPS服务器，速度就更慢了，没办法只能花大价钱买国内的云服务器。博客迁移得过程比较简单，无非就是添加nginx解析，因此本篇有点水，主要为了记录一下nginx配置web服务的一些笔记。  htt">
+  
+    <link rel="alternate" href="/atom.xml" title="chucz&#39;s blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">chucz&#39;s blog</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://chucz.club"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-Nginx配置相关笔记" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/07/27/Nginx配置相关笔记/" class="article-date">
+  <time datetime="2018-07-27T03:47:15.000Z" itemprop="datePublished">2018-07-27</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Nginx配置相关笔记
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <blockquote>
+<p>好久没更，来水一篇～！～<br>　　就在刚刚，我花了四百大洋租了台腾讯云香港的服务器（～心在滴血～），因此我的博客终于可以宣告回国了。PS：之前一直使用github-page，众所周知速度贼慢，后面换成了新加坡的VPS服务器，速度就更慢了，没办法只能花大价钱买国内的云服务器。博客迁移得过程比较简单，无非就是添加nginx解析，因此本篇有点水，主要为了记录一下nginx配置web服务的一些笔记。<br><a id="more"></a></p>
+</blockquote>
+<h3 id="http-301-https"><a href="#http-301-https" class="headerlink" title="http 301 https"></a><a href="#http-301-https" title="http 301 https"></a>http 301 https</h3><p>我的博客使用了腾讯云免费签发的证书，因此可以使用https访问，默认情况下http也是可以访问的，那么如何将http请求301重定向到https，便是第一个要解决的问题。<br>编辑/etc/nginx/nginx.conf文件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">……</div><div class="line">server &#123;</div><div class="line">       listen         80;</div><div class="line">       server_name    thief.one;</div><div class="line">       <span class="built_in">return</span>         301 https://<span class="variable">$server_name</span><span class="variable">$request_uri</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line">server &#123;</div><div class="line">    listen 443;</div><div class="line">    server_name thief.one;</div><div class="line">    ……</div><div class="line">&#125;</div><div class="line">……</div></pre></td></tr></table></figure>
+
+<p>创建一个80端口，一个443端口的web服务，并且将80端口的服务重定向到<em>https://….</em>。重启nginx后，访问<em><a href="http://thief.one" target="_blank" rel="noopener">http://thief.one</a></em>会被301重定向到<em><a href="https://thief.one" target="_blank" rel="noopener">https://thief.one</a></em></p>
+<h3 id="禁止访问某些目录文件"><a href="#禁止访问某些目录文件" class="headerlink" title="禁止访问某些目录文件"></a><a href="#禁止访问某些目录文件" title="禁止访问某些目录文件"></a>禁止访问某些目录文件</h3><p>由于我的博客项目存放在git上，因此服务器web目录内含有.git目录，也算是敏感信息泄露（当然都是一些静态的网页，其实也没有什么危害），那么如何在nginx中配置访问.git目录403是要解决的第二个问题。<br>编辑/etc/nginx/nginx.conf文件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">server &#123;</div><div class="line">    listen 443;</div><div class="line">    server_name thief.one;</div><div class="line">    ……</div><div class="line"></div><div class="line">    location /.git/ &#123;</div><div class="line">            deny    all;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+
+<p>添加一个location，禁止访问某目录。重启nginx后，尝试访问<em><a href="https://thief.one/.git/config" target="_blank" rel="noopener">https://thief.one/.git/config</a></em> 返回403</p>
+<h3 id="负载均衡"><a href="#负载均衡" class="headerlink" title="负载均衡"></a><a href="#负载均衡" title="负载均衡"></a>负载均衡</h3><p>这个之前总结过：<a href="https://thief.one/2017/08/22/1/" target="_blank" rel="noopener">https://thief.one/2017/08/22/1/</a></p>
+<h3 id="只能通过域名访问"><a href="#只能通过域名访问" class="headerlink" title="只能通过域名访问"></a><a href="#只能通过域名访问" title="只能通过域名访问"></a>只能通过域名访问</h3><p>如果博客不想通过IP被访问到，需要在nginx上配置禁止ip访问，或者访问ip跳转到域名。<br>编辑/etc/nginx/nginx.conf文件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">server &#123;</div><div class="line">        listen       80 default_server;</div><div class="line">        listen       443 default_server;</div><div class="line">        <span class="built_in">return</span> 403</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+
+<p>重启nginx，访问：<em><a href="http://150.109.106.49/" target="_blank" rel="noopener">http://150.109.106.49/</a></em> 返回403。</p>
+<h3 id="权限问题"><a href="#权限问题" class="headerlink" title="权限问题"></a><a href="#权限问题" title="权限问题"></a>权限问题</h3><p>首先说明一下，一般我不推荐使用root权限启动nginx服务。但如果nginx服务是用root权限安装的，且网站放在root目录下，启动nginx解析网站会有权限问题（因为配置文件中默认不是用root权限启动），因此需要更改配置文件为：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">user root;</div></pre></td></tr></table></figure>
+
+<p>更安全的方法是用普通用户权限安装nginx，并将web目录移到普通用户目录下，用普通用户权限启动nginx服务。</p>
+<p><em>nginx配置相关问题笔记，之后我都会记录在此篇中</em></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://chucz.club/2018/07/27/Nginx配置相关笔记/" data-id="cjmlsnpnj0003vzrmcbgpc10g" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/nginx/">nginx</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/技术研究/">技术研究</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/08/17/kubernetes-jenkins-ci-cd/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          kubernetes-jenkins-ci-cd
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/07/09/Headless-Chrome-and-API/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Headless Chrome and API</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ELK/">ELK</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Headless-Chrome/">Headless Chrome</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/K8s/">K8s</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kafka/">Kafka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Logrotate/">Logrotate</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Puppeteer/">Puppeteer</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Pyecharts/">Pyecharts</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Supervisord/">Supervisord</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SyncWriteStream/">SyncWriteStream</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/android-for-python/">android for python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/burpsuite/">burpsuite</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/chrome-remote-interface/">chrome_remote_interface</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/chromeless/">chromeless</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/django/">django</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/exp/">exp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/falcon/">falcon</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/headless-chrome/">headless chrome</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/phantomjs爬虫/">phantomjs爬虫</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pychrome/">pychrome</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python开发app/">python开发app</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web安全/">web安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/whatweb/">whatweb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/x-pack/">x-pack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/余弦相似性/">余弦相似性</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/区块链/">区块链</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/区块链安全/">区块链安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/协程/">协程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/技术研究/">技术研究</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/未授权访问漏洞/">未授权访问漏洞</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/漏洞扫描器/">漏洞扫描器</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爬虫技术/">爬虫技术</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活杂谈/">生活杂谈</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/编程之道/">编程之道</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/ELK/" style="font-size: 18px;">ELK</a> <a href="/tags/Headless-Chrome/" style="font-size: 10px;">Headless Chrome</a> <a href="/tags/K8s/" style="font-size: 16px;">K8s</a> <a href="/tags/Kafka/" style="font-size: 10px;">Kafka</a> <a href="/tags/Logrotate/" style="font-size: 10px;">Logrotate</a> <a href="/tags/Puppeteer/" style="font-size: 10px;">Puppeteer</a> <a href="/tags/Pyecharts/" style="font-size: 10px;">Pyecharts</a> <a href="/tags/Supervisord/" style="font-size: 10px;">Supervisord</a> <a href="/tags/SyncWriteStream/" style="font-size: 10px;">SyncWriteStream</a> <a href="/tags/android-for-python/" style="font-size: 10px;">android for python</a> <a href="/tags/burpsuite/" style="font-size: 10px;">burpsuite</a> <a href="/tags/chrome-remote-interface/" style="font-size: 10px;">chrome_remote_interface</a> <a href="/tags/chromeless/" style="font-size: 10px;">chromeless</a> <a href="/tags/django/" style="font-size: 10px;">django</a> <a href="/tags/docker/" style="font-size: 10px;">docker</a> <a href="/tags/exp/" style="font-size: 10px;">exp</a> <a href="/tags/falcon/" style="font-size: 10px;">falcon</a> <a href="/tags/headless-chrome/" style="font-size: 10px;">headless chrome</a> <a href="/tags/hexo/" style="font-size: 12px;">hexo</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/phantomjs爬虫/" style="font-size: 10px;">phantomjs爬虫</a> <a href="/tags/pychrome/" style="font-size: 10px;">pychrome</a> <a href="/tags/python/" style="font-size: 14px;">python</a> <a href="/tags/python开发app/" style="font-size: 10px;">python开发app</a> <a href="/tags/web安全/" style="font-size: 10px;">web安全</a> <a href="/tags/whatweb/" style="font-size: 10px;">whatweb</a> <a href="/tags/x-pack/" style="font-size: 10px;">x-pack</a> <a href="/tags/余弦相似性/" style="font-size: 10px;">余弦相似性</a> <a href="/tags/区块链/" style="font-size: 10px;">区块链</a> <a href="/tags/区块链安全/" style="font-size: 10px;">区块链安全</a> <a href="/tags/协程/" style="font-size: 10px;">协程</a> <a href="/tags/技术研究/" style="font-size: 12px;">技术研究</a> <a href="/tags/未授权访问漏洞/" style="font-size: 10px;">未授权访问漏洞</a> <a href="/tags/漏洞扫描器/" style="font-size: 10px;">漏洞扫描器</a> <a href="/tags/爬虫技术/" style="font-size: 12px;">爬虫技术</a> <a href="/tags/生活杂谈/" style="font-size: 10px;">生活杂谈</a> <a href="/tags/编程之道/" style="font-size: 20px;">编程之道</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">August 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">July 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">June 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">February 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">November 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/09/28/hello-world/">Hello World</a>
+          </li>
+        
+          <li>
+            <a href="/2018/08/28/记Django开发中的一些常用代码段/">记Django开发中的一些常用代码段</a>
+          </li>
+        
+          <li>
+            <a href="/2018/08/21/生成k8s证书的三种方式/">生成k8s证书的三种方式</a>
+          </li>
+        
+          <li>
+            <a href="/2018/08/19/23种非常有用的ElasticSearch查询例子/">23种非常有用的ElasticSearch查询例子</a>
+          </li>
+        
+          <li>
+            <a href="/2018/08/19/ElasticSearch-索引查询使用指南/">ElasticSearch 索引查询使用指南</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 chucz<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

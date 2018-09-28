@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>利用chrome_remote_interface实现程序化、自动化Web安全测试 | chucz&#39;s blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="高考加油！  　　如果要问有哪些抓包神器或者流量分析工具？以下几款工具是必须要提的，burpsuite（跨平台）、fiddler（windows下抓包神器）、wireshark（经典网络抓包工具）、justniffer（与前面几个使用代理获取流量不一样的是，justniffer是基于网卡获取流量）等。以上这几款工具之前我有单独成文介绍过，如有需要可点击蓝色链接移步。　　那么如果问有哪些程序化的抓">
+<meta name="keywords" content="爬虫技术,chrome_remote_interface,headless chrome">
+<meta property="og:type" content="article">
+<meta property="og:title" content="利用chrome_remote_interface实现程序化、自动化Web安全测试">
+<meta property="og:url" content="http://chucz.club/2018/06/07/利用chrome-remote-interface实现程序化、自动化Web安全测试/index.html">
+<meta property="og:site_name" content="chucz&#39;s blog">
+<meta property="og:description" content="高考加油！  　　如果要问有哪些抓包神器或者流量分析工具？以下几款工具是必须要提的，burpsuite（跨平台）、fiddler（windows下抓包神器）、wireshark（经典网络抓包工具）、justniffer（与前面几个使用代理获取流量不一样的是，justniffer是基于网卡获取流量）等。以上这几款工具之前我有单独成文介绍过，如有需要可点击蓝色链接移步。　　那么如果问有哪些程序化的抓">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://chucz.club/upload_image/20180607/1.png">
+<meta property="og:image" content="http://chucz.club/upload_image/20180607/2.png">
+<meta property="og:image" content="http://chucz.club/upload_image/20180607/3.png">
+<meta property="og:updated_time" content="2018-09-28T08:51:24.508Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="利用chrome_remote_interface实现程序化、自动化Web安全测试">
+<meta name="twitter:description" content="高考加油！  　　如果要问有哪些抓包神器或者流量分析工具？以下几款工具是必须要提的，burpsuite（跨平台）、fiddler（windows下抓包神器）、wireshark（经典网络抓包工具）、justniffer（与前面几个使用代理获取流量不一样的是，justniffer是基于网卡获取流量）等。以上这几款工具之前我有单独成文介绍过，如有需要可点击蓝色链接移步。　　那么如果问有哪些程序化的抓">
+<meta name="twitter:image" content="http://chucz.club/upload_image/20180607/1.png">
+  
+    <link rel="alternate" href="/atom.xml" title="chucz&#39;s blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">chucz&#39;s blog</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://chucz.club"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-利用chrome-remote-interface实现程序化、自动化Web安全测试" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/06/07/利用chrome-remote-interface实现程序化、自动化Web安全测试/" class="article-date">
+  <time datetime="2018-06-07T09:00:27.000Z" itemprop="datePublished">2018-06-07</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      利用chrome_remote_interface实现程序化、自动化Web安全测试
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <blockquote>
+<p>高考加油！</p>
+</blockquote>
+<p>　　如果要问有哪些抓包神器或者流量分析工具？以下几款工具是必须要提的，burpsuite（跨平台）、<a href="https://thief.one/2017/04/27/1/" target="_blank" rel="noopener">fiddler</a>（windows下抓包神器）、<a href="https://thief.one/2017/02/09/WireShark%E8%BF%87%E6%BB%A4%E8%A7%84%E5%88%99/" target="_blank" rel="noopener">wireshark</a>（经典网络抓包工具）、<a href="https://thief.one/2017/09/27/1/" target="_blank" rel="noopener">justniffer</a>（与前面几个使用代理获取流量不一样的是，justniffer是基于网卡获取流量）等。以上这几款工具之前我有单独成文介绍过，如有需要可点击蓝色链接移步。<br>　　那么如果问有哪些程序化的抓包工具？（注明一下这里的程序化指的是可编程）首先burpsuite算一个，因为我们可以开发扩展工具（<a href="https://thief.one/2018/05/04/1/" target="_blank" rel="noopener">burpsuite插件开发之检测越权访问漏洞</a>）；另外fiddle也算一个，可以编辑配置文件，达到扩展功能，之前也介绍过。<br>　　那么如果问有哪些即可以实现程序化又可以实现自动化的抓包工具？（注明一下这里的自动化是指自动产生流量）这个问题有点拗口，你可能会想为什么一个抓包工具要负责产生流量，流量交给爬虫岂不是更好？这个问题暂且放一放，继续往下看。<br><a id="more"></a></p>
+<h3 id="自动化安全测试"><a href="#自动化安全测试" class="headerlink" title="自动化安全测试"></a><a href="#自动化安全测试" title="自动化安全测试"></a>自动化安全测试</h3><p>　　平常我们经常会使用burpsuite等工具检测一个网站的安全性，检测方法不外乎使用浏览器访问网站且把流量代理到burpsuite上，然后在burpsuite上通过拦截、修改、重放流量等方式测试网站安全性。然而当要测试的网站非常多时，有没有一个更自动化、更省力的方式去测试呢？方案肯定是有的，简单来说要实现自动化web安全测试无非要解决几个问题，首先是流量怎么产生？然后是怎么从流量中分析出漏洞？</p>
+<h4 id="自动化测试方案：主动扫描器"><a href="#自动化测试方案：主动扫描器" class="headerlink" title="自动化测试方案：主动扫描器"></a><a href="#自动化测试方案：主动扫描器" title="自动化测试方案：主动扫描器"></a>自动化测试方案：主动扫描器</h4><p>　　市面上基于爬虫的主动扫描器就是一种自动化安全测试工具，首先它的流量是通过爬虫爬取url主动产生的，然后利用一些漏洞插件去构造不同的访问请求。短板：目前市面上扫描器爬虫大多基于web1.0，无法加载js渲染网页，而现在越来越多的网站使用web2.0技术实现前后端数据交互。</p>
+<h4 id="自动化测试方案：被动扫描器"><a href="#自动化测试方案：被动扫描器" class="headerlink" title="自动化测试方案：被动扫描器"></a><a href="#自动化测试方案：被动扫描器" title="自动化测试方案：被动扫描器"></a>自动化测试方案：被动扫描器</h4><p>　　一些大厂内部自研的被动扫描器，首先它的流量不是通过爬虫主动获取的，而是通过监听交换机等网络设备的网卡流量，然后利用一些漏洞插件去分析流量中存在漏洞的点。短板：适合大厂各业务线安全检查不适合测试某个特定的网站，因为需要人为访问网站产生流量。</p>
+<h4 id="自动化测试方案：selenium-流量获取工具-漏洞插件"><a href="#自动化测试方案：selenium-流量获取工具-漏洞插件" class="headerlink" title="自动化测试方案：selenium+流量获取工具+漏洞插件"></a><a href="#自动化测试方案：selenium-流量获取工具-漏洞插件" title="自动化测试方案：selenium+流量获取工具+漏洞插件"></a>自动化测试方案：selenium+流量获取工具+漏洞插件</h4><p>　　selenium是一款网站自动化测试工具，可以程序化的操作浏览器，实现自动化产生流量。再结合抓包工具以及漏洞检测插件，应该就可以解决流量获取以及漏洞检测的问题。短板：用selenium只能实现一些简单的浏览器操作，对于检测复杂的网站系统，似乎不够用，而且速度很慢，性能很差。</p>
+<h4 id="自动化测试方案：chrome-remote-interface-漏洞插件"><a href="#自动化测试方案：chrome-remote-interface-漏洞插件" class="headerlink" title="自动化测试方案：chrome_remote_interface+漏洞插件"></a><a href="#自动化测试方案：chrome-remote-interface-漏洞插件" title="自动化测试方案：chrome_remote_interface+漏洞插件"></a>自动化测试方案：chrome_remote_interface+漏洞插件</h4><p>　　之前我介绍过<a href="https://thief.one/2018/03/06/1/" target="_blank" rel="noopener">headless chrome</a>，也介绍过<a href="https://thief.one/2017/03/31/Phantomjs%E6%AD%A3%E7%A1%AE%E6%89%93%E5%BC%80%E6%96%B9%E5%BC%8F/" target="_blank" rel="noopener">phantomjs</a>等web2.0爬虫工具，目前推荐去学习使用headless-chrome。headless chrome工具是用来自动加载js，获取渲染后的页面源码，解决web2.0爬虫之困。而chrome_remote_interface是一个更底层的工具，可以用来分析协议，简单说就是可以分析整个渲染过程，以及截取分析过程中的流量。就类似您打开了chrome浏览器的审查元素功能，然后刷新一下页面，查看一下network信息。<br><img src="/upload_image/20180607/1.png" alt=""></p>
+<h3 id="chrome-remote-interface介绍"><a href="#chrome-remote-interface介绍" class="headerlink" title="chrome_remote_interface介绍"></a><a href="#chrome-remote-interface介绍" title="chrome_remote_interface介绍"></a>chrome_remote_interface介绍</h3><p>chrome_remote_interface是一个开源项目，<a href="https://github.com/cyrus-and/chrome-remote-interface" target="_blank" rel="noopener">项目地址</a>，并且支持命令行、编码两种方式，且使用node.js开发。</p>
+<h4 id="安装使用"><a href="#安装使用" class="headerlink" title="安装使用"></a><a href="#安装使用" title="安装使用"></a>安装使用</h4><p>因为chrome_remote_interface是基于nodejs的，因此需要安装npm包管理工具。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">yum install npm -y</div></pre></td></tr></table></figure>
+
+<p>然后创建一个目录，初始化一个项目</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">npm init</div></pre></td></tr></table></figure>
+
+<p>在目录下安装chrome_remote_interface</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">npm install chrome-remote-interface</div></pre></td></tr></table></figure>
+
+<p>创建一个简单的nodejs程序(nmask.js)：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line">const CDP = require(<span class="string">‘chrome-remote-interface’</span>);</div><div class="line"></div><div class="line">// node nmask.js <a href="https://nmask.cn" target="_blank" rel="noopener">https://nmask.cn</a></div><div class="line"></div><div class="line">var options = process.argv;</div><div class="line">var target_url = options[2];</div><div class="line"></div><div class="line">CDP((client) =&gt; &#123;</div><div class="line">    // extract domains</div><div class="line">    const &#123;Network, Page&#125; = client;</div><div class="line">    </div><div class="line">    // setup handlers</div><div class="line">    Network.requestWillBeSent((params) =&gt; &#123;</div><div class="line">        console.log(params.request.url);</div><div class="line">    &#125;);</div><div class="line">    Page.loadEventFired(() =&gt; &#123;</div><div class="line">        client.close();</div><div class="line">    &#125;);</div><div class="line">    </div><div class="line">    // <span class="built_in">enable</span> events <span class="keyword">then</span> start!</div><div class="line">    Promise.all([</div><div class="line">        Network.enable(),</div><div class="line">        Page.enable()</div><div class="line">    ]).<span class="keyword">then</span>(() =&gt; &#123;</div><div class="line">        <span class="built_in">return</span> Page.navigate(&#123;url: target_url&#125;);//输出请求的url</div><div class="line">    &#125;).catch((err) =&gt; &#123;</div><div class="line">        console.error(err);</div><div class="line">        client.close();</div><div class="line">    &#125;);</div><div class="line">&#125;).on(<span class="string">‘error’</span>, (err) =&gt; &#123;</div><div class="line">    console.error(err);</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+
+<p>说明：在运行这段程序前，必须要在系统上安装chrome以及启动chrome headless监听模式，具体怎么安装chrome headless可以移步：<a href="https://thief.one/2018/03/06/1/" target="_blank" rel="noopener">headless chrome and api</a><br>启动chrome headless监听模式：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">chrome –headless –remote-debugging-port=9222</div><div class="line">或者</div><div class="line">google-chrome –headless –remote-debugging-port=9222</div></pre></td></tr></table></figure>
+
+<p>然后另外开启一个窗口，运行nodejs：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">node nmask.js <a href="https://thief.one" target="_blank" rel="noopener">https://thief.one</a></div></pre></td></tr></table></figure>
+
+<p>运行结果如下：(输出渲染过程中请求的所有url)<br><img src="/upload_image/20180607/2.png" alt=""></p>
+<h3 id="chrome-remote-interface-for-python"><a href="#chrome-remote-interface-for-python" class="headerlink" title="chrome_remote_interface for python"></a><a href="#chrome-remote-interface-for-python" title="chrome_remote_interface for python"></a>chrome_remote_interface for python</h3><p>　　由于chrome_remote_interface是nodejs实现的，因此对于不熟悉nodejs的朋友来说coding成本比较高。然而好在已经有外国友人用python封装了一个工具，<a href="https://github.com/wasiher/chrome_remote_interface_python" target="_blank" rel="noopener">项目地址</a>，虽然目前此项目尚处于初级阶段，但实实在在地解决了我的问题。</p>
+<h4 id="安装使用-1"><a href="#安装使用-1" class="headerlink" title="安装使用"></a><a href="#安装使用-1" title="安装使用"></a>安装使用</h4><p>基于是用python3.5开发的，那么就clone一下项目，直接安装吧：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">git <span class="built_in">clone</span> <a href="https://github.com/wasiher/chrome-remote-interface-python.git" target="_blank" rel="noopener">https://github.com/wasiher/chrome-remote-interface-python.git</a></div><div class="line">python3 setup.py install</div></pre></td></tr></table></figure>
+
+<p>编写一个python版的程序(nmask.py)：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#! -<em>- coding:utf-8 -</em>-</span></div><div class="line"></div><div class="line"><span class="string">‘’</span><span class="string">‘</span></div><div class="line"><strong>author</strong>=”nMask”</div><div class="line"><strong>Date</strong>=”7 Jun 2018”</div><div class="line"><strong>Blog</strong>=”<a href="https://thief.one&quot;" target="_blank" rel="noopener">https://thief.one&quot;</a></div><div class="line"><strong>version</strong>=”1.0”</div><div class="line"><strong>py_version</strong>=”3.5”</div><div class="line"></div><div class="line">‘<span class="string">‘’</span></div><div class="line"></div><div class="line">import asyncio</div><div class="line">import chrome_remote_interface</div><div class="line"></div><div class="line"></div><div class="line">class callbacks(object):</div><div class="line">    <span class="string">‘’</span><span class="string">‘ callback class ‘</span><span class="string">‘’</span></div><div class="line"></div><div class="line">    target_url = <span class="string">‘’</span></div><div class="line">    result = []</div><div class="line"></div><div class="line">    async def start(tabs):</div><div class="line">        await tabs.add()</div><div class="line"></div><div class="line">    async def tab_start(tabs, tab):</div><div class="line">        await tab.Page.enable()</div><div class="line">        await tab.Network.enable()</div><div class="line">        await tab.Page.navigate(url=callbacks.target_url)</div><div class="line"></div><div class="line">    async def network__response_received(tabs, tab, requestId, loaderId, timestamp, <span class="built_in">type</span>, response, <strong>kwargs):</strong></div><div class="line">        <span class="string">‘’</span><span class="string">‘</span></div><div class="line">        print(response.requestHeaders)</div><div class="line">        print(dir(response))</div><div class="line">        more response attribute <a href="https://chromedevtools.github.io/devtools-protocol/tot/Network#type-Response" target="_blank" rel="noopener">https://chromedevtools.github.io/devtools-protocol/tot/Network#type-Response</a></div><div class="line">        ‘<span class="string">‘’</span></div><div class="line">        try:</div><div class="line">            body = tabs.helpers.old_helpers.unpack_response_body(await tab.Network.get_response_body(requestId=requestId))</div><div class="line">        except tabs.FailResponse as e:</div><div class="line">            <span class="built_in">print</span>(<span class="string">‘[Error]’</span>, e)</div><div class="line">        <span class="keyword">else</span>:</div><div class="line">            <span class="built_in">print</span>(response.url,response.status,len(body))</div><div class="line">            callbacks.result.append((response.url,response.status,len(body)))</div><div class="line"></div><div class="line">    async def page__frame_stopped_loading(tabs, tab, kwargs):</div><div class="line">        <span class="built_in">print</span>(<span class="string">“[Info]Finish”</span>)</div><div class="line">        tabs.terminate()</div><div class="line"></div><div class="line">    async def any(tabs, tab, callback_name, parameters):</div><div class="line">        pass</div><div class="line"></div><div class="line"></div><div class="line"><span class="keyword">if</span> <strong>name</strong>==<span class="string">“<strong>main</strong>“</span>:</div><div class="line">    callbacks.target_url = <span class="string">“<a href="http://www.baidu.com&quot;" target="_blank" rel="noopener">http://www.baidu.com&quot;</a></span></div><div class="line">    asyncio.get_event_loop().run_until_complete(chrome_remote_interface.Tabs.run(<span class="string">‘localhost’</span>, 9222, callbacks))</div><div class="line">    <span class="built_in">print</span>(callbacks.result)</div></pre></td></tr></table></figure>
+
+<p>说明：同样的在运行这段代码前，先运行chrome headless监听程序。</p>
+<p>然后运行该程序：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">python nmask.py</div></pre></td></tr></table></figure>
+
+<p><img src="/upload_image/20180607/3.png" alt=""></p>
+<p>说明：运行程序，最终得到渲染过程中请求的url、响应码、响应内容长度。</p>
+<h3 id="Chrome-Debugging-Protocol"><a href="#Chrome-Debugging-Protocol" class="headerlink" title="Chrome Debugging Protocol"></a><a href="#Chrome-Debugging-Protocol" title="Chrome Debugging Protocol"></a>Chrome Debugging Protocol</h3><p>　　无论是nodejs版本的chrome-remote-interface还是python版本的，实现的底层都是基于Chrome Debugging Protocol接口，<a href="https://chromedevtools.github.io/devtools-protocol/" target="_blank" rel="noopener">官方文档</a>，因此在使用chrome-remote-interface过程中，可以查询一下这个文档。比如python版本中network__response_received函数，是封装了Chrome Debugging Protocol接口Network.ResponseReceived函数，而此函数接受的参数，以及一些属性方法等都可以在该文档中查询。</p>
+<h3 id="解决文章开头的问题"><a href="#解决文章开头的问题" class="headerlink" title="解决文章开头的问题"></a><a href="#解决文章开头的问题" title="解决文章开头的问题"></a>解决文章开头的问题</h3><p>　　文章开头还留了一个问题，有哪些即可以实现程序化又可以实现自动化的抓包工具？想想chrome-remote-interface能干啥？其一可以使用nodejs、python（可能还有其他语言封装的项目）编程，底层接口文档比较完善；其二用它来写web2.0爬虫，访问页面产生流量，当然区别web1.0爬虫，这里的流量是完整的流量，相当于人工打开浏览器访问网页；其三可以获取流量，并且进行分析。第一点功能实现了程序化，第二三点功能实现了自动化。<br>　　最后让我们回过头看一下前文提到的自动化测试方案–主动扫描器，其短板就是没法解决web2.0爬虫的困境，而chrome-remote-interface恰恰可以解决，发挥下想象力，其前途应该无限！</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://chucz.club/2018/06/07/利用chrome-remote-interface实现程序化、自动化Web安全测试/" data-id="cjmlsnpqa002dvzrmwrnmqp1a" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/chrome-remote-interface/">chrome_remote_interface</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/headless-chrome/">headless chrome</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/爬虫技术/">爬虫技术</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/06/21/Python3-5协程学习研究/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          Python3.5协程学习研究
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/05/25/区块链系列·python实现的区块链/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">区块链系列·python实现的区块链</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ELK/">ELK</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Headless-Chrome/">Headless Chrome</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/K8s/">K8s</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kafka/">Kafka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Logrotate/">Logrotate</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Puppeteer/">Puppeteer</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Pyecharts/">Pyecharts</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Supervisord/">Supervisord</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SyncWriteStream/">SyncWriteStream</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/android-for-python/">android for python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/burpsuite/">burpsuite</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/chrome-remote-interface/">chrome_remote_interface</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/chromeless/">chromeless</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/django/">django</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/exp/">exp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/falcon/">falcon</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/headless-chrome/">headless chrome</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/phantomjs爬虫/">phantomjs爬虫</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pychrome/">pychrome</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python开发app/">python开发app</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web安全/">web安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/whatweb/">whatweb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/x-pack/">x-pack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/余弦相似性/">余弦相似性</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/区块链/">区块链</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/区块链安全/">区块链安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/协程/">协程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/技术研究/">技术研究</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/未授权访问漏洞/">未授权访问漏洞</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/漏洞扫描器/">漏洞扫描器</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爬虫技术/">爬虫技术</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活杂谈/">生活杂谈</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/编程之道/">编程之道</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/ELK/" style="font-size: 18px;">ELK</a> <a href="/tags/Headless-Chrome/" style="font-size: 10px;">Headless Chrome</a> <a href="/tags/K8s/" style="font-size: 16px;">K8s</a> <a href="/tags/Kafka/" style="font-size: 10px;">Kafka</a> <a href="/tags/Logrotate/" style="font-size: 10px;">Logrotate</a> <a href="/tags/Puppeteer/" style="font-size: 10px;">Puppeteer</a> <a href="/tags/Pyecharts/" style="font-size: 10px;">Pyecharts</a> <a href="/tags/Supervisord/" style="font-size: 10px;">Supervisord</a> <a href="/tags/SyncWriteStream/" style="font-size: 10px;">SyncWriteStream</a> <a href="/tags/android-for-python/" style="font-size: 10px;">android for python</a> <a href="/tags/burpsuite/" style="font-size: 10px;">burpsuite</a> <a href="/tags/chrome-remote-interface/" style="font-size: 10px;">chrome_remote_interface</a> <a href="/tags/chromeless/" style="font-size: 10px;">chromeless</a> <a href="/tags/django/" style="font-size: 10px;">django</a> <a href="/tags/docker/" style="font-size: 10px;">docker</a> <a href="/tags/exp/" style="font-size: 10px;">exp</a> <a href="/tags/falcon/" style="font-size: 10px;">falcon</a> <a href="/tags/headless-chrome/" style="font-size: 10px;">headless chrome</a> <a href="/tags/hexo/" style="font-size: 12px;">hexo</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/phantomjs爬虫/" style="font-size: 10px;">phantomjs爬虫</a> <a href="/tags/pychrome/" style="font-size: 10px;">pychrome</a> <a href="/tags/python/" style="font-size: 14px;">python</a> <a href="/tags/python开发app/" style="font-size: 10px;">python开发app</a> <a href="/tags/web安全/" style="font-size: 10px;">web安全</a> <a href="/tags/whatweb/" style="font-size: 10px;">whatweb</a> <a href="/tags/x-pack/" style="font-size: 10px;">x-pack</a> <a href="/tags/余弦相似性/" style="font-size: 10px;">余弦相似性</a> <a href="/tags/区块链/" style="font-size: 10px;">区块链</a> <a href="/tags/区块链安全/" style="font-size: 10px;">区块链安全</a> <a href="/tags/协程/" style="font-size: 10px;">协程</a> <a href="/tags/技术研究/" style="font-size: 12px;">技术研究</a> <a href="/tags/未授权访问漏洞/" style="font-size: 10px;">未授权访问漏洞</a> <a href="/tags/漏洞扫描器/" style="font-size: 10px;">漏洞扫描器</a> <a href="/tags/爬虫技术/" style="font-size: 12px;">爬虫技术</a> <a href="/tags/生活杂谈/" style="font-size: 10px;">生活杂谈</a> <a href="/tags/编程之道/" style="font-size: 20px;">编程之道</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">August 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">July 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">June 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">February 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">November 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/09/28/hello-world/">Hello World</a>
+          </li>
+        
+          <li>
+            <a href="/2018/08/28/记Django开发中的一些常用代码段/">记Django开发中的一些常用代码段</a>
+          </li>
+        
+          <li>
+            <a href="/2018/08/21/生成k8s证书的三种方式/">生成k8s证书的三种方式</a>
+          </li>
+        
+          <li>
+            <a href="/2018/08/19/23种非常有用的ElasticSearch查询例子/">23种非常有用的ElasticSearch查询例子</a>
+          </li>
+        
+          <li>
+            <a href="/2018/08/19/ElasticSearch-索引查询使用指南/">ElasticSearch 索引查询使用指南</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 chucz<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

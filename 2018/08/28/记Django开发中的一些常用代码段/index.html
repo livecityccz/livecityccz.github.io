@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>记Django开发中的一些常用代码段 | chucz&#39;s blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="2018年的第一场雪，比2002年来得更晚一些　　记得之前有分享过Django开发相关的系列文章（可在博客右上方自行搜索），内容包括模版、视图、路由等。那么本篇再补充一些Django开发过程中常用到的一些功能代码块，内容涉及前端、后端相关功能代码。这些代码块都是平常开发中常用的，因此在此做个备份，方便查询。  前端功能搞安全的还需要会前端？当然啊，搞安全的也需要出产品，出产品了没前端不就显得很l">
+<meta name="keywords" content="编程之道,django">
+<meta property="og:type" content="article">
+<meta property="og:title" content="记Django开发中的一些常用代码段">
+<meta property="og:url" content="http://chucz.club/2018/08/28/记Django开发中的一些常用代码段/index.html">
+<meta property="og:site_name" content="chucz&#39;s blog">
+<meta property="og:description" content="2018年的第一场雪，比2002年来得更晚一些　　记得之前有分享过Django开发相关的系列文章（可在博客右上方自行搜索），内容包括模版、视图、路由等。那么本篇再补充一些Django开发过程中常用到的一些功能代码块，内容涉及前端、后端相关功能代码。这些代码块都是平常开发中常用的，因此在此做个备份，方便查询。  前端功能搞安全的还需要会前端？当然啊，搞安全的也需要出产品，出产品了没前端不就显得很l">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://chucz.club/upload_image/20180126/6.png">
+<meta property="og:image" content="http://chucz.club/upload_image/20180126/1.png">
+<meta property="og:image" content="http://chucz.club/upload_image/20180126/7.png">
+<meta property="og:image" content="http://chucz.club/upload_image/20180126/2.png">
+<meta property="og:image" content="http://chucz.club/upload_image/20180126/3.png">
+<meta property="og:image" content="http://chucz.club/upload_image/20180126/4.png">
+<meta property="og:image" content="http://chucz.club/upload_image/20180126/5.png">
+<meta property="og:updated_time" content="2018-09-28T08:51:24.508Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="记Django开发中的一些常用代码段">
+<meta name="twitter:description" content="2018年的第一场雪，比2002年来得更晚一些　　记得之前有分享过Django开发相关的系列文章（可在博客右上方自行搜索），内容包括模版、视图、路由等。那么本篇再补充一些Django开发过程中常用到的一些功能代码块，内容涉及前端、后端相关功能代码。这些代码块都是平常开发中常用的，因此在此做个备份，方便查询。  前端功能搞安全的还需要会前端？当然啊，搞安全的也需要出产品，出产品了没前端不就显得很l">
+<meta name="twitter:image" content="http://chucz.club/upload_image/20180126/6.png">
+  
+    <link rel="alternate" href="/atom.xml" title="chucz&#39;s blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">chucz&#39;s blog</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://chucz.club"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-记Django开发中的一些常用代码段" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/08/28/记Django开发中的一些常用代码段/" class="article-date">
+  <time datetime="2018-08-28T06:46:20.000Z" itemprop="datePublished">2018-08-28</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      记Django开发中的一些常用代码段
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <blockquote>
+<p>2018年的第一场雪，比2002年来得更晚一些<br>　　记得之前有分享过Django开发相关的系列文章（可在博客右上方自行搜索），内容包括模版、视图、路由等。那么本篇再补充一些Django开发过程中常用到的一些功能代码块，内容涉及前端、后端相关功能代码。这些代码块都是平常开发中常用的，因此在此做个备份，方便查询。<br><a id="more"></a></p>
+</blockquote>
+<h3 id="前端功能"><a href="#前端功能" class="headerlink" title="前端功能"></a><a href="#前端功能" title="前端功能"></a>前端功能</h3><p>搞安全的还需要会前端？当然啊，搞安全的也需要出产品，出产品了没前端不就显得很low吗？不过自己写前端太累了，因此还得用框架，这里推荐<a href="http://v3.bootcss.com/" target="_blank" rel="noopener">Bootstrap</a>。在尝试使用文章下方介绍的前端代码前，先在代码中添加上Bootstrap框架提供给的css、js连接。</p>
+<h4 id="面板折叠"><a href="#面板折叠" class="headerlink" title="面板折叠"></a><a href="#面板折叠" title="面板折叠"></a>面板折叠</h4><p><img src="/upload_image/20180126/6.png" alt=""><br><img src="/upload_image/20180126/1.png" alt=""><br>这个功能经常在侧边菜单栏中用到，面板折叠可有效的保持界面整洁。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">&lt;div class=<span class="string">“panel panel-success”</span>&gt;</div><div class="line">&lt;div class=<span class="string">“panel-heading”</span> data-toggle=<span class="string">“collapse”</span> data-parent=<span class="string">“#accordion”</span> href=<span class="string">“#collapse”</span>&gt;</div><div class="line">  &lt;h1 class=<span class="string">“panel-title”</span>&gt;&lt;span class=<span class="string">“glyphicon glyphicon-tag”</span> aria-hidden=<span class="string">“true”</span>&gt;&lt;/span&gt;Index&lt;/h1&gt;</div><div class="line">&lt;/div&gt;</div><div class="line">&lt;div id=<span class="string">“collapse”</span> class=<span class="string">“panel-collapse collapse out”</span>&gt; <span class="comment"># out or in 控制折叠状态</span></div><div class="line">  &lt;div class=<span class="string">“panel-body”</span>&gt;</div><div class="line">    &lt;a href=<span class="string">“”</span>&gt;index1&lt;/a&gt;&lt;br&gt;&lt;br&gt;</div><div class="line">    &lt;a href=<span class="string">“”</span>&gt;index2&lt;/a&gt;&lt;br&gt;&lt;br&gt;</div><div class="line">  &lt;/div&gt;</div><div class="line">&lt;/div&gt;</div><div class="line">&lt;/div&gt;</div></pre></td></tr></table></figure>
+
+<h4 id="表格分页"><a href="#表格分页" class="headerlink" title="表格分页"></a><a href="#表格分页" title="表格分页"></a>表格分页</h4><p><img src="/upload_image/20180126/7.png" alt=""><br>表格分页前端比较简单，想要实现真正的分页显示数据，需要结合后端代码，文章后面会介绍。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">&lt;!– 分页 –&gt;</div><div class="line">&lt;form action=<span class="string">“&#123;% url ‘asset_list’ %&#125;”</span> method=<span class="string">“POST”</span>&gt;</div><div class="line">&#123;% csrf_token %&#125;</div><div class="line">&lt;ul class=<span class="string">“pagination pagination”</span>&gt;</div><div class="line">    &lt;li&gt;&lt;a href=<span class="string">“&#123;% url ‘asset_list’ %&#125;?page=0&amp;search_key=&#123;&#123;search_key&#125;&#125;”</span>&gt;首页&lt;/a&gt;&lt;/li&gt;</div><div class="line">    &lt;li&gt;&lt;a href=<span class="string">“&#123;% url ‘asset_list’ %&#125;?page=&#123;&#123;pre_page&#125;&#125;&amp;search_key=&#123;&#123;search_key&#125;&#125;”</span>&gt;上一页&lt;/a&gt;&lt;/li&gt;</div><div class="line">    &#123;% <span class="keyword">for</span> i <span class="keyword">in</span> page_list %&#125;</div><div class="line">        &lt;li&gt;&lt;a href=<span class="string">“&#123;% url ‘asset_list’ %&#125;?page=&#123;&#123; i &#125;&#125;&amp;search_key=&#123;&#123;search_key&#125;&#125;”</span> class=<span class="string">“active”</span>&gt;&#123;&#123; i &#125;&#125;&lt;/a&gt;&lt;/li&gt;</div><div class="line">    &#123;% endfor %&#125;</div><div class="line">    &lt;li&gt;&lt;a href=<span class="string">“&#123;% url ‘asset_list’ %&#125;?page=&#123;&#123; next_page &#125;&#125;&amp;search_key=&#123;&#123;search_key&#125;&#125;”</span>&gt;下一页&lt;/a&gt;&lt;/li&gt;</div><div class="line">    &lt;li&gt;&lt;a href=<span class="string">“&#123;% url ‘asset_list’ %&#125;?page=&#123;&#123; last_page &#125;&#125;&amp;search_key=&#123;&#123;search_key&#125;&#125;”</span>&gt;尾页&lt;/a&gt;&lt;/li&gt;</div><div class="line">    &amp;nbsp;</div><div class="line">     &lt;li&gt;</div><div class="line">        &lt;input <span class="built_in">type</span>=<span class="string">“text”</span> placeholder=<span class="string">“输入页码”</span> ng-model=<span class="string">“gotoPage”</span> class=<span class="string">“”</span> style=<span class="string">“width: 80px”</span> name=<span class="string">“page”</span>&gt;</div><div class="line">        &amp;nbsp;</div><div class="line">        &lt;input <span class="built_in">type</span>=<span class="string">“submit”</span> class=<span class="string">“btn btn-default”</span> name=<span class="string">“”</span> value=<span class="string">“跳转到”</span> style=<span class="string">“width:70px;height: 34px”</span>&gt;</div><div class="line">    &lt;/li&gt;</div><div class="line"> &lt;/ul&gt;</div><div class="line">&lt;/form&gt;</div></pre></td></tr></table></figure>
+
+<h4 id="控制表格单元格内容自动换行"><a href="#控制表格单元格内容自动换行" class="headerlink" title="控制表格单元格内容自动换行"></a><a href="#控制表格单元格内容自动换行" title="控制表格单元格内容自动换行"></a>控制表格单元格内容自动换行</h4><p>有些时候表格中单元格内容太长，会导致表格整体很不好看，因此对于内容会很长的表格列需要添加如下style</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&lt;td style=<span class="string">“word-wrap:break-word;word-break:break-all;”</span>&gt;<span class="built_in">test</span>&lt;/td&gt;</div></pre></td></tr></table></figure>
+
+<h4 id="弹出框（可编辑）"><a href="#弹出框（可编辑）" class="headerlink" title="弹出框（可编辑）"></a><a href="#弹出框（可编辑）" title="弹出框（可编辑）"></a>弹出框（可编辑）</h4><p><img src="/upload_image/20180126/2.png" alt=""><br>有些时候需要修改一些表格数据，之前的做法是点击一个按钮，跳转到一个修改的页面，但这种做法不够优雅，因此可以选择点击按钮弹出一个可编辑的对话框。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line">&lt;form action=<span class="string">“/index/“</span> method=<span class="string">“POST”</span>&gt;</div><div class="line">&lt;div class=<span class="string">“modal fade”</span> id=<span class="string">“update”</span> tabindex=<span class="string">“-1”</span> role=<span class="string">“dialog”</span> aria-labelledby=<span class="string">“myModalLabel”</span> aria-hidden=<span class="string">“true”</span>&gt;</div><div class="line">  &lt;div class=<span class="string">“modal-dialog”</span>&gt;</div><div class="line">    &lt;div class=<span class="string">“modal-content”</span>&gt;</div><div class="line">      &lt;div class=<span class="string">“modal-header”</span>&gt;</div><div class="line">        &lt;button <span class="built_in">type</span>=<span class="string">“button”</span> class=<span class="string">“close”</span> data-dismiss=<span class="string">“modal”</span> aria-hidden=<span class="string">“true”</span>&gt;</div><div class="line">          &amp;<span class="built_in">times</span>;</div><div class="line">        &lt;/button&gt;</div><div class="line">        &lt;h4 class=<span class="string">“modal-title”</span> id=<span class="string">“myModalLabel”</span>&gt;</div><div class="line">          提醒框</div><div class="line">        &lt;/h4&gt;</div><div class="line">      &lt;/div&gt;</div><div class="line">      &lt;div class=<span class="string">“modal-body”</span>&gt;</div><div class="line">        &lt;label&gt;KEY&lt;/label&gt;</div><div class="line">        &lt;input <span class="built_in">type</span>=<span class="string">“text”</span> class=<span class="string">“form-control”</span> name=<span class="string">“new_key”</span> value=<span class="string">“&#123;&#123;i.key_&#125;&#125;”</span>&gt;</div><div class="line">        &lt;label&gt;VALUES&lt;/label&gt;</div><div class="line">        &lt;input <span class="built_in">type</span>=<span class="string">“text”</span> class=<span class="string">“form-control”</span> name=<span class="string">“new_value”</span> value=<span class="string">“&#123;&#123;i.value_&#125;&#125;”</span>&gt;</div><div class="line"></div><div class="line">      &lt;/div&gt;</div><div class="line">      &lt;div class=<span class="string">“modal-footer”</span>&gt;</div><div class="line">        &lt;button <span class="built_in">type</span>=<span class="string">“button”</span> class=<span class="string">“btn btn-default”</span> data-dismiss=<span class="string">“modal”</span>&gt;关闭</div><div class="line">        &lt;/button&gt;</div><div class="line">        &lt;button <span class="built_in">type</span>=<span class="string">“submit”</span> name=<span class="string">“update_id”</span> value=<span class="string">“&#123;&#123;i.id&#125;&#125;”</span> class=<span class="string">“btn btn-primary”</span>&gt;</div><div class="line">          确定修改</div><div class="line">        &lt;/button&gt;</div><div class="line">      &lt;/div&gt;</div><div class="line">    &lt;/div&gt;</div><div class="line">  &lt;/div&gt;</div><div class="line">&lt;/div&gt;</div><div class="line">&lt;input <span class="built_in">type</span>=<span class="string">“button”</span> data-toggle=<span class="string">“modal”</span> data-target=<span class="string">“#update”</span> class=<span class="string">“btn btn-info”</span> value=<span class="string">“修改”</span>&gt;</div><div class="line">&lt;/form&gt;</div></pre></td></tr></table></figure>
+
+<h4 id="弹出提醒框（不可编辑）"><a href="#弹出提醒框（不可编辑）" class="headerlink" title="弹出提醒框（不可编辑）"></a><a href="#弹出提醒框（不可编辑）" title="弹出提醒框（不可编辑）"></a>弹出提醒框（不可编辑）</h4><p><img src="/upload_image/20180126/3.png" alt=""><br>这个功能主要作用删除数据、修改数据时的提醒。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line">&lt;form action=<span class="string">“/index/“</span> method=<span class="string">“POST”</span>&gt;</div><div class="line">&lt;div class=<span class="string">“modal fade”</span> id=<span class="string">“del”</span> tabindex=<span class="string">“-1”</span> role=<span class="string">“dialog”</span> aria-labelledby=<span class="string">“myModalLabel”</span> aria-hidden=<span class="string">“true”</span>&gt;</div><div class="line">&lt;div class=<span class="string">“modal-dialog”</span>&gt;</div><div class="line">&lt;div class=<span class="string">“modal-content”</span>&gt;</div><div class="line">  &lt;div class=<span class="string">“modal-header”</span>&gt;</div><div class="line">    &lt;button <span class="built_in">type</span>=<span class="string">“button”</span> class=<span class="string">“close”</span> data-dismiss=<span class="string">“modal”</span> aria-hidden=<span class="string">“true”</span>&gt;</div><div class="line">      &amp;<span class="built_in">times</span>;</div><div class="line">    &lt;/button&gt;</div><div class="line">    &lt;h4 class=<span class="string">“modal-title”</span> id=<span class="string">“myModalLabel”</span>&gt;</div><div class="line">      提醒框</div><div class="line">    &lt;/h4&gt;</div><div class="line">  &lt;/div&gt;</div><div class="line">  &lt;div class=<span class="string">“modal-body”</span>&gt;</div><div class="line">    您确定要删除记录吗？</div><div class="line">  &lt;/div&gt;</div><div class="line">  &lt;div class=<span class="string">“modal-footer”</span>&gt;</div><div class="line">    &lt;button <span class="built_in">type</span>=<span class="string">“button”</span> class=<span class="string">“btn btn-default”</span> data-dismiss=<span class="string">“modal”</span>&gt;关闭</div><div class="line">    &lt;/button&gt;</div><div class="line">    &lt;button <span class="built_in">type</span>=<span class="string">“submit”</span> name=<span class="string">“del_id”</span> value=<span class="string">“&#123;&#123;i.id&#125;&#125;”</span> class=<span class="string">“btn btn-primary”</span>&gt;</div><div class="line">      确定删除</div><div class="line">    &lt;/button&gt;</div><div class="line">  &lt;/div&gt;</div><div class="line">&lt;/div&gt;</div><div class="line">&lt;/div&gt;</div><div class="line">&lt;/div&gt;</div><div class="line">&lt;input <span class="built_in">type</span>=<span class="string">“button”</span> data-toggle=<span class="string">“modal”</span> data-target=<span class="string">“#del”</span> class=<span class="string">“btn btn-danger”</span> value=<span class="string">“删除”</span>&gt;</div><div class="line">&lt;/form&gt;</div></pre></td></tr></table></figure>
+
+<h4 id="搜索框自动补全"><a href="#搜索框自动补全" class="headerlink" title="搜索框自动补全"></a><a href="#搜索框自动补全" title="搜索框自动补全"></a>搜索框自动补全</h4><p><img src="/upload_image/20180126/4.png" alt=""><br>这个就厉害啦，当搜索一些资源的时候，如果能自动补全是不是会方便很多呢？</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">&lt;label <span class="keyword">for</span>=<span class="string">“autocomplete”</span>&gt;选择扫描插件（必选）&lt;/label&gt;&lt;br&gt;</div><div class="line">&lt;input  class=<span class="string">“form-control”</span> id=<span class="string">“autocomplete”</span> name=<span class="string">“vul_name”</span> placeholder=<span class="string">“输入漏洞名称”</span>&gt;&lt;br&gt;&lt;br&gt;</div><div class="line"></div><div class="line"></div><div class="line">&lt;script <span class="built_in">type</span>=<span class="string">“text/javascript”</span>&gt;</div><div class="line">var tags = &#123;&#123; plugin_list|safe &#125;&#125;; <span class="comment"># 注plugin_list</span></div><div class="line">$( <span class="string">“#autocomplete”</span> ).autocomplete(&#123;</div><div class="line">  <span class="built_in">source</span>: tags</div><div class="line">&#125;);</div><div class="line">&lt;/script&gt;</div></pre></td></tr></table></figure>
+
+<h4 id="ajax请求"><a href="#ajax请求" class="headerlink" title="ajax请求"></a><a href="#ajax请求" title="ajax请求"></a>ajax请求</h4><p>用ajax发送请求有好有坏，具体用法可参考：<a href="https://thief.one/2017/09/14/3/" target="_blank" rel="noopener">https://thief.one/2017/09/14/3/</a></p>
+<h4 id="界面面板布局"><a href="#界面面板布局" class="headerlink" title="界面面板布局"></a><a href="#界面面板布局" title="界面面板布局"></a>界面面板布局</h4><p><img src="/upload_image/20180126/5.png" alt=""><br>这个纯粹为了装逼。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">&lt;div class=<span class="string">“container”</span>&gt;</div><div class="line">  &lt;div class=<span class="string">“row”</span>&gt;</div><div class="line">        <span class="comment">####### 面板 ##########</span></div><div class="line">        &lt;div class=<span class="string">“col-md-3”</span>&gt;</div><div class="line">            &lt;div class=<span class="string">“list-group”</span>&gt;</div><div class="line">                &lt;form class=<span class="string">“list-group-item”</span>&gt; </div><div class="line">                    &lt;a href=<span class="string">“”</span>&gt;<span class="built_in">test</span>&lt;/a&gt;</div><div class="line">                &lt;/form&gt;</div><div class="line">            &lt;/div&gt;</div><div class="line">        &lt;/div&gt;</div><div class="line"></div><div class="line">       <span class="comment">####### 面板 ##########</span></div><div class="line">        &lt;div class=<span class="string">“col-md-3”</span>&gt;</div><div class="line">            &lt;div class=<span class="string">“list-group”</span>&gt;</div><div class="line">                &lt;form class=<span class="string">“list-group-item”</span>&gt; </div><div class="line">                    &lt;a href=<span class="string">“”</span>&gt;test2&lt;/a&gt;</div><div class="line">                &lt;/form&gt;</div><div class="line">            &lt;/div&gt;</div><div class="line">        &lt;/div&gt;</div><div class="line">  </div><div class="line">  &lt;/div&gt;</div><div class="line">&lt;/div&gt;</div></pre></td></tr></table></figure>
+
+<h4 id="表格单选框"><a href="#表格单选框" class="headerlink" title="表格单选框"></a><a href="#表格单选框" title="表格单选框"></a>表格单选框</h4><p>表格显示数据是常见的功能，一般情况下需要多表格数据进行删改，因此批量选中就很重要。一般表格中的批量选择，可以使用单选框实现。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div></pre></td><td class="code"><pre><div class="line">&lt;!– 导入js –&gt;</div><div class="line">&lt;script src=<span class="string">“<a href="https://cdn.bootcss.com/jquery/2.1.1/jquery.min.js&quot;" target="_blank" rel="noopener">https://cdn.bootcss.com/jquery/2.1.1/jquery.min.js&quot;</a></span>&gt;&lt;/script&gt;</div><div class="line">&lt;!– 表格数据 –&gt;</div><div class="line">&lt;div id=<span class="string">“list”</span>&gt;</div><div class="line">    &lt;table class=<span class="string">“table table-hover table-bordered table-striped”</span>&gt;</div><div class="line">        &lt;thead&gt;</div><div class="line">            &lt;tr&gt;</div><div class="line">                &lt;th&gt;&lt;input <span class="built_in">type</span>=<span class="string">“checkbox”</span> id=<span class="string">“all”</span> name=<span class="string">“task_check_”</span> value=<span class="string">“”</span>&gt;&lt;/th&gt;</div><div class="line">                &lt;th&gt;ID&lt;/th&gt;</div><div class="line">                &lt;th&gt;User&lt;/th&gt;</div><div class="line">            &lt;/tr&gt;</div><div class="line">        &lt;/thead&gt;</div><div class="line">        &lt;tbody&gt;</div><div class="line">            &lt;tr&gt;</div><div class="line">                &lt;th&gt;&lt;input <span class="built_in">type</span>=<span class="string">“checkbox”</span> id=<span class="string">“”</span> name=<span class="string">“task_check”</span> value=<span class="string">“”</span>&gt;&lt;/th&gt;</div><div class="line">                &lt;td&gt;01&lt;/td&gt;</div><div class="line">                &lt;td&gt;nmask&lt;/td&gt;</div><div class="line">                &lt;td&gt;</div><div class="line">                    &lt;a href=<span class="string">“”</span> class=<span class="string">“link”</span>&gt;修改&lt;/a&gt;&amp;nbsp;&amp;nbsp;</div><div class="line">                &lt;/td&gt;</div><div class="line">            &lt;/tr&gt;</div><div class="line">        &lt;/tbody&gt;</div><div class="line">    &lt;/table&gt;</div><div class="line">&lt;/div&gt;</div><div class="line">&lt;!– js –&gt;</div><div class="line">&lt;script&gt;</div><div class="line">$(document).ready(<span class="function"><span class="title">function</span></span> () &#123;</div><div class="line">    //全选或全不选</div><div class="line">    $(<span class="string">“#all”</span>).click(<span class="function"><span class="title">function</span></span> () &#123;</div><div class="line">        <span class="keyword">if</span> (this.checked) &#123;</div><div class="line">            $(<span class="string">“#list :checkbox”</span>).prop(<span class="string">“checked”</span>, <span class="literal">true</span>);</div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line">            $(<span class="string">“#list :checkbox”</span>).attr(<span class="string">“checked”</span>, <span class="literal">false</span>);</div><div class="line">        &#125;</div><div class="line">    &#125;);</div><div class="line">    //设置全选复选框</div><div class="line">    $(<span class="string">“#list :checkbox”</span>).click(<span class="function"><span class="title">function</span></span> () &#123;</div><div class="line">        allchk();</div><div class="line">    &#125;);</div><div class="line">    <span class="keyword">function</span> selectAll(check)&#123;</div><div class="line">        $(check).click(<span class="function"><span class="title">function</span></span>()&#123;</div><div class="line">            <span class="keyword">if</span> ($(check).is(<span class="string">‘:checked’</span>)) &#123;</div><div class="line">                $(<span class="string">“.list input”</span>).prop(<span class="string">“checked”</span>,<span class="literal">true</span>);</div><div class="line">            &#125;<span class="keyword">else</span>&#123;</div><div class="line">                $(<span class="string">“.list input”</span>).prop(<span class="string">“checked”</span>,<span class="literal">false</span>);</div><div class="line">            &#125;;</div><div class="line">        &#125;);</div><div class="line">        </div><div class="line">    &#125;</div><div class="line">    //显示时执行一次</div><div class="line">    selectAll();</div><div class="line">&#125;);</div><div class="line">&lt;/script&gt;</div></pre></td></tr></table></figure>
+
+<h3 id="后端功能"><a href="#后端功能" class="headerlink" title="后端功能"></a><a href="#后端功能" title="后端功能"></a>后端功能</h3><h4 id="表格分页-1"><a href="#表格分页-1" class="headerlink" title="表格分页"></a><a href="#表格分页-1" title="表格分页"></a>表格分页</h4><p>前面介绍了前端的分页，那么后端怎么写分页的功能呢？django框架有内置的分页模块Paginator，其他框架也有，比如flask等。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div></pre></td><td class="code"><pre><div class="line">from django.core.paginator import Paginator</div><div class="line"></div><div class="line">def page_fenye(objects,page,num=10):</div><div class="line">    <span class="string">‘’</span><span class="string">‘分页函数</span></div><div class="line">    @num:每页显示多少条数据</div><div class="line">    @page:当前页码</div><div class="line">    @fenye_num:分页栏显示的数字数量</div><div class="line"></div><div class="line">    return：</div><div class="line">    @object_list:该页显示的数据对象</div><div class="line">    @page_range:分页栏显示的数字范围</div><div class="line">    @last_page:最后一页的数字</div><div class="line">    ‘<span class="string">‘’</span></div><div class="line">    fenye_num=6</div><div class="line">    fenye_num_av=fenye_num/2</div><div class="line"></div><div class="line">    try:</div><div class="line">        page=int(page)</div><div class="line">    except:</div><div class="line">        page=1</div><div class="line"></div><div class="line">    <span class="keyword">if</span> page&lt;1:</div><div class="line">        page=1</div><div class="line"></div><div class="line">    range_first_page=page-fenye_num_av</div><div class="line">    range_last_page=page+fenye_num_av</div><div class="line"></div><div class="line">    <span class="keyword">if</span> range_first_page&lt;0:</div><div class="line">        range_first_page=0</div><div class="line">        range_last_page=fenye_num</div><div class="line"></div><div class="line">    p = Paginator(objects, num)</div><div class="line"></div><div class="line">    page_range=list(p.page_range)[range_first_page:range_last_page]</div><div class="line"></div><div class="line">    last_page=len(p.page_range)</div><div class="line"></div><div class="line">    <span class="keyword">if</span> page&gt;last_page:</div><div class="line">        page=1</div><div class="line"></div><div class="line">    page1 = p.page(page)</div><div class="line"></div><div class="line">    object_list=page1.object_list</div><div class="line"></div><div class="line">    <span class="built_in">return</span> object_list,page_range,last_page</div></pre></td></tr></table></figure>
+
+<p>但个人使用以后发现性能不好，因为每次请求页面需要先获取所有的数据，再通过此模块计算出此页面需要展示的数据，当所有的数据量比较大时，返回就比较慢了(也可能是我没用对这个模块)。因此，我自己写了一个分页的模块。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div></pre></td><td class="code"><pre><div class="line">def fenye(all_num,page,num,page_list_num):</div><div class="line">    <span class="string">‘’</span><span class="string">‘分页计算</span></div><div class="line">    @all_num:数据库记录总量</div><div class="line">    @page:当前页码</div><div class="line">    @num:每一页显示的记录条数</div><div class="line">    @page_list_num:分页导航显示多少个数字，要为偶数</div><div class="line">    @page_list_aver:page_list_num除以2</div><div class="line"></div><div class="line">    return：</div><div class="line">    @page:显示第几页</div><div class="line">    @last_page:最后一页的数字</div><div class="line">    @page_list:分页栏显示的数字范围</div><div class="line">    ‘<span class="string">‘’</span></div><div class="line"></div><div class="line">    page=int(page)</div><div class="line">    </div><div class="line">    <span class="keyword">if</span> all_num!=0:</div><div class="line">        last_page = all_num/num-1 <span class="keyword">if</span> all_num%num == 0 <span class="keyword">else</span> all_num/num <span class="comment">#计算最后一页数字</span></div><div class="line">    <span class="keyword">else</span>:</div><div class="line">        last_page=0</div><div class="line"></div><div class="line">    page_list_aver=page_list_num/2</div><div class="line"> </div><div class="line">    page=last_page <span class="keyword">if</span> page &gt; last_page <span class="keyword">else</span> page <span class="comment">#判断请求的页数是否超过范围</span></div><div class="line"></div><div class="line">    <span class="keyword">if</span> page &gt; page_list_aver:</div><div class="line">        <span class="keyword">if</span> last_page &gt; page+page_list_aver:</div><div class="line"></div><div class="line">            page_list=range(page - page_list_aver , page + page_list_aver)</div><div class="line">        <span class="keyword">else</span>:</div><div class="line"></div><div class="line">            page_list=range(last_page - (page_list_num-1), last_page + 1)</div><div class="line">    <span class="keyword">else</span>:</div><div class="line">        <span class="keyword">if</span> last_page &gt; page_list_num:</div><div class="line"></div><div class="line">            page_list = range(page_list_num)</div><div class="line">        <span class="keyword">else</span>:</div><div class="line"></div><div class="line">            page_list = range(last_page + 1)</div><div class="line"></div><div class="line">    <span class="built_in">return</span> page,last_page,page_list</div></pre></td></tr></table></figure>
+
+<p>这样不需要提前先查询出所有的数据存入内存，而只需要查询出总共存在多少条数据（注意，这里的查询语句由select <code>*</code> 改为select count(<code>*</code>)会快很多）。获取到分页函数返回的page后，可以结合sql语句中的limit功能，查询分页要展示的数据内容。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">select <em> from <span class="built_in">test</span> <span class="built_in">limit</span> page</em>num,num <span class="comment"># page为分页返回的显示页码，num是一页显示的数据数量</span></div></pre></td></tr></table></figure>
+
+<h4 id="session做身份认证"><a href="#session做身份认证" class="headerlink" title="session做身份认证"></a><a href="#session做身份认证" title="session做身份认证"></a>session做身份认证</h4><p>这个功能就是用来验证用户身份的，可配合登录功能，写一个装饰器函数，检查全局是否存在session值。（session值是一个字典格式，在用户登录时生成）</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">def session_check(level=2,return_=False):</div><div class="line">    <span class="string">‘’</span><span class="string">‘session_check装饰器函数 针对函数</span></div><div class="line">    @level：可以给用户区分权限</div><div class="line">    @return_:检测到不存在session后跳转到不同的页面</div><div class="line">    ‘<span class="string">‘’</span></div><div class="line">    def dec(func):</div><div class="line">        def warp(request,<em>args,**kwargs):</em></div><div class="line">            <span class="keyword">if</span> request.session.get(<span class="string">‘user_id’</span>,False) and int(request.session.get(<span class="string">‘level’</span>))&lt;=level:</div><div class="line">                <span class="built_in">return</span> func(request,args,**kwargs)</div><div class="line">            <span class="keyword">elif</span> return_:</div><div class="line">                <span class="built_in">return</span> HttpResponse(<span class="string">‘&lt;head&gt;&lt;meta http-equiv=”refresh” content=”0.0001;url=/login/“&gt;&lt;/head&gt;’</span>)</div><div class="line">            <span class="keyword">else</span>:</div><div class="line">                <span class="built_in">return</span> HttpResponse(<span class="string">‘&lt;head&gt;&lt;meta http-equiv=”refresh” content=”0.0001;url=/error/“&gt;&lt;/head&gt;’</span>)</div><div class="line">        <span class="built_in">return</span> warp</div><div class="line"></div><div class="line">    <span class="built_in">return</span> dec</div></pre></td></tr></table></figure>
+
+<p>使用的话，直接在需要权限控制的函数上添加：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">@session_check(return_=True)</div><div class="line">def vul_index(request):</div><div class="line">    <span class="string">‘’</span><span class="string">‘ 漏洞扫描 ‘</span><span class="string">‘’</span></div><div class="line">    pass</div></pre></td></tr></table></figure>
+
+<p><code>暂时就想到了这些，先记这么多吧，等以后遇上了再补充一些，o了</code></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://chucz.club/2018/08/28/记Django开发中的一些常用代码段/" data-id="cjmlsnpr8003dvzrm6642ha2g" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/django/">django</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/编程之道/">编程之道</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/09/28/hello-world/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          Hello World
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/08/21/生成k8s证书的三种方式/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">生成k8s证书的三种方式</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ELK/">ELK</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Headless-Chrome/">Headless Chrome</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/K8s/">K8s</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kafka/">Kafka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Logrotate/">Logrotate</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Puppeteer/">Puppeteer</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Pyecharts/">Pyecharts</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Supervisord/">Supervisord</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SyncWriteStream/">SyncWriteStream</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/android-for-python/">android for python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/burpsuite/">burpsuite</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/chrome-remote-interface/">chrome_remote_interface</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/chromeless/">chromeless</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/django/">django</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/exp/">exp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/falcon/">falcon</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/headless-chrome/">headless chrome</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/phantomjs爬虫/">phantomjs爬虫</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pychrome/">pychrome</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python开发app/">python开发app</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web安全/">web安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/whatweb/">whatweb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/x-pack/">x-pack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/余弦相似性/">余弦相似性</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/区块链/">区块链</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/区块链安全/">区块链安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/协程/">协程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/技术研究/">技术研究</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/未授权访问漏洞/">未授权访问漏洞</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/漏洞扫描器/">漏洞扫描器</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爬虫技术/">爬虫技术</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活杂谈/">生活杂谈</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/编程之道/">编程之道</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/ELK/" style="font-size: 18px;">ELK</a> <a href="/tags/Headless-Chrome/" style="font-size: 10px;">Headless Chrome</a> <a href="/tags/K8s/" style="font-size: 16px;">K8s</a> <a href="/tags/Kafka/" style="font-size: 10px;">Kafka</a> <a href="/tags/Logrotate/" style="font-size: 10px;">Logrotate</a> <a href="/tags/Puppeteer/" style="font-size: 10px;">Puppeteer</a> <a href="/tags/Pyecharts/" style="font-size: 10px;">Pyecharts</a> <a href="/tags/Supervisord/" style="font-size: 10px;">Supervisord</a> <a href="/tags/SyncWriteStream/" style="font-size: 10px;">SyncWriteStream</a> <a href="/tags/android-for-python/" style="font-size: 10px;">android for python</a> <a href="/tags/burpsuite/" style="font-size: 10px;">burpsuite</a> <a href="/tags/chrome-remote-interface/" style="font-size: 10px;">chrome_remote_interface</a> <a href="/tags/chromeless/" style="font-size: 10px;">chromeless</a> <a href="/tags/django/" style="font-size: 10px;">django</a> <a href="/tags/docker/" style="font-size: 10px;">docker</a> <a href="/tags/exp/" style="font-size: 10px;">exp</a> <a href="/tags/falcon/" style="font-size: 10px;">falcon</a> <a href="/tags/headless-chrome/" style="font-size: 10px;">headless chrome</a> <a href="/tags/hexo/" style="font-size: 12px;">hexo</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/phantomjs爬虫/" style="font-size: 10px;">phantomjs爬虫</a> <a href="/tags/pychrome/" style="font-size: 10px;">pychrome</a> <a href="/tags/python/" style="font-size: 14px;">python</a> <a href="/tags/python开发app/" style="font-size: 10px;">python开发app</a> <a href="/tags/web安全/" style="font-size: 10px;">web安全</a> <a href="/tags/whatweb/" style="font-size: 10px;">whatweb</a> <a href="/tags/x-pack/" style="font-size: 10px;">x-pack</a> <a href="/tags/余弦相似性/" style="font-size: 10px;">余弦相似性</a> <a href="/tags/区块链/" style="font-size: 10px;">区块链</a> <a href="/tags/区块链安全/" style="font-size: 10px;">区块链安全</a> <a href="/tags/协程/" style="font-size: 10px;">协程</a> <a href="/tags/技术研究/" style="font-size: 12px;">技术研究</a> <a href="/tags/未授权访问漏洞/" style="font-size: 10px;">未授权访问漏洞</a> <a href="/tags/漏洞扫描器/" style="font-size: 10px;">漏洞扫描器</a> <a href="/tags/爬虫技术/" style="font-size: 12px;">爬虫技术</a> <a href="/tags/生活杂谈/" style="font-size: 10px;">生活杂谈</a> <a href="/tags/编程之道/" style="font-size: 20px;">编程之道</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">August 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">July 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">June 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">February 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">November 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/09/28/hello-world/">Hello World</a>
+          </li>
+        
+          <li>
+            <a href="/2018/08/28/记Django开发中的一些常用代码段/">记Django开发中的一些常用代码段</a>
+          </li>
+        
+          <li>
+            <a href="/2018/08/21/生成k8s证书的三种方式/">生成k8s证书的三种方式</a>
+          </li>
+        
+          <li>
+            <a href="/2018/08/19/23种非常有用的ElasticSearch查询例子/">23种非常有用的ElasticSearch查询例子</a>
+          </li>
+        
+          <li>
+            <a href="/2018/08/19/ElasticSearch-索引查询使用指南/">ElasticSearch 索引查询使用指南</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 chucz<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

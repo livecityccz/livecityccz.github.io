@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>Supervisord管理进程实践 | chucz&#39;s blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="小孩在门前唱着歌阳光它照暖了溪河　　今天凑空研究了下Supervisord，这是一款linux进程管理工具，使用python开发，主要用于在后台维护进程（类似master守护进程），可以实现监控进程的状态、自动重启进程等操作，便于一些服务的维护与监控。  安装Supervisord由于是用python开发的，因此使用pip安装最为方便。 1$ pip install supervisor  说明">
+<meta name="keywords" content="技术研究,Supervisord">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Supervisord管理进程实践">
+<meta property="og:url" content="http://chucz.club/2018/06/25/Supervisord管理进程实践/index.html">
+<meta property="og:site_name" content="chucz&#39;s blog">
+<meta property="og:description" content="小孩在门前唱着歌阳光它照暖了溪河　　今天凑空研究了下Supervisord，这是一款linux进程管理工具，使用python开发，主要用于在后台维护进程（类似master守护进程），可以实现监控进程的状态、自动重启进程等操作，便于一些服务的维护与监控。  安装Supervisord由于是用python开发的，因此使用pip安装最为方便。 1$ pip install supervisor  说明">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://chucz.club/upload_image/20180601/1.png">
+<meta property="og:image" content="http://chucz.club/upload_image/20180601/2.png">
+<meta property="og:image" content="http://chucz.club/upload_image/20180601/3.png">
+<meta property="og:updated_time" content="2018-09-28T08:51:24.508Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Supervisord管理进程实践">
+<meta name="twitter:description" content="小孩在门前唱着歌阳光它照暖了溪河　　今天凑空研究了下Supervisord，这是一款linux进程管理工具，使用python开发，主要用于在后台维护进程（类似master守护进程），可以实现监控进程的状态、自动重启进程等操作，便于一些服务的维护与监控。  安装Supervisord由于是用python开发的，因此使用pip安装最为方便。 1$ pip install supervisor  说明">
+<meta name="twitter:image" content="http://chucz.club/upload_image/20180601/1.png">
+  
+    <link rel="alternate" href="/atom.xml" title="chucz&#39;s blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">chucz&#39;s blog</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://chucz.club"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-Supervisord管理进程实践" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2018/06/25/Supervisord管理进程实践/" class="article-date">
+  <time datetime="2018-06-25T02:59:38.000Z" itemprop="datePublished">2018-06-25</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Supervisord管理进程实践
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <blockquote>
+<p>小孩在门前唱着歌<br>阳光它照暖了溪河<br>　　今天凑空研究了下Supervisord，这是一款linux进程管理工具，使用python开发，主要用于在后台维护进程（类似master守护进程），可以实现监控进程的状态、自动重启进程等操作，便于一些服务的维护与监控。<br><a id="more"></a></p>
+</blockquote>
+<h3 id="安装Supervisord"><a href="#安装Supervisord" class="headerlink" title="安装Supervisord"></a><a href="#安装Supervisord" title="安装Supervisord"></a>安装Supervisord</h3><p>由于是用python开发的，因此使用pip安装最为方便。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ pip install supervisor</div></pre></td></tr></table></figure>
+
+<p>说明：安装完成之后多了3个工具：echo_supervisord_conf、supervisorctl和supervisord。</p>
+<h3 id="Supervisord配置文件"><a href="#Supervisord配置文件" class="headerlink" title="Supervisord配置文件"></a><a href="#Supervisord配置文件" title="Supervisord配置文件"></a>Supervisord配置文件</h3><p>首先可以使用echo_supervisord_conf命令获取supervisor配置模板：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">echo_supervisord_conf &gt; supervisord.conf</div></pre></td></tr></table></figure>
+
+<p>说明：该命令在当前目录下创建了一个文件名为supervisord.conf的配置文件，编辑配置文件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">vim supervisord.conf</div></pre></td></tr></table></figure>
+
+<p>来看看默认配置文件中的主要配置项：（还有一些配置不常用，可以忽略）</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line">[unix_http_server]</div><div class="line">file=/tmp/supervisor.sock   ; UNIX socket 文件，supervisorctl 会使用</div><div class="line">;chmod=0700                 ; socket 文件的 mode，默认是 0700</div><div class="line">;chown=nobody:nogroup       ; socket 文件的 owner，格式： uid:gid</div><div class="line"></div><div class="line">;[inet_http_server]         ; HTTP 服务器，提供 web 管理界面</div><div class="line">;port=127.0.0.1:9001        ; Web 管理后台运行的 IP 和端口，如果开放到公网，需要注意安全性</div><div class="line">;username=user              ; 登录管理后台的用户名</div><div class="line">;password=123               ; 登录管理后台的密码</div><div class="line"></div><div class="line">[supervisord]</div><div class="line">logfile=/tmp/supervisord.log ; 日志文件，默认是 <span class="variable">$CWD</span>/supervisord.log</div><div class="line">logfile_maxbytes=50MB        ; 日志文件大小，超出会 rotate，默认 50MB</div><div class="line">logfile_backups=10           ; 日志文件保留备份数量默认 10</div><div class="line">loglevel=info                ; 日志级别，默认 info，其它: debug,warn,trace</div><div class="line">pidfile=/tmp/supervisord.pid ; pid 文件</div><div class="line">nodaemon=<span class="literal">false</span>               ; 是否在前台启动，默认是 <span class="literal">false</span>，即以 daemon 的方式启动</div><div class="line">minfds=1024                  ; 可以打开的文件描述符的最小值，默认 1024</div><div class="line">minprocs=200                 ; 可以打开的进程数的最小值，默认 200</div><div class="line"></div><div class="line">; the below section must remain <span class="keyword">in</span> the config file <span class="keyword">for</span> RPC</div><div class="line">; (supervisorctl/web interface) to work, additional interfaces may be</div><div class="line">; added by defining them <span class="keyword">in</span> separate rpcinterface: sections</div><div class="line">[rpcinterface:supervisor]</div><div class="line">supervisor.rpcinterface_factory = supervisor.rpcinterface:make_main_rpcinterface</div><div class="line"></div><div class="line">[supervisorctl]</div><div class="line">serverurl=unix:///tmp/supervisor.sock ; 通过 UNIX socket 连接 supervisord，路径与 unix_http_server 部分的 file 一致</div><div class="line">;serverurl=<a href="http://127.0.0.1:9001" target="_blank" rel="noopener">http://127.0.0.1:9001</a> ; 通过 HTTP 的方式连接 supervisord</div><div class="line"></div><div class="line">; 包含其他的配置文件</div><div class="line">[include]</div><div class="line">files = relative/directory/<em>.ini    ; 可以是 </em>.conf 或 *.ini</div></pre></td></tr></table></figure>
+
+<p>运行以下命令启动supervisord进程，可测试supervisord是否安装成功并执行。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">supervisord -c supervisord.conf</div></pre></td></tr></table></figure>
+
+<p>查看系统进程中是否多了一个supervisord：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">ps -aux | grep supervisord</div></pre></td></tr></table></figure>
+
+<h3 id="配置Program"><a href="#配置Program" class="headerlink" title="配置Program"></a><a href="#配置Program" title="配置Program"></a>配置Program</h3><p>　　program就是用来配置监控不同的应用程序进程的，推荐每个应用程序单独写一个program配置文件，然后在supervisord.conf中通过include加载所有应用程序的配置。<br>这里拿创建一个celery进程为例，首先在supervisord.conf最后一行写入：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">;加载/etc/supervisor/目录下所有的配置文件</div><div class="line">[include]</div><div class="line">files = /etc/supervisor/*.conf</div></pre></td></tr></table></figure>
+
+<p>然后创建/etc/supervisor目录，并到目录下创建/etc/supervisor/celery_touchscan.conf文件，写入：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line">;program名称，随便写，但不要重复，是program的唯一标识</div><div class="line">[program:celery_touchscan]</div><div class="line">;指定运行目录</div><div class="line">directory=/root/TouchScanV2/ </div><div class="line">;运行目录下执行命令</div><div class="line"><span class="built_in">command</span>=celery -A scan worker –queue=touchscan –pidfile=<span class="string">“./log/pid.txt”</span> –logfile=<span class="string">“./log/scan.log”</span> -c 10</div><div class="line">;进程名称</div><div class="line">process_name=%(program_name)s_%(process_num)02d</div><div class="line"></div><div class="line">;启动设置</div><div class="line">numprocs=1         ;进程数，注意：（celery进程数量,不是work数量，相当于执行了10个<span class="built_in">command</span>命令，而不是在celery中指定-c 为10）</div><div class="line">autostart=<span class="literal">true</span>      ;当supervisor启动时,程序将会自动启动</div><div class="line">autorestart=<span class="literal">true</span>    ;自动重启（当work被<span class="built_in">kill</span>了之后会重新启动）</div><div class="line">;运行程序的用户</div><div class="line">;user=root</div><div class="line">;startsecs=1 ;程序重启时候停留在runing状态的秒数</div><div class="line">;startretries=10 ;启动失败时的最多重试次数</div><div class="line"></div><div class="line">;停止信号,默认TERM</div><div class="line">;中断:INT (类似于Ctrl+C)(<span class="built_in">kill</span> -INT pid)，退出后会将写文件或日志(推荐)</div><div class="line">;终止:TERM (<span class="built_in">kill</span> -TERM pid)</div><div class="line">;挂起:HUP (<span class="built_in">kill</span> -HUP pid),注意与Ctrl+Z/<span class="built_in">kill</span> -stop pid不同</div><div class="line">;从容停止:QUIT (<span class="built_in">kill</span> -QUIT pid)</div><div class="line">stopsignal=INT</div></pre></td></tr></table></figure>
+
+<p>重启supervisord进程：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">supervisorctl -c supervisord.conf reload</div></pre></td></tr></table></figure>
+
+<p>　　此时查看系统上的进程，发现创建了一个supervisord守护进程，10个celery的work进程（celery的work进程数量取决于command命令中的-c参数以及配置文件中的numprocs参数，numprocs参数是指运行几次command命令，而在celery命令行中指定了需要运行的work数量）</p>
+<p><img src="/upload_image/20180601/1.png" alt=""><br><img src="/upload_image/20180601/2.png" alt=""></p>
+<p>说明：此时如果手动kill掉celery的work进程，会发现celery的work进程会被supervisord自动重启，只有当supervisord守护进程被kill以后，才能真正kill掉celery的work进程。</p>
+<h3 id="supervisord命令行操作"><a href="#supervisord命令行操作" class="headerlink" title="supervisord命令行操作"></a><a href="#supervisord命令行操作" title="supervisord命令行操作"></a>supervisord命令行操作</h3><h4 id="启动supervisord进程"><a href="#启动supervisord进程" class="headerlink" title="启动supervisord进程"></a><a href="#启动supervisord进程" title="启动supervisord进程"></a>启动supervisord进程</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">supervisord -c supervisord.conf</div></pre></td></tr></table></figure>
+
+<h4 id="关闭supervisord进程"><a href="#关闭supervisord进程" class="headerlink" title="关闭supervisord进程"></a><a href="#关闭supervisord进程" title="关闭supervisord进程"></a>关闭supervisord进程</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">supervisorctl -c supervisord.conf shutdown <span class="comment">#注意这里将supervisord进程关闭，但通过supervisord启动的进程没有关闭</span></div></pre></td></tr></table></figure>
+
+<h4 id="重启supervisord进程"><a href="#重启supervisord进程" class="headerlink" title="重启supervisord进程"></a><a href="#重启supervisord进程" title="重启supervisord进程"></a>重启supervisord进程</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">supervisorctl -c supervisord.conf reload</div></pre></td></tr></table></figure>
+
+<h4 id="查看进程状态"><a href="#查看进程状态" class="headerlink" title="查看进程状态"></a><a href="#查看进程状态" title="查看进程状态"></a>查看进程状态</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">supervisorctl</div></pre></td></tr></table></figure>
+
+<p>效果如下：<br><img src="/upload_image/20180601/3.png" alt=""><br>每列分别代表：programe名称、进程名称，进程状态、进程id，运行时间</p>
+<h4 id="更多supervisorctl命令"><a href="#更多supervisorctl命令" class="headerlink" title="更多supervisorctl命令"></a><a href="#更多supervisorctl命令" title="更多supervisorctl命令"></a>更多supervisorctl命令</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">$ supervisorctl status</div><div class="line">$ supervisorctl stop celery_touchscan <span class="comment"># celery_touchscan是一个program的名称</span></div><div class="line">$ supervisorctl start celery_touchscan</div><div class="line">$ supervisorctl restart celery_touchscan</div><div class="line">$ supervisorctl reread</div><div class="line">$ supervisorctl update</div></pre></td></tr></table></figure>
+
+<p>说明：可以直接在系统shell中执行，也可以先执行supervisorctl，进入supervisorctl_shell中执行相应的命令。</p>
+<h4 id="针对Python环境"><a href="#针对Python环境" class="headerlink" title="针对Python环境"></a><a href="#针对Python环境" title="针对Python环境"></a>针对Python环境</h4><p>如果项目使用了python的pyenv模块来设置环境，则supervisord配置文件中需要指定python环境的路径。其中有两种方式指定程序使用的Python环境：</p>
+<ul>
+<li>command使用绝对路径。</li>
+<li>通过environment配置PYTHONPATH。</li>
+</ul>
+<h3 id="使用supervisord注意点"><a href="#使用supervisord注意点" class="headerlink" title="使用supervisord注意点"></a><a href="#使用supervisord注意点" title="使用supervisord注意点"></a>使用supervisord注意点</h3><h4 id="子进程问题"><a href="#子进程问题" class="headerlink" title="子进程问题"></a><a href="#子进程问题" title="子进程问题"></a>子进程问题</h4><p>有时候用Supervisor托管的程序还会有子进程，如果只杀死主进程，子进程就可能变成孤儿进程。通过以下这两项配置来确保所有子进程都能正确停止：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">stopasgroup=<span class="literal">true</span></div><div class="line">killasgroup=<span class="literal">true</span></div></pre></td></tr></table></figure>
+
+<h4 id="配置更新"><a href="#配置更新" class="headerlink" title="配置更新"></a><a href="#配置更新" title="配置更新"></a>配置更新</h4><p>每次修改supervisord配置文件后，需要重启supervisord进程。</p>
+<h4 id="后台程序问题"><a href="#后台程序问题" class="headerlink" title="后台程序问题"></a><a href="#后台程序问题" title="后台程序问题"></a>后台程序问题</h4><p>Supervisor只能管理在前台运行的程序，所以如果应用程序有后台运行的选项，需要关闭。</p>
+<h3 id="supervisord与定时任务"><a href="#supervisord与定时任务" class="headerlink" title="supervisord与定时任务"></a><a href="#supervisord与定时任务" title="supervisord与定时任务"></a>supervisord与定时任务</h3><p>supervisord主要用来管理进程，而不是调度任务，因此如果有定时任务的需求，跟结合crontab一起使用。当然如果是管理celery服务，可以结合celery自身的定时任务功能，具体可移步：<a href="https://thief.one/2017/08/25/1/" target="_blank" rel="noopener">https://thief.one/2017/08/25/1/</a></p>
+<h3 id="supervisord-xml-rpc"><a href="#supervisord-xml-rpc" class="headerlink" title="supervisord xml-rpc"></a><a href="#supervisord-xml-rpc" title="supervisord xml-rpc"></a>supervisord xml-rpc</h3><p>前面介绍的都是在本地利用supervisord管理进程，那么如何实现在远处管理服务器上的进程呢？supervisord工具提供了相关的api。首先需要在配置文件中打开相关配置信息：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">[inet_http_server]         ; HTTP 服务器，提供 web 管理界面</div><div class="line">port=127.0.0.1:9001        ; Web 管理后台运行的 IP 和端口，如果开放到公网，需要注意安全性</div><div class="line">username=user              ; 登录管理后台的用户名</div><div class="line">password=123               ; 登录管理后台的密码</div></pre></td></tr></table></figure>
+
+<p>然后启动supervisord后，可以用web界面管理进程，打开<em><a href="http://127.0.0.1:9001" target="_blank" rel="noopener">http://127.0.0.1:9001</a></em>。当然也提供了rpc接口，可供远程调用，代码样例如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">import xmlrpclib</div><div class="line">server = xmlrpclib.Server(<span class="string">‘<a href="http://user:123@127.0.0.1:9111/RPC2&#39;" target="_blank" rel="noopener">http://user:123@127.0.0.1:9111/RPC2&#39;</a></span>) <span class="comment">#连接rpc服务</span></div><div class="line"><span class="comment"># print server.system.listMethods() # 查询api支持的方法</span></div><div class="line"><span class="comment"># print server.supervisor.getState() # 获取supervisord进程状态</span></div><div class="line"><span class="comment"># print server.supervisor.shutdown() # 关闭supervisor,慎用</span></div><div class="line"><span class="comment"># print server.supervisor.restart() # 重启supervisor</span></div><div class="line"><span class="built_in">print</span> server.supervisor.getProcessInfo(process_name) <span class="comment"># 获取指定进程信息</span></div><div class="line"><span class="built_in">print</span> server.supervisor.startProcess(process_name) <span class="comment"># 启动指定进程</span></div><div class="line"><span class="built_in">print</span> server.supervisor.stopProcess(process_name) <span class="comment"># 暂停指定进程</span></div></pre></td></tr></table></figure>
+
+<p>api操作比较简单，具体的方法使用文档可以参考：<a href="http://supervisord.org/api.html#xml-rpc" target="_blank" rel="noopener">http://supervisord.org/api.html#xml-rpc</a></p>
+<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a><a href="#参考" title="参考"></a>参考</h3><p><a href="https://pypi.org/project/supervisor/" target="_blank" rel="noopener">https://pypi.org/project/supervisor/</a><br><a href="https://www.jianshu.com/p/9559ab642d88" target="_blank" rel="noopener">https://www.jianshu.com/p/9559ab642d88</a><br><a href="http://liyangliang.me/posts/2015/06/using-supervisor/" target="_blank" rel="noopener">http://liyangliang.me/posts/2015/06/using-supervisor/</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://chucz.club/2018/06/25/Supervisord管理进程实践/" data-id="cjmlsnpq40028vzrm5tarvu0d" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Supervisord/">Supervisord</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/技术研究/">技术研究</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/07/09/Headless-Chrome-and-API/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          Headless Chrome and API
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2018/06/21/Python3-5协程学习研究/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Python3.5协程学习研究</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ELK/">ELK</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Headless-Chrome/">Headless Chrome</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/K8s/">K8s</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kafka/">Kafka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Logrotate/">Logrotate</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Puppeteer/">Puppeteer</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Pyecharts/">Pyecharts</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Supervisord/">Supervisord</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SyncWriteStream/">SyncWriteStream</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/android-for-python/">android for python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/burpsuite/">burpsuite</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/chrome-remote-interface/">chrome_remote_interface</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/chromeless/">chromeless</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/django/">django</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/exp/">exp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/falcon/">falcon</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/headless-chrome/">headless chrome</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/phantomjs爬虫/">phantomjs爬虫</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pychrome/">pychrome</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python开发app/">python开发app</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web安全/">web安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/whatweb/">whatweb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/x-pack/">x-pack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/余弦相似性/">余弦相似性</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/区块链/">区块链</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/区块链安全/">区块链安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/协程/">协程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/技术研究/">技术研究</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/未授权访问漏洞/">未授权访问漏洞</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/漏洞扫描器/">漏洞扫描器</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爬虫技术/">爬虫技术</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活杂谈/">生活杂谈</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/编程之道/">编程之道</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/ELK/" style="font-size: 18px;">ELK</a> <a href="/tags/Headless-Chrome/" style="font-size: 10px;">Headless Chrome</a> <a href="/tags/K8s/" style="font-size: 16px;">K8s</a> <a href="/tags/Kafka/" style="font-size: 10px;">Kafka</a> <a href="/tags/Logrotate/" style="font-size: 10px;">Logrotate</a> <a href="/tags/Puppeteer/" style="font-size: 10px;">Puppeteer</a> <a href="/tags/Pyecharts/" style="font-size: 10px;">Pyecharts</a> <a href="/tags/Supervisord/" style="font-size: 10px;">Supervisord</a> <a href="/tags/SyncWriteStream/" style="font-size: 10px;">SyncWriteStream</a> <a href="/tags/android-for-python/" style="font-size: 10px;">android for python</a> <a href="/tags/burpsuite/" style="font-size: 10px;">burpsuite</a> <a href="/tags/chrome-remote-interface/" style="font-size: 10px;">chrome_remote_interface</a> <a href="/tags/chromeless/" style="font-size: 10px;">chromeless</a> <a href="/tags/django/" style="font-size: 10px;">django</a> <a href="/tags/docker/" style="font-size: 10px;">docker</a> <a href="/tags/exp/" style="font-size: 10px;">exp</a> <a href="/tags/falcon/" style="font-size: 10px;">falcon</a> <a href="/tags/headless-chrome/" style="font-size: 10px;">headless chrome</a> <a href="/tags/hexo/" style="font-size: 12px;">hexo</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/phantomjs爬虫/" style="font-size: 10px;">phantomjs爬虫</a> <a href="/tags/pychrome/" style="font-size: 10px;">pychrome</a> <a href="/tags/python/" style="font-size: 14px;">python</a> <a href="/tags/python开发app/" style="font-size: 10px;">python开发app</a> <a href="/tags/web安全/" style="font-size: 10px;">web安全</a> <a href="/tags/whatweb/" style="font-size: 10px;">whatweb</a> <a href="/tags/x-pack/" style="font-size: 10px;">x-pack</a> <a href="/tags/余弦相似性/" style="font-size: 10px;">余弦相似性</a> <a href="/tags/区块链/" style="font-size: 10px;">区块链</a> <a href="/tags/区块链安全/" style="font-size: 10px;">区块链安全</a> <a href="/tags/协程/" style="font-size: 10px;">协程</a> <a href="/tags/技术研究/" style="font-size: 12px;">技术研究</a> <a href="/tags/未授权访问漏洞/" style="font-size: 10px;">未授权访问漏洞</a> <a href="/tags/漏洞扫描器/" style="font-size: 10px;">漏洞扫描器</a> <a href="/tags/爬虫技术/" style="font-size: 12px;">爬虫技术</a> <a href="/tags/生活杂谈/" style="font-size: 10px;">生活杂谈</a> <a href="/tags/编程之道/" style="font-size: 20px;">编程之道</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">August 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">July 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">June 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">February 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">November 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/09/28/hello-world/">Hello World</a>
+          </li>
+        
+          <li>
+            <a href="/2018/08/28/记Django开发中的一些常用代码段/">记Django开发中的一些常用代码段</a>
+          </li>
+        
+          <li>
+            <a href="/2018/08/21/生成k8s证书的三种方式/">生成k8s证书的三种方式</a>
+          </li>
+        
+          <li>
+            <a href="/2018/08/19/23种非常有用的ElasticSearch查询例子/">23种非常有用的ElasticSearch查询例子</a>
+          </li>
+        
+          <li>
+            <a href="/2018/08/19/ElasticSearch-索引查询使用指南/">ElasticSearch 索引查询使用指南</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 chucz<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>

