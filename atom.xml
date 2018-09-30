@@ -5,9 +5,9 @@
   <subtitle>青青子衿, 悠悠我心</subtitle>
   <link href="/atom.xml" rel="self"/>
   
-  <link href="http://chucz.club/"/>
+  <link href="http://www.chucz.club/"/>
   <updated>2018-09-28T08:25:28.616Z</updated>
-  <id>http://chucz.club/</id>
+  <id>http://www.chucz.club/</id>
   
   <author>
     <name>褚成志</name>
@@ -18,8 +18,8 @@
   
   <entry>
     <title>23种非常有用的ElasticSearch查询例子</title>
-    <link href="http://chucz.club/2018/08/19/23%E7%A7%8D%E9%9D%9E%E5%B8%B8%E6%9C%89%E7%94%A8%E7%9A%84ElasticSearch%E6%9F%A5%E8%AF%A2%E4%BE%8B%E5%AD%90/"/>
-    <id>http://chucz.club/2018/08/19/23种非常有用的ElasticSearch查询例子/</id>
+    <link href="http://www.chucz.club/2018/08/19/23%E7%A7%8D%E9%9D%9E%E5%B8%B8%E6%9C%89%E7%94%A8%E7%9A%84ElasticSearch%E6%9F%A5%E8%AF%A2%E4%BE%8B%E5%AD%90/"/>
+    <id>http://www.chucz.club/2018/08/19/23种非常有用的ElasticSearch查询例子/</id>
     <published>2018-08-19T01:57:30.000Z</published>
     <updated>2018-09-28T08:25:28.616Z</updated>
     
@@ -29,7 +29,7 @@
       
         
         
-          &lt;h2 id=&quot;一、新建索引&quot;&gt;&lt;a href=&quot;#一、新建索引&quot; class=&quot;headerlink&quot; title=&quot;一、新建索引&quot;&gt;&lt;/a&gt;&lt;a href=&quot;#一、新建索引&quot;
+          &lt;!-- build time:Sun Sep 30 2018 07:37:55 GMT+0000 (Coordinated Universal Time) --&gt;&lt;h2 id=&quot;一、新建索引&quot;&gt;&lt;a href=&quot;#一、新建索引&quot; class=&quot;headerlink&quot;
         
       
     
@@ -40,8 +40,8 @@
   
   <entry>
     <title>ElasticSearch 索引查询使用指南</title>
-    <link href="http://chucz.club/2018/08/19/ElasticSearch-%E7%B4%A2%E5%BC%95%E6%9F%A5%E8%AF%A2%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97/"/>
-    <id>http://chucz.club/2018/08/19/ElasticSearch-索引查询使用指南/</id>
+    <link href="http://www.chucz.club/2018/08/19/ElasticSearch-%E7%B4%A2%E5%BC%95%E6%9F%A5%E8%AF%A2%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97/"/>
+    <id>http://www.chucz.club/2018/08/19/ElasticSearch-索引查询使用指南/</id>
     <published>2018-08-19T01:56:47.000Z</published>
     <updated>2018-09-28T08:25:28.616Z</updated>
     
@@ -51,21 +51,21 @@
       
         
         
-          &lt;p&gt;1.我们通常用用&lt;a href=&quot;https://www.elastic.co/guide/en/elasticsearch/reference/current/cat.html&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;_cat
+          &lt;!-- build time:Sun Sep 30 2018 07:37:55 GMT+0000 (Coordinated Universal Time) --&gt;&lt;p&gt;1.我们通常用用&lt;a
         
       
     
     </summary>
     
     
-      <category term="ELK" scheme="http://chucz.club/tags/ELK/"/>
+      <category term="ELK" scheme="http://www.chucz.club/tags/ELK/"/>
     
   </entry>
   
   <entry>
     <title>ES内置账号密码修改、自定义角色自定义账号、ldap及AD认证</title>
-    <link href="http://chucz.club/2018/08/19/ES%E5%86%85%E7%BD%AE%E8%B4%A6%E5%8F%B7%E5%AF%86%E7%A0%81%E4%BF%AE%E6%94%B9%E3%80%81%E8%87%AA%E5%AE%9A%E4%B9%89%E8%A7%92%E8%89%B2%E8%87%AA%E5%AE%9A%E4%B9%89%E8%B4%A6%E5%8F%B7%E3%80%81ldap%E5%8F%8AAD%E8%AE%A4%E8%AF%81/"/>
-    <id>http://chucz.club/2018/08/19/ES内置账号密码修改、自定义角色自定义账号、ldap及AD认证/</id>
+    <link href="http://www.chucz.club/2018/08/19/ES%E5%86%85%E7%BD%AE%E8%B4%A6%E5%8F%B7%E5%AF%86%E7%A0%81%E4%BF%AE%E6%94%B9%E3%80%81%E8%87%AA%E5%AE%9A%E4%B9%89%E8%A7%92%E8%89%B2%E8%87%AA%E5%AE%9A%E4%B9%89%E8%B4%A6%E5%8F%B7%E3%80%81ldap%E5%8F%8AAD%E8%AE%A4%E8%AF%81/"/>
+    <id>http://www.chucz.club/2018/08/19/ES内置账号密码修改、自定义角色自定义账号、ldap及AD认证/</id>
     <published>2018-08-19T01:55:58.000Z</published>
     <updated>2018-09-28T08:25:28.616Z</updated>
     
@@ -75,21 +75,21 @@
       
         
         
-          &lt;h2 id=&quot;自定义内置账号&quot;&gt;&lt;a href=&quot;#自定义内置账号&quot; class=&quot;headerlink&quot; title=&quot;自定义内置账号&quot;&gt;&lt;/a&gt;&lt;a href=&quot;#自定义内置账号&quot;
+          &lt;!-- build time:Sun Sep 30 2018 07:37:55 GMT+0000 (Coordinated Universal Time) --&gt;&lt;h2 id=&quot;自定义内置账号&quot;&gt;&lt;a href=&quot;#自定义内置账号&quot; class=&quot;headerlink&quot;
         
       
     
     </summary>
     
     
-      <category term="ELK" scheme="http://chucz.club/tags/ELK/"/>
+      <category term="ELK" scheme="http://www.chucz.club/tags/ELK/"/>
     
   </entry>
   
   <entry>
     <title>crontab、anacron、logrotate relationship</title>
-    <link href="http://chucz.club/2018/08/19/crontab%E3%80%81anacron%E3%80%81logrotate-relationship/"/>
-    <id>http://chucz.club/2018/08/19/crontab、anacron、logrotate-relationship/</id>
+    <link href="http://www.chucz.club/2018/08/19/crontab%E3%80%81anacron%E3%80%81logrotate-relationship/"/>
+    <id>http://www.chucz.club/2018/08/19/crontab、anacron、logrotate-relationship/</id>
     <published>2018-08-19T01:55:15.000Z</published>
     <updated>2018-09-28T08:25:28.616Z</updated>
     
@@ -99,21 +99,21 @@
       
         
         
-          &lt;p&gt;服务器上的nginx使用logrotate来分割日志，设置为每天分割。但是logrotate似乎没有工作，日志并没有分割。服务器是CentOS
+          &lt;!-- build time:Sun Sep 30 2018 07:37:55 GMT+0000 (Coordinated Universal Time)
         
       
     
     </summary>
     
     
-      <category term="Logrotate" scheme="http://chucz.club/tags/Logrotate/"/>
+      <category term="Logrotate" scheme="http://www.chucz.club/tags/Logrotate/"/>
     
   </entry>
   
   <entry>
     <title>基于k8s 动态配置及扩容maven nexus私服</title>
-    <link href="http://chucz.club/2018/08/19/%E5%9F%BA%E4%BA%8Ek8s-%E5%8A%A8%E6%80%81%E9%85%8D%E7%BD%AE%E5%8F%8A%E6%89%A9%E5%AE%B9maven-nexus%E7%A7%81%E6%9C%8D/"/>
-    <id>http://chucz.club/2018/08/19/基于k8s-动态配置及扩容maven-nexus私服/</id>
+    <link href="http://www.chucz.club/2018/08/19/%E5%9F%BA%E4%BA%8Ek8s-%E5%8A%A8%E6%80%81%E9%85%8D%E7%BD%AE%E5%8F%8A%E6%89%A9%E5%AE%B9maven-nexus%E7%A7%81%E6%9C%8D/"/>
+    <id>http://www.chucz.club/2018/08/19/基于k8s-动态配置及扩容maven-nexus私服/</id>
     <published>2018-08-19T01:53:31.000Z</published>
     <updated>2018-09-28T08:25:28.616Z</updated>
     
@@ -123,21 +123,21 @@
       
         
         
-          &lt;h3 id=&quot;配置nexus&quot;&gt;&lt;a href=&quot;#配置nexus&quot; class=&quot;headerlink&quot; title=&quot;配置nexus&quot;&gt;&lt;/a&gt;&lt;a href=&quot;#配置nexus&quot;
+          &lt;!-- build time:Sun Sep 30 2018 07:37:55 GMT+0000 (Coordinated Universal Time) --&gt;&lt;h3 id=&quot;配置nexus&quot;&gt;&lt;a href=&quot;#配置nexus&quot; class=&quot;headerlink&quot;
         
       
     
     </summary>
     
     
-      <category term="K8s" scheme="http://chucz.club/tags/K8s/"/>
+      <category term="K8s" scheme="http://www.chucz.club/tags/K8s/"/>
     
   </entry>
   
   <entry>
     <title>Kubernetes RBAC  Detailed</title>
-    <link href="http://chucz.club/2018/08/19/Kubernetes-RBAC-Detailed/"/>
-    <id>http://chucz.club/2018/08/19/Kubernetes-RBAC-Detailed/</id>
+    <link href="http://www.chucz.club/2018/08/19/Kubernetes-RBAC-Detailed/"/>
+    <id>http://www.chucz.club/2018/08/19/Kubernetes-RBAC-Detailed/</id>
     <published>2018-08-19T01:51:37.000Z</published>
     <updated>2018-09-28T08:25:28.616Z</updated>
     
@@ -147,21 +147,21 @@
       
         
         
-          &lt;p&gt;RBAC - 基于角色的访问控制&lt;br&gt;RBAC使用：rbac.authorization.k8s.io API Group 来实现授权决策，允许管理员通过 Kubernetes API 动态配置策略，要启用RBAC，需要在 apiserver
+          &lt;!-- build time:Sun Sep 30 2018 07:37:55 GMT+0000 (Coordinated Universal Time) --&gt;&lt;p&gt;RBAC - 基于角色的访问控制&lt;br&gt;RBAC使用：rbac.authorization.k8s.io
         
       
     
     </summary>
     
     
-      <category term="K8s" scheme="http://chucz.club/tags/K8s/"/>
+      <category term="K8s" scheme="http://www.chucz.club/tags/K8s/"/>
     
   </entry>
   
   <entry>
     <title>只在移动端网页内显示”Fork me on Github”</title>
-    <link href="http://chucz.club/2018/08/19/%E5%8F%AA%E5%9C%A8%E7%A7%BB%E5%8A%A8%E7%AB%AF%E7%BD%91%E9%A1%B5%E5%86%85%E6%98%BE%E7%A4%BA%E2%80%9DFork-me-on-Github%E2%80%9D/"/>
-    <id>http://chucz.club/2018/08/19/只在移动端网页内显示”Fork-me-on-Github”/</id>
+    <link href="http://www.chucz.club/2018/08/19/%E5%8F%AA%E5%9C%A8%E7%A7%BB%E5%8A%A8%E7%AB%AF%E7%BD%91%E9%A1%B5%E5%86%85%E6%98%BE%E7%A4%BA%E2%80%9DFork-me-on-Github%E2%80%9D/"/>
+    <id>http://www.chucz.club/2018/08/19/只在移动端网页内显示”Fork-me-on-Github”/</id>
     <published>2018-08-19T01:48:41.000Z</published>
     <updated>2018-09-28T08:25:28.616Z</updated>
     
@@ -171,21 +171,21 @@
       
         
         
-          &lt;h5 id=&quot;1-修改文件hexo博客根目录-themes-next-layout-layout-swig-找到如下代码块&quot;&gt;&lt;a href=&quot;#1-修改文件hexo博客根目录-themes-next-layout-layout-swig-找到如下代码块&quot;
+          &lt;!-- build time:Sun Sep 30 2018 07:37:55 GMT+0000 (Coordinated Universal Time) --&gt;&lt;h5
         
       
     
     </summary>
     
     
-      <category term="hexo" scheme="http://chucz.club/tags/hexo/"/>
+      <category term="hexo" scheme="http://www.chucz.club/tags/hexo/"/>
     
   </entry>
   
   <entry>
     <title>Elasticsearch分片及集群说明</title>
-    <link href="http://chucz.club/2018/08/16/Elasticsearch%E5%88%86%E7%89%87%E5%8F%8A%E9%9B%86%E7%BE%A4%E8%AF%B4%E6%98%8E/"/>
-    <id>http://chucz.club/2018/08/16/Elasticsearch分片及集群说明/</id>
+    <link href="http://www.chucz.club/2018/08/16/Elasticsearch%E5%88%86%E7%89%87%E5%8F%8A%E9%9B%86%E7%BE%A4%E8%AF%B4%E6%98%8E/"/>
+    <id>http://www.chucz.club/2018/08/16/Elasticsearch分片及集群说明/</id>
     <published>2018-08-16T23:56:33.000Z</published>
     <updated>2018-09-28T08:25:28.616Z</updated>
     
@@ -195,21 +195,21 @@
       
         
         
-          &lt;h2 id=&quot;replica的作用主要包括：&quot;&gt;&lt;a href=&quot;#replica的作用主要包括：&quot; class=&quot;headerlink&quot; title=&quot;replica的作用主要包括：&quot;&gt;&lt;/a&gt;&lt;a href=&quot;#replica的作用主要包括：&quot;
+          &lt;!-- build time:Sun Sep 30 2018 07:37:55 GMT+0000 (Coordinated Universal Time) --&gt;&lt;h2 id=&quot;replica的作用主要包括：&quot;&gt;&lt;a href=&quot;#replica的作用主要包括：&quot;
         
       
     
     </summary>
     
     
-      <category term="ELK" scheme="http://chucz.club/tags/ELK/"/>
+      <category term="ELK" scheme="http://www.chucz.club/tags/ELK/"/>
     
   </entry>
   
   <entry>
     <title>Pause容器</title>
-    <link href="http://chucz.club/2018/08/16/Pause%E5%AE%B9%E5%99%A8/"/>
-    <id>http://chucz.club/2018/08/16/Pause容器/</id>
+    <link href="http://www.chucz.club/2018/08/16/Pause%E5%AE%B9%E5%99%A8/"/>
+    <id>http://www.chucz.club/2018/08/16/Pause容器/</id>
     <published>2018-08-16T23:55:14.000Z</published>
     <updated>2018-09-28T08:25:28.616Z</updated>
     
@@ -219,21 +219,21 @@
       
         
         
-          &lt;h2 id=&quot;Pause容器定义&quot;&gt;&lt;a href=&quot;#Pause容器定义&quot; class=&quot;headerlink&quot; title=&quot;Pause容器定义&quot;&gt;&lt;/a&gt;&lt;a href=&quot;#Pause容器定义&quot;
+          &lt;!-- build time:Sun Sep 30 2018 07:37:55 GMT+0000 (Coordinated Universal Time) --&gt;&lt;h2 id=&quot;Pause容器定义&quot;&gt;&lt;a href=&quot;#Pause容器定义&quot;
         
       
     
     </summary>
     
     
-      <category term="K8s" scheme="http://chucz.club/tags/K8s/"/>
+      <category term="K8s" scheme="http://www.chucz.club/tags/K8s/"/>
     
   </entry>
   
   <entry>
     <title>docker cicd持续集成部署</title>
-    <link href="http://chucz.club/2018/08/16/docker-cicd%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E9%83%A8%E7%BD%B2/"/>
-    <id>http://chucz.club/2018/08/16/docker-cicd持续集成部署/</id>
+    <link href="http://www.chucz.club/2018/08/16/docker-cicd%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90%E9%83%A8%E7%BD%B2/"/>
+    <id>http://www.chucz.club/2018/08/16/docker-cicd持续集成部署/</id>
     <published>2018-08-16T23:53:55.000Z</published>
     <updated>2018-09-28T08:25:28.616Z</updated>
     
@@ -243,21 +243,21 @@
       
         
         
-          &lt;h2 id=&quot;持续集成的概念&quot;&gt;&lt;a href=&quot;#持续集成的概念&quot; class=&quot;headerlink&quot; title=&quot;持续集成的概念&quot;&gt;&lt;/a&gt;&lt;a href=&quot;#持续集成的概念&quot;
+          &lt;!-- build time:Sun Sep 30 2018 07:37:55 GMT+0000 (Coordinated Universal Time) --&gt;&lt;h2 id=&quot;持续集成的概念&quot;&gt;&lt;a href=&quot;#持续集成的概念&quot; class=&quot;headerlink&quot;
         
       
     
     </summary>
     
     
-      <category term="docker" scheme="http://chucz.club/tags/docker/"/>
+      <category term="docker" scheme="http://www.chucz.club/tags/docker/"/>
     
   </entry>
   
   <entry>
     <title>kubernetes-jenkins-ci-cd</title>
-    <link href="http://chucz.club/2018/08/16/kubernetes-jenkins-ci-cd/"/>
-    <id>http://chucz.club/2018/08/16/kubernetes-jenkins-ci-cd/</id>
+    <link href="http://www.chucz.club/2018/08/16/kubernetes-jenkins-ci-cd/"/>
+    <id>http://www.chucz.club/2018/08/16/kubernetes-jenkins-ci-cd/</id>
     <published>2018-08-16T23:53:11.000Z</published>
     <updated>2018-09-28T08:25:28.616Z</updated>
     
@@ -267,21 +267,21 @@
       
         
         
-          &lt;h3 id=&quot;流程图：&quot;&gt;&lt;a href=&quot;#流程图：&quot; class=&quot;headerlink&quot; title=&quot;流程图：&quot;&gt;&lt;/a&gt;&lt;a href=&quot;#流程图：&quot;
+          &lt;!-- build time:Sun Sep 30 2018 07:37:55 GMT+0000 (Coordinated Universal Time) --&gt;&lt;h3 id=&quot;流程图：&quot;&gt;&lt;a href=&quot;#流程图：&quot; class=&quot;headerlink&quot;
         
       
     
     </summary>
     
     
-      <category term="K8s" scheme="http://chucz.club/tags/K8s/"/>
+      <category term="K8s" scheme="http://www.chucz.club/tags/K8s/"/>
     
   </entry>
   
   <entry>
     <title>Nginx配置相关笔记</title>
-    <link href="http://chucz.club/2018/07/26/Nginx%E9%85%8D%E7%BD%AE%E7%9B%B8%E5%85%B3%E7%AC%94%E8%AE%B0/"/>
-    <id>http://chucz.club/2018/07/26/Nginx配置相关笔记/</id>
+    <link href="http://www.chucz.club/2018/07/26/Nginx%E9%85%8D%E7%BD%AE%E7%9B%B8%E5%85%B3%E7%AC%94%E8%AE%B0/"/>
+    <id>http://www.chucz.club/2018/07/26/Nginx配置相关笔记/</id>
     <published>2018-07-26T19:47:15.000Z</published>
     <updated>2018-09-28T08:51:24.508Z</updated>
     
@@ -291,24 +291,23 @@
       
         
         
-          &lt;blockquote&gt;
-&lt;p&gt;好久没更，来水一篇～！～&lt;br&gt;　　就在刚刚，我花了四百大洋租了台腾讯云香港的服务器（～心在滴血～），因此我的博客终于可以宣告回国了。PS：之前一直使用github-page，众所周知速度贼慢，后面换成了新加坡的VPS服务器，速度就更慢了，没办法只
+          &lt;!-- build time:Sun Sep 30 2018 07:37:55 GMT+0000 (Coordinated Universal Time)
         
       
     
     </summary>
     
     
-      <category term="技术研究" scheme="http://chucz.club/tags/%E6%8A%80%E6%9C%AF%E7%A0%94%E7%A9%B6/"/>
+      <category term="技术研究" scheme="http://www.chucz.club/tags/%E6%8A%80%E6%9C%AF%E7%A0%94%E7%A9%B6/"/>
     
-      <category term="nginx" scheme="http://chucz.club/tags/nginx/"/>
+      <category term="nginx" scheme="http://www.chucz.club/tags/nginx/"/>
     
   </entry>
   
   <entry>
     <title>Headless Chrome and API</title>
-    <link href="http://chucz.club/2018/07/09/Headless-Chrome-and-API/"/>
-    <id>http://chucz.club/2018/07/09/Headless-Chrome-and-API/</id>
+    <link href="http://www.chucz.club/2018/07/09/Headless-Chrome-and-API/"/>
+    <id>http://www.chucz.club/2018/07/09/Headless-Chrome-and-API/</id>
     <published>2018-07-09T00:59:10.000Z</published>
     <updated>2018-09-28T08:51:24.508Z</updated>
     
@@ -318,32 +317,29 @@
       
         
         
-          &lt;blockquote&gt;
-&lt;p&gt;我已爬遍了全世界，而你却迟迟不见&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;p&gt;　　自从Google在chrome59版本后加入了 &lt;a
+          &lt;!-- build time:Sun Sep 30 2018 07:37:55 GMT+0000 (Coordinated Universal Time)
         
       
     
     </summary>
     
     
-      <category term="爬虫技术" scheme="http://chucz.club/tags/%E7%88%AC%E8%99%AB%E6%8A%80%E6%9C%AF/"/>
+      <category term="爬虫技术" scheme="http://www.chucz.club/tags/%E7%88%AC%E8%99%AB%E6%8A%80%E6%9C%AF/"/>
     
-      <category term="Headless Chrome" scheme="http://chucz.club/tags/Headless-Chrome/"/>
+      <category term="Headless Chrome" scheme="http://www.chucz.club/tags/Headless-Chrome/"/>
     
-      <category term="Puppeteer" scheme="http://chucz.club/tags/Puppeteer/"/>
+      <category term="Puppeteer" scheme="http://www.chucz.club/tags/Puppeteer/"/>
     
-      <category term="pychrome" scheme="http://chucz.club/tags/pychrome/"/>
+      <category term="pychrome" scheme="http://www.chucz.club/tags/pychrome/"/>
     
-      <category term="chromeless" scheme="http://chucz.club/tags/chromeless/"/>
+      <category term="chromeless" scheme="http://www.chucz.club/tags/chromeless/"/>
     
   </entry>
   
   <entry>
     <title>Supervisord管理进程实践</title>
-    <link href="http://chucz.club/2018/06/24/Supervisord%E7%AE%A1%E7%90%86%E8%BF%9B%E7%A8%8B%E5%AE%9E%E8%B7%B5/"/>
-    <id>http://chucz.club/2018/06/24/Supervisord管理进程实践/</id>
+    <link href="http://www.chucz.club/2018/06/24/Supervisord%E7%AE%A1%E7%90%86%E8%BF%9B%E7%A8%8B%E5%AE%9E%E8%B7%B5/"/>
+    <id>http://www.chucz.club/2018/06/24/Supervisord管理进程实践/</id>
     <published>2018-06-24T18:59:38.000Z</published>
     <updated>2018-09-28T08:51:24.508Z</updated>
     
@@ -353,24 +349,23 @@
       
         
         
-          &lt;blockquote&gt;
-&lt;p&gt;小孩在门前唱着歌&lt;br&gt;阳光它照暖了溪河&lt;br&gt;　　今天凑空研究了下Supervisord，这是一款linux进程管理工具，使用python开发，主要用于在后台维护进程（类似master守护进程），可以实现监控进程的状态、自动重启进程等操作，便于一
+          &lt;!-- build time:Sun Sep 30 2018 07:37:55 GMT+0000 (Coordinated Universal Time)
         
       
     
     </summary>
     
     
-      <category term="技术研究" scheme="http://chucz.club/tags/%E6%8A%80%E6%9C%AF%E7%A0%94%E7%A9%B6/"/>
+      <category term="技术研究" scheme="http://www.chucz.club/tags/%E6%8A%80%E6%9C%AF%E7%A0%94%E7%A9%B6/"/>
     
-      <category term="Supervisord" scheme="http://chucz.club/tags/Supervisord/"/>
+      <category term="Supervisord" scheme="http://www.chucz.club/tags/Supervisord/"/>
     
   </entry>
   
   <entry>
     <title>Python3.5协程学习研究</title>
-    <link href="http://chucz.club/2018/06/20/Python3-5%E5%8D%8F%E7%A8%8B%E5%AD%A6%E4%B9%A0%E7%A0%94%E7%A9%B6/"/>
-    <id>http://chucz.club/2018/06/20/Python3-5协程学习研究/</id>
+    <link href="http://www.chucz.club/2018/06/20/Python3-5%E5%8D%8F%E7%A8%8B%E5%AD%A6%E4%B9%A0%E7%A0%94%E7%A9%B6/"/>
+    <id>http://www.chucz.club/2018/06/20/Python3-5协程学习研究/</id>
     <published>2018-06-20T23:18:04.000Z</published>
     <updated>2018-09-28T08:51:24.508Z</updated>
     
@@ -380,28 +375,25 @@
       
         
         
-          &lt;blockquote&gt;
-&lt;p&gt;今夕何夕故人不来迟暮连山黛&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;p&gt;　　
+          &lt;!-- build time:Sun Sep 30 2018 07:37:55 GMT+0000 (Coordinated Universal Time)
         
       
     
     </summary>
     
     
-      <category term="编程之道" scheme="http://chucz.club/tags/%E7%BC%96%E7%A8%8B%E4%B9%8B%E9%81%93/"/>
+      <category term="编程之道" scheme="http://www.chucz.club/tags/%E7%BC%96%E7%A8%8B%E4%B9%8B%E9%81%93/"/>
     
-      <category term="python" scheme="http://chucz.club/tags/python/"/>
+      <category term="python" scheme="http://www.chucz.club/tags/python/"/>
     
-      <category term="协程" scheme="http://chucz.club/tags/%E5%8D%8F%E7%A8%8B/"/>
+      <category term="协程" scheme="http://www.chucz.club/tags/%E5%8D%8F%E7%A8%8B/"/>
     
   </entry>
   
   <entry>
     <title>利用chrome_remote_interface实现程序化、自动化Web安全测试</title>
-    <link href="http://chucz.club/2018/06/07/%E5%88%A9%E7%94%A8chrome-remote-interface%E5%AE%9E%E7%8E%B0%E7%A8%8B%E5%BA%8F%E5%8C%96%E3%80%81%E8%87%AA%E5%8A%A8%E5%8C%96Web%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/"/>
-    <id>http://chucz.club/2018/06/07/利用chrome-remote-interface实现程序化、自动化Web安全测试/</id>
+    <link href="http://www.chucz.club/2018/06/07/%E5%88%A9%E7%94%A8chrome-remote-interface%E5%AE%9E%E7%8E%B0%E7%A8%8B%E5%BA%8F%E5%8C%96%E3%80%81%E8%87%AA%E5%8A%A8%E5%8C%96Web%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/"/>
+    <id>http://www.chucz.club/2018/06/07/利用chrome-remote-interface实现程序化、自动化Web安全测试/</id>
     <published>2018-06-07T01:00:27.000Z</published>
     <updated>2018-09-28T08:51:24.508Z</updated>
     
@@ -411,28 +403,25 @@
       
         
         
-          &lt;blockquote&gt;
-&lt;p&gt;高考加油！&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;p&gt;　　如果要问有哪些抓包神器或者流量分析工具？以下几款工具是必须要提的，burpsuite（跨平台）、&lt;a href=&quot;https://thief.one/2017/04/27/1/&quot;
+          &lt;!-- build time:Sun Sep 30 2018 07:37:55 GMT+0000 (Coordinated Universal Time)
         
       
     
     </summary>
     
     
-      <category term="爬虫技术" scheme="http://chucz.club/tags/%E7%88%AC%E8%99%AB%E6%8A%80%E6%9C%AF/"/>
+      <category term="爬虫技术" scheme="http://www.chucz.club/tags/%E7%88%AC%E8%99%AB%E6%8A%80%E6%9C%AF/"/>
     
-      <category term="chrome_remote_interface" scheme="http://chucz.club/tags/chrome-remote-interface/"/>
+      <category term="chrome_remote_interface" scheme="http://www.chucz.club/tags/chrome-remote-interface/"/>
     
-      <category term="headless chrome" scheme="http://chucz.club/tags/headless-chrome/"/>
+      <category term="headless chrome" scheme="http://www.chucz.club/tags/headless-chrome/"/>
     
   </entry>
   
   <entry>
     <title>区块链系列·python实现的区块链</title>
-    <link href="http://chucz.club/2018/05/25/%E5%8C%BA%E5%9D%97%E9%93%BE%E7%B3%BB%E5%88%97%C2%B7python%E5%AE%9E%E7%8E%B0%E7%9A%84%E5%8C%BA%E5%9D%97%E9%93%BE/"/>
-    <id>http://chucz.club/2018/05/25/区块链系列·python实现的区块链/</id>
+    <link href="http://www.chucz.club/2018/05/25/%E5%8C%BA%E5%9D%97%E9%93%BE%E7%B3%BB%E5%88%97%C2%B7python%E5%AE%9E%E7%8E%B0%E7%9A%84%E5%8C%BA%E5%9D%97%E9%93%BE/"/>
+    <id>http://www.chucz.club/2018/05/25/区块链系列·python实现的区块链/</id>
     <published>2018-05-25T00:16:48.000Z</published>
     <updated>2018-09-28T08:51:24.508Z</updated>
     
@@ -442,24 +431,23 @@
       
         
         
-          &lt;blockquote&gt;
-&lt;p&gt;地是床 天是被 流星是眼泪&lt;br&gt;有时醒 有时醉
+          &lt;!-- build time:Sun Sep 30 2018 07:37:55 GMT+0000 (Coordinated Universal Time) --&gt;&lt;blockquote&gt;&lt;p&gt;地是床 天是被 流星是眼泪&lt;br&gt;有时醒 有时醉
         
       
     
     </summary>
     
     
-      <category term="区块链安全" scheme="http://chucz.club/tags/%E5%8C%BA%E5%9D%97%E9%93%BE%E5%AE%89%E5%85%A8/"/>
+      <category term="区块链安全" scheme="http://www.chucz.club/tags/%E5%8C%BA%E5%9D%97%E9%93%BE%E5%AE%89%E5%85%A8/"/>
     
-      <category term="区块链" scheme="http://chucz.club/tags/%E5%8C%BA%E5%9D%97%E9%93%BE/"/>
+      <category term="区块链" scheme="http://www.chucz.club/tags/%E5%8C%BA%E5%9D%97%E9%93%BE/"/>
     
   </entry>
   
   <entry>
     <title>ELK Sentinl</title>
-    <link href="http://chucz.club/2018/05/20/ELK-Sentinl/"/>
-    <id>http://chucz.club/2018/05/20/ELK-Sentinl/</id>
+    <link href="http://www.chucz.club/2018/05/20/ELK-Sentinl/"/>
+    <id>http://www.chucz.club/2018/05/20/ELK-Sentinl/</id>
     <published>2018-05-20T18:14:12.000Z</published>
     <updated>2018-09-28T08:25:28.616Z</updated>
     
@@ -469,21 +457,21 @@
       
         
         
-          &lt;h3 id=&quot;Sentinl简介&quot;&gt;&lt;a href=&quot;#Sentinl简介&quot; class=&quot;headerlink&quot; title=&quot;Sentinl简介&quot;&gt;&lt;/a&gt;&lt;a href=&quot;#Sentinl简介&quot;
+          &lt;!-- build time:Sun Sep 30 2018 07:37:55 GMT+0000 (Coordinated Universal Time) --&gt;&lt;h3 id=&quot;Sentinl简介&quot;&gt;&lt;a href=&quot;#Sentinl简介&quot;
         
       
     
     </summary>
     
     
-      <category term="ELK" scheme="http://chucz.club/tags/ELK/"/>
+      <category term="ELK" scheme="http://www.chucz.club/tags/ELK/"/>
     
   </entry>
   
   <entry>
     <title>端口扫描器的几种代码实现方案</title>
-    <link href="http://chucz.club/2018/05/20/%E7%AB%AF%E5%8F%A3%E6%89%AB%E6%8F%8F%E5%99%A8%E7%9A%84%E5%87%A0%E7%A7%8D%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0%E6%96%B9%E6%A1%88/"/>
-    <id>http://chucz.club/2018/05/20/端口扫描器的几种代码实现方案/</id>
+    <link href="http://www.chucz.club/2018/05/20/%E7%AB%AF%E5%8F%A3%E6%89%AB%E6%8F%8F%E5%99%A8%E7%9A%84%E5%87%A0%E7%A7%8D%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0%E6%96%B9%E6%A1%88/"/>
+    <id>http://www.chucz.club/2018/05/20/端口扫描器的几种代码实现方案/</id>
     <published>2018-05-20T18:13:36.000Z</published>
     <updated>2018-09-28T08:51:24.508Z</updated>
     
@@ -493,22 +481,21 @@
       
         
         
-          &lt;blockquote&gt;
-&lt;p&gt;这雨夜太漫长 失眠的我 在谁梦里
+          &lt;!-- build time:Sun Sep 30 2018 07:37:55 GMT+0000 (Coordinated Universal Time) --&gt;&lt;blockquote&gt;&lt;p&gt;这雨夜太漫长 失眠的我 在谁梦里
         
       
     
     </summary>
     
     
-      <category term="编程之道" scheme="http://chucz.club/tags/%E7%BC%96%E7%A8%8B%E4%B9%8B%E9%81%93/"/>
+      <category term="编程之道" scheme="http://www.chucz.club/tags/%E7%BC%96%E7%A8%8B%E4%B9%8B%E9%81%93/"/>
     
   </entry>
   
   <entry>
     <title>利用python开发app实战</title>
-    <link href="http://chucz.club/2018/05/07/%E5%88%A9%E7%94%A8python%E5%BC%80%E5%8F%91app%E5%AE%9E%E6%88%98/"/>
-    <id>http://chucz.club/2018/05/07/利用python开发app实战/</id>
+    <link href="http://www.chucz.club/2018/05/07/%E5%88%A9%E7%94%A8python%E5%BC%80%E5%8F%91app%E5%AE%9E%E6%88%98/"/>
+    <id>http://www.chucz.club/2018/05/07/利用python开发app实战/</id>
     <published>2018-05-07T21:35:25.000Z</published>
     <updated>2018-09-28T08:51:24.508Z</updated>
     
@@ -518,21 +505,18 @@
       
         
         
-          &lt;blockquote&gt;
-&lt;p&gt;你说，我们的未来&lt;br&gt;被装进棺材，染不上尘埃&lt;/p&gt;
-&lt;/blockquote&gt;
-&lt;p&gt;　　我很早之前就想开发一款app玩玩，无奈对java不够熟悉，之前也没有开发app的经验，因此一直耽搁了。最近想到尝试用python开发一款app，googl
+          &lt;!-- build time:Sun Sep 30 2018 07:37:55 GMT+0000 (Coordinated Universal Time)
         
       
     
     </summary>
     
     
-      <category term="编程之道" scheme="http://chucz.club/tags/%E7%BC%96%E7%A8%8B%E4%B9%8B%E9%81%93/"/>
+      <category term="编程之道" scheme="http://www.chucz.club/tags/%E7%BC%96%E7%A8%8B%E4%B9%8B%E9%81%93/"/>
     
-      <category term="python开发app" scheme="http://chucz.club/tags/python%E5%BC%80%E5%8F%91app/"/>
+      <category term="python开发app" scheme="http://www.chucz.club/tags/python%E5%BC%80%E5%8F%91app/"/>
     
-      <category term="android for python" scheme="http://chucz.club/tags/android-for-python/"/>
+      <category term="android for python" scheme="http://www.chucz.club/tags/android-for-python/"/>
     
   </entry>
   

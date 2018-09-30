@@ -1,1 +1,3 @@
-http://chucz.club/2018/08/19/23种非常有用的ElasticSearch查询例子/
+http://www.chucz.club/2018/08/19/23种非常有用的ElasticSearch查询例子/
+http://www.chucz.club/2018/08/19/ElasticSearch-索引查询使用指南/
+http://www.chucz.club/2018/08/19/ES内置账号密码修改、自定义角色自定义账号、ldap及AD认证/
