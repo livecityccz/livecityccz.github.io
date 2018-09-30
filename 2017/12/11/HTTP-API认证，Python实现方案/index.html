@@ -1,1 +1,1044 @@
-<!DOCTYPE html><html class="theme-next gemini use-motion" lang="zh-Hans"><head><meta charset="UTF-8"><meta name="baidu-site-verification" content="2WtclSxlwa"><meta name="google-site-verification" content="-v1R6yxahUz-_HLWFSGNlUtQ5JburbSV6Ma_eU9eOXo"><meta name="msvalidate.01" content="B593F889E6A9B7CAEB29758AD324E36B"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"><meta name="theme-color" content="#222"><script src="/lib/pace/pace.min.js?v=1.0.2"></script><link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet"><meta http-equiv="Cache-Control" content="no-transform"><meta http-equiv="Cache-Control" content="no-siteapp"><link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet"><link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet"><link href="/css/main.css?v=5.1.4" rel="stylesheet"><link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4"><link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4"><link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4"><link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222"><meta name="keywords" content="编程之道,python,"><link rel="alternate" href="/atom.xml" title="褚成志的博客" type="application/atom+xml"><meta name="description" content="一杯敬自由，一杯敬死亡　　标题写的比较模糊拗口，简单来说本文就是介绍如何利用python将http的api接口做加密认证，防止不法分子乱用。这里有几个前提需要说明下，首先我们要实现的是http的加密认证，因此不考虑https。其次认证的目的是为了让一个http的api接口让正确的（通过认证的）人使用，而不是任何都可以用。  设计方案明白了http api认证的目的，那么就来设计方案吧！ 最偷懒的"><meta name="keywords" content="编程之道,python"><meta property="og:type" content="article"><meta property="og:title" content="HTTP-API认证，Python实现方案"><meta property="og:url" content="http://chucz.club/2017/12/11/HTTP-API认证，Python实现方案/index.html"><meta property="og:site_name" content="褚成志的博客"><meta property="og:description" content="一杯敬自由，一杯敬死亡　　标题写的比较模糊拗口，简单来说本文就是介绍如何利用python将http的api接口做加密认证，防止不法分子乱用。这里有几个前提需要说明下，首先我们要实现的是http的加密认证，因此不考虑https。其次认证的目的是为了让一个http的api接口让正确的（通过认证的）人使用，而不是任何都可以用。  设计方案明白了http api认证的目的，那么就来设计方案吧！ 最偷懒的"><meta property="og:locale" content="zh-Hans"><meta property="og:updated_time" content="2018-09-28T08:51:24.508Z"><meta name="twitter:card" content="summary"><meta name="twitter:title" content="HTTP-API认证，Python实现方案"><meta name="twitter:description" content="一杯敬自由，一杯敬死亡　　标题写的比较模糊拗口，简单来说本文就是介绍如何利用python将http的api接口做加密认证，防止不法分子乱用。这里有几个前提需要说明下，首先我们要实现的是http的加密认证，因此不考虑https。其次认证的目的是为了让一个http的api接口让正确的（通过认证的）人使用，而不是任何都可以用。  设计方案明白了http api认证的目的，那么就来设计方案吧！ 最偷懒的"><script id="hexo.configurations">var NexT=window.NexT||{},CONFIG={root:"/",scheme:"Gemini",version:"5.1.4",sidebar:{position:"left",display:"post",offset:12,b2t:!1,scrollpercent:!1,onmobile:!1},fancybox:!0,tabs:!0,motion:{enable:!0,async:!1,transition:{post_block:"fadeIn",post_header:"slideDownIn",post_body:"slideDownIn",coll_header:"slideLeftIn",sidebar:"slideUpIn"}},duoshuo:{userId:"0",author:"博主"},algolia:{applicationID:"",apiKey:"",indexName:"",hits:{per_page:10},labels:{input_placeholder:"Search for Posts",hits_empty:"We didn't find any results for the search: ${query}",hits_stats:"${hits} results found in ${time} ms"}}}</script><link rel="canonical" href="http://chucz.club/2017/12/11/HTTP-API认证，Python实现方案/"><title>HTTP-API认证，Python实现方案 | 褚成志的博客</title><script>!function(e,a,t,c,n,g,o){e.GoogleAnalyticsObject=n,e.ga=e.ga||function(){(e.ga.q=e.ga.q||[]).push(arguments)},e.ga.l=1*new Date,g=a.createElement(t),o=a.getElementsByTagName(t)[0],g.async=1,g.src="https://www.google-analytics.com/analytics.js",o.parentNode.insertBefore(g,o)}(window,document,"script",0,"ga"),ga("create","livecityccz@gmail.com","auto"),ga("send","pageview")</script></head><body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans"><div class="container sidebar-position-left page-post-detail"><div class="headband"></div><header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="header-inner"><div class="site-brand-wrapper"><div class="site-meta"><div class="custom-logo-site-title"><a href="/" class="brand" rel="start"><span class="logo-line-before"><i></i></span> <span class="site-title">褚成志的博客</span><span class="logo-line-after"><i></i></span></a></div><p class="site-subtitle">青青子衿, 悠悠我心</p></div><div class="site-nav-toggle"><button><span class="btn-bar"></span><span class="btn-bar"></span><span class="btn-bar"></span></button></div></div><nav class="site-nav"><ul id="menu" class="menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i><br>首页</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i><br>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i><br>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i><br>归档</a></li></ul></nav></div></header><main id="main" class="main"><div class="main-inner"><div class="content-wrap"><div id="content" class="content"><div id="posts" class="posts-expand"><article class="post post-type-normal" itemscope itemtype="http://schema.org/Article"><div class="post-block"><link itemprop="mainEntityOfPage" href="http://chucz.club/2017/12/11/HTTP-API认证，Python实现方案/"><span hidden itemprop="author" itemscope itemtype="http://schema.org/Person"><meta itemprop="name" content="褚成志"><meta itemprop="description" content=""><meta itemprop="image" content="/images/avatar.gif"></span><span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization"><meta itemprop="name" content="褚成志的博客"></span><header class="post-header"><h1 class="post-title" itemprop="name headline">HTTP-API认证，Python实现方案</h1><div class="post-meta"><span class="post-time"><span class="post-meta-item-icon"><i class="fa fa-calendar-o"></i></span> <span class="post-meta-item-text">发表于</span> <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-11T01:53:04+00:00">2017-12-11</time></span> <span id="/2017/12/11/HTTP-API认证，Python实现方案/" class="leancloud_visitors" data-flag-title="HTTP-API认证，Python实现方案"><span class="post-meta-divider">|</span><span class="post-meta-item-icon"><i class="fa fa-eye"></i></span> <span class="post-meta-item-text">阅读次数&#58;</span><span class="leancloud-visitors-count"></span></span> <span class="post-meta-divider">|</span><span class="page-pv"><i class="fa fa-file-o"></i><span class="busuanzi-value" id="busuanzi_value_page_pv"></span></span><div class="post-wordcount"><span class="post-meta-item-icon"><i class="fa fa-file-word-o"></i></span> <span class="post-meta-item-text">字数统计&#58;</span> <span title="字数统计">1.6k</span></div></div></header><div class="post-body" itemprop="articleBody"><blockquote><p>一杯敬自由，一杯敬死亡<br>　　标题写的比较模糊拗口，简单来说本文就是介绍如何利用python将http的api接口做加密认证，防止不法分子乱用。这里有几个前提需要说明下，首先我们要实现的是http的加密认证，因此不考虑https。其次认证的目的是为了让一个http的api接口让正确的（通过认证的）人使用，而不是任何都可以用。<br><a id="more"></a></p></blockquote><h3 id="设计方案"><a href="#设计方案" class="headerlink" title="设计方案"></a><a href="#设计方案" title="设计方案"></a>设计方案</h3><p>明白了http api认证的目的，那么就来设计方案吧！</p><h4 id="最偷懒的方案"><a href="#最偷懒的方案" class="headerlink" title="最偷懒的方案"></a><a href="#最偷懒的方案" title="最偷懒的方案"></a>最偷懒的方案</h4><p>我之前写过几个api接口，主要是自己用来传输一些数据库数据的，由于数据有一点敏感，因此使用了认证。当时为了偷懒，认证的方式写得特别简单无脑，即在api接口上增加了一个auth字段，字段的内容会在服务端进行校验，但其内容是一串写死的md5。这虽然也算是一种认证方式(不知道auth字段内容的朋友无法拿到api接口的数据)，但如果局域网内流量被监听，那这种方案就形同虚设了。</p><h4 id="比较简单实用的设计方案"><a href="#比较简单实用的设计方案" class="headerlink" title="比较简单实用的设计方案"></a><a href="#比较简单实用的设计方案" title="比较简单实用的设计方案"></a>比较简单实用的设计方案</h4><p>一种比较好的设计方案，是在客户端与服务端实现一套加密算法，算法可自定义但最好复杂一点。如将请求的参数以及内容以一定的方式排列后，可以再加上时间戳，整体做一个hash运算。服务端将获取的参数同样做hash，与客户端传递的hash做对比。因为有了时间戳，即使被监听了流量，进行流量重放也是不能认证成功的。（因为时间戳存在差异）</p><p><em>说明一下：本文介绍的是api的一个认证方式，这跟网站啥的认证还是有区别的。主要还是看api的应用场景，如果是给内部人员调用，而且调用的用户不多，其实以上认证方案足够了。因为用来加密的密钥（key）可以用其他安全的方式发送给用户（甚至可以写纸上，2333），而不必像https协议一样，使用非对称加密+对称加密，并且使用数字证书等一系列复杂的加密认证方式。</em></p><hr><p>好了，前文介绍了一些api认证的方案，那么接下来再写点啥呢？我不打算介绍怎么去开发一个认证方案的代码，我主要想推荐一个开源的项目—hawk，因为它就是用来实现http加密认证的，而且它有一个python的实现模块（mohawk），推荐它是因为它比较简单实用。</p><p>因为之前研究过mohawk模块2个小时（真的是2个小时），因此本文主要介绍一下mohawk的用法。企业内部一般自己设计api的加密认证方案（一般是生成一个token密文，严格一点的会做双因子认证），因此这个模块适合给初学者练练手，也可以给打算自己设计认证方案的朋友提供一种思路。以下内容是我阅读mohawk文档总结的一些基础用法，更详细的可以参考下官网文档。</p><h3 id="hawk介绍"><a href="#hawk介绍" class="headerlink" title="hawk介绍"></a><a href="#hawk介绍" title="hawk介绍"></a>hawk介绍</h3><p>hawk项目地址：<a href="https://github.com/hueniverse/hawk" target="_blank" rel="noopener">https://github.com/hueniverse/hawk</a><br>python实现：<a href="https://github.com/kumar303/mohawk" target="_blank" rel="noopener">https://github.com/kumar303/mohawk</a><br>官方文档：<a href="https://mohawk.readthedocs.io/en/latest/" target="_blank" rel="noopener">https://mohawk.readthedocs.io/en/latest/</a></p><h4 id="安装hawk"><a href="#安装hawk" class="headerlink" title="安装hawk"></a><a href="#安装hawk" title="安装hawk"></a>安装hawk</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">pip install mohawk</div></pre></td></tr></table></figure><h3 id="构建一个webserver"><a href="#构建一个webserver" class="headerlink" title="构建一个webserver"></a><a href="#构建一个webserver" title="构建一个webserver"></a>构建一个webserver</h3><p>这里我使用python的falcon框架来构建一个api webserver，如果对falcon框架不熟悉，可以先阅读：<a href="https://thief.one/2017/11/27/1/" target="_blank" rel="noopener">https://thief.one/2017/11/27/1/</a></p><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div></pre></td><td class="code"><pre><div class="line">import falcon</div><div class="line">from mohawk import Receiver <span class="comment"># 导入mohawk模块的Receiver方法</span></div><div class="line">from wsgiref import simple_server</div><div class="line"></div><div class="line"><span class="comment"># 认证字典,可以创建不同的用户，每个用户都可以用不同的密钥（key）</span></div><div class="line">allowed_senders=&#123;</div><div class="line"></div><div class="line">    <span class="string">“test”</span>:&#123;</div><div class="line"></div><div class="line">        <span class="string">‘id’</span>: <span class="string">‘test’</span>,</div><div class="line">        <span class="string">‘key’</span>: <span class="string">‘110’</span>,</div><div class="line">        <span class="string">‘algorithm’</span>: <span class="string">‘sha256’</span></div><div class="line"></div><div class="line">    &#125;, <span class="comment"># test 用户组</span></div><div class="line"></div><div class="line">    <span class="string">“nmask”</span>:&#123;</div><div class="line"></div><div class="line">        <span class="string">‘id’</span>: <span class="string">‘nmask’</span>,</div><div class="line">        <span class="string">‘key’</span>: <span class="string">‘112’</span>,</div><div class="line">        <span class="string">‘algorithm’</span>: <span class="string">‘sha256’</span></div><div class="line"></div><div class="line">    &#125;, <span class="comment"># nmask 用户组</span></div><div class="line"></div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line">def lookup_credentials(sender_id):</div><div class="line">    <span class="string">‘’</span><span class="string">‘ 验证用户是否在允许的范围内 ‘</span><span class="string">‘’</span></div><div class="line">    <span class="keyword">if</span> sender_id <span class="keyword">in</span> allowed_senders:</div><div class="line">        <span class="built_in">return</span> allowed_senders[sender_id]</div><div class="line">    <span class="keyword">else</span>:</div><div class="line">        raise LookupError(<span class="string">‘unknown sender’</span>)</div><div class="line"></div><div class="line"></div><div class="line">class Test(object):</div><div class="line">    def on_post(self, req, resp):</div><div class="line">    <span class="string">‘’</span><span class="string">‘ http post 方法 ‘</span><span class="string">‘’</span></div><div class="line">        try:</div><div class="line">            Receiver(</div><div class="line">                    lookup_credentials, </div><div class="line">                    req.headers.get(<span class="string">‘AUTHORIZATION’</span>), <span class="comment"># 请求时生成的密钥</span></div><div class="line">                    req.url,</div><div class="line">                    req.method,</div><div class="line">                    content= req.stream.read(),</div><div class="line">                    content_type=req.headers.get(<span class="string">‘CONTENT-TYPE’</span>)</div><div class="line">            )</div><div class="line">        except Exception,e:</div><div class="line">            <span class="string">‘’</span><span class="string">‘ 报错则说明认证失败 ‘</span><span class="string">‘’</span></div><div class="line">            <span class="built_in">print</span> e</div><div class="line">            resp.status = falcon.HTTP_403  <span class="comment"># This is the default status</span></div><div class="line">        <span class="keyword">else</span>:</div><div class="line">            resp.status = falcon.HTTP_200  <span class="comment"># This is the default status</span></div><div class="line">            resp.body = (<span class="string">‘Hello World!’</span>)</div><div class="line"></div><div class="line"></div><div class="line">    def on_get(self, req, resp):</div><div class="line">        <span class="string">‘’</span><span class="string">‘ http get 方法 ‘</span><span class="string">‘’</span></div><div class="line">        try:</div><div class="line">            Receiver(</div><div class="line">                    lookup_credentials,</div><div class="line">                    req.headers.get(<span class="string">‘AUTHORIZATION’</span>),</div><div class="line">                    req.url,</div><div class="line">                    req.method,</div><div class="line">                    content= req.stream.read(),</div><div class="line">                    content_type=req.headers.get(<span class="string">‘CONTENT-TYPE’</span>)</div><div class="line">            )</div><div class="line">        except Exception,e:</div><div class="line">            <span class="built_in">print</span> e</div><div class="line">            resp.status = falcon.HTTP_403  <span class="comment"># This is the default status</span></div><div class="line">            resp.body = (<span class="string">‘authorization fail!’</span>)</div><div class="line">        <span class="keyword">else</span>:</div><div class="line">            resp.status = falcon.HTTP_200  <span class="comment"># This is the default status</span></div><div class="line">            resp.body = (<span class="string">‘Hello World!’</span>)</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">app = falcon.API()</div><div class="line"><span class="built_in">test</span> = Test()</div><div class="line">app.add_route(<span class="string">‘/‘</span>, <span class="built_in">test</span>)</div><div class="line"></div><div class="line"></div><div class="line"><span class="keyword">if</span> <strong>name</strong> == <span class="string">‘<strong>main</strong>‘</span>:</div><div class="line">    httpd = simple_server.make_server(<span class="string">‘127.0.0.1’</span>, 8000, app)</div><div class="line">    httpd.serve_forever()</div></pre></td></tr></table></figure><h3 id="构建一个http请求"><a href="#构建一个http请求" class="headerlink" title="构建一个http请求"></a><a href="#构建一个http请求" title="构建一个http请求"></a>构建一个http请求</h3><p>搭建好webserver以后，我们自然需要构建http请求，去验证请求是否经历了认证的过程，且认证的结果是否正确，这里使用requests包去构建。</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div></pre></td><td class="code"><pre><div class="line">import json</div><div class="line">import requests</div><div class="line">from mohawk import Sender <span class="comment"># 导入mohawk模块的Sender方法</span></div><div class="line"></div><div class="line">url = <span class="string">“<a href="http://127.0.0.1:8000/&quot;" target="_blank" rel="noopener">http://127.0.0.1:8000/&quot;</a></span></div><div class="line">post_data = json.dumps(<span class="string">“”</span>) <span class="comment"># 如果是get请求，参数内容可以设置为””</span></div><div class="line">content_type = <span class="string">‘application/x-www-form-urlencoded’</span></div><div class="line"></div><div class="line"><span class="comment"># 用于认证的字典</span></div><div class="line">credentials = &#123;</div><div class="line"></div><div class="line">               <span class="string">‘id’</span>: <span class="string">‘test’</span>,</div><div class="line">               <span class="string">‘key’</span>: <span class="string">‘10’</span>,</div><div class="line">               <span class="string">‘algorithm’</span>: <span class="string">‘sha256’</span></div><div class="line">           &#125;</div><div class="line"></div><div class="line">sender = Sender(credentials,</div><div class="line">                url = url, <span class="comment"># 必填</span></div><div class="line">                method = <span class="string">‘POST’</span>, <span class="comment"># 必填 </span></div><div class="line">                content = post_data, <span class="comment"># 必填，如果是get请求，参数内容可以设置为””</span></div><div class="line">                content_type = content_type <span class="comment"># 必填</span></div><div class="line">            )</div><div class="line"></div><div class="line"><span class="built_in">print</span> sender.request_header <span class="comment"># 生成的密文，通过header的形式传递到服务端</span></div><div class="line"></div><div class="line">res=requests.post(</div><div class="line">                url = url,</div><div class="line">                data = post_data,</div><div class="line">                headers=&#123;</div><div class="line">                        <span class="string">‘Authorization’</span>: sender.request_header,</div><div class="line">                        <span class="string">‘Content-Type’</span>: content_type</div><div class="line">                        &#125;</div><div class="line">                )</div><div class="line"></div><div class="line"><span class="built_in">print</span> res.status_code</div><div class="line"><span class="built_in">print</span> res.text</div></pre></td></tr></table></figure><h3 id="mohawk模块说明"><a href="#mohawk模块说明" class="headerlink" title="mohawk模块说明"></a><a href="#mohawk模块说明" title="mohawk模块说明"></a>mohawk模块说明</h3><p>mohawk是hawk的python实现，有几个主要方法：Sender、Receiver等，详细的可以去阅读源码。</p><p>Sender方法用来生成在http请求认证中所需的密码，该方法需要传递几个参数，比如：url、method、content（post_data）、content_type、credentials(认证的字典，包含了id、key、加密方式)等，该方法会根据传递的参数值，生成一个密文密码，然后我们可以将其放在headers中传递到服务端。</p><p>Receiver方法用来在服务端接收客户端传递的请求，根据获取的参数的内容计算出一个新的密文密码，与客户端传递的密文进行对比，达到认证的效果。</p></div><footer class="post-footer"><div class="post-tags"><a href="/tags/编程之道/" rel="tag"><i class="fa fa-tag"></i> 编程之道</a><a href="/tags/python/" rel="tag"><i class="fa fa-tag"></i> python</a></div><div class="post-nav"><div class="post-nav-next post-nav-item"><a href="/2017/12/07/未授权访问漏洞的检测与利用/" rel="next" title="未授权访问漏洞的检测与利用"><i class="fa fa-chevron-left"></i> 未授权访问漏洞的检测与利用</a></div><span class="post-nav-divider"></span><div class="post-nav-prev post-nav-item"><a href="/2018/01/11/利用Whatweb获取Web指纹信息/" rel="prev" title="利用Whatweb获取Web指纹信息">利用Whatweb获取Web指纹信息<i class="fa fa-chevron-right"></i></a></div></div></footer></div></article><div class="post-spread"></div></div></div></div><div class="sidebar-toggle"><div class="sidebar-toggle-line-wrap"><span class="sidebar-toggle-line sidebar-toggle-line-first"></span><span class="sidebar-toggle-line sidebar-toggle-line-middle"></span><span class="sidebar-toggle-line sidebar-toggle-line-last"></span></div></div><aside id="sidebar" class="sidebar"><div class="sidebar-inner"><ul class="sidebar-nav motion-element"><li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">文章目录</li><li class="sidebar-nav-overview" data-target="site-overview-wrap">站点概览</li></ul><section class="site-overview-wrap sidebar-panel"><div class="site-overview"><div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person"><p class="site-author-name" itemprop="name">褚成志</p><p class="site-description motion-element" itemprop="description">关注互联网的科技博客</p></div><nav class="site-state motion-element"><div class="site-state-item site-state-posts"><a href="/archives/"><span class="site-state-item-count">39</span> <span class="site-state-item-name">日志</span></a></div><div class="site-state-item site-state-tags"><span class="site-state-item-count">36</span> <span class="site-state-item-name">标签</span></div></nav><div class="feed-link motion-element"><a href="/atom.xml" rel="alternate"><i class="fa fa-rss"></i> RSS</a></div><div class="links-of-author motion-element"><span class="links-of-author-item"><a href="https://github.com/livecityccz" target="_blank" title="GitHub"><i class="fa fa-fw fa-github"></i> GitHub</a></span><span class="links-of-author-item"><a href="mailto:livecityccz@gmail.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i> E-Mail</a></span><span class="links-of-author-item"><a href="https://plus.google.com/livecityccz" target="_blank" title="Google"><i class="fa fa-fw fa-google"></i> Google</a></span><span class="links-of-author-item"><a href="https://twitter.com/livecityccz" target="_blank" title="Twitter"><i class="fa fa-fw fa-twitter"></i> Twitter</a></span><span class="links-of-author-item"><a href="https://www.facebook.com/livecityccz" target="_blank" title="FB Page"><i class="fa fa-fw fa-facebook"></i> FB Page</a></span><span class="links-of-author-item"><a href="https://youtube.com/livecityccz" target="_blank" title="YouTube"><i class="fa fa-fw fa-youtube"></i> YouTube</a></span></div></div></section><section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active"><div class="post-toc"><div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#设计方案"><span class="nav-number">1.</span> <span class="nav-text">设计方案</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#最偷懒的方案"><span class="nav-number">1.1.</span> <span class="nav-text">最偷懒的方案</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#比较简单实用的设计方案"><span class="nav-number">1.2.</span> <span class="nav-text">比较简单实用的设计方案</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#hawk介绍"><span class="nav-number">2.</span> <span class="nav-text">hawk介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#安装hawk"><span class="nav-number">2.1.</span> <span class="nav-text">安装hawk</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#构建一个webserver"><span class="nav-number">3.</span> <span class="nav-text">构建一个webserver</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#构建一个http请求"><span class="nav-number">4.</span> <span class="nav-text">构建一个http请求</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#mohawk模块说明"><span class="nav-number">5.</span> <span class="nav-text">mohawk模块说明</span></a></li></ol></div></div></section></div></aside></div></main><footer id="footer" class="footer"><div class="footer-inner"><div class="copyright">&copy; <span itemprop="copyrightYear">2018</span><span class="with-love" id="heart"><i class="fa fa-heart"></i></span> <span class="author" itemprop="copyrightHolder">褚成志</span> <span class="post-meta-divider">|</span><span class="post-meta-item-icon"><i class="fa fa-area-chart"></i></span> <span class="post-meta-item-text">Site words total count&#58;</span> <span title="Site words total count">60.8k</span></div><div class="busuanzi-count"><script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script><span class="site-uv"><i class="fa fa-user"></i> 你是第<span class="busuanzi-value" id="busuanzi_value_site_uv"></span> 个小伙伴</span><span class="site-pv"><i class="fa fa-eye"></i> 总访问<span class="busuanzi-value" id="busuanzi_value_site_pv"></span> 人次</span></div></div></footer><div class="back-to-top"><i class="fa fa-arrow-up"></i></div></div><script>"[object Function]"!==Object.prototype.toString.call(window.Promise)&&(window.Promise=null)</script><script src="/lib/jquery/index.js?v=2.1.3"></script><script src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script><script src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script><script src="/lib/velocity/velocity.min.js?v=1.2.1"></script><script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script><script src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script><script src="/lib/canvas-nest/canvas-nest.min.js"></script><script src="/lib/three/three.min.js"></script><script src="/lib/three/canvas_sphere.min.js"></script><script src="/js/src/utils.js?v=5.1.4"></script><script src="/js/src/motion.js?v=5.1.4"></script><script src="/js/src/affix.js?v=5.1.4"></script><script src="/js/src/schemes/pisces.js?v=5.1.4"></script><script src="/js/src/scrollspy.js?v=5.1.4"></script><script src="/js/src/post-details.js?v=5.1.4"></script><script src="/js/src/bootstrap.js?v=5.1.4"></script><script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script><script>AV.initialize("","")</script><script>function showTime(e){var t=new AV.Query(e),c=[],u=$(".leancloud_visitors");u.each(function(){c.push($(this).attr("id").trim())}),t.containedIn("url",c),t.find().done(function(e){var t=".leancloud-visitors-count";if(0!==e.length){for(var n=0;n<e.length;n++){var o=e[n],i=o.get("url"),s=o.get("time"),r=document.getElementById(i);$(r).find(t).text(s)}for(n=0;n<c.length;n++){i=c[n],r=document.getElementById(i);var l=$(r).find(t);""==l.text()&&l.text(0)}}else u.find(t).text(0)}).fail(function(e,t){console.log("Error: "+t.code+" "+t.message)})}function addCount(i){var e=$(".leancloud_visitors"),s=e.attr("id").trim(),r=e.attr("data-flag-title").trim(),t=new AV.Query(i);t.equalTo("url",s),t.find({success:function(e){if(0<e.length){var t=e[0];t.fetchWhenSave(!0),t.increment("time"),t.save(null,{success:function(e){$(document.getElementById(s)).find(".leancloud-visitors-count").text(e.get("time"))},error:function(e,t){console.log("Failed to save Visitor num, with error message: "+t.message)}})}else{var n=new i,o=new AV.ACL;o.setPublicReadAccess(!0),o.setPublicWriteAccess(!0),n.setACL(o),n.set("title",r),n.set("url",s),n.set("time",1),n.save(null,{success:function(e){$(document.getElementById(s)).find(".leancloud-visitors-count").text(e.get("time"))},error:function(e,t){console.log("Failed to create")}})}},error:function(e){console.log("Error:"+e.code+" "+e.message)}})}$(function(){var e=AV.Object.extend("Counter");1==$(".leancloud_visitors").length?addCount(e):1<$(".post-title-link").length&&showTime(e)})</script><script>!function(){var t=document.createElement("script"),e=window.location.protocol.split(":")[0];t.src="https"===e?"https://zz.bdstatic.com/linksubmit/push.js":"http://push.zhanzhang.baidu.com/push.js";var s=document.getElementsByTagName("script")[0];s.parentNode.insertBefore(t,s)}()</script><script src="/js/src/love.js"></script></body></html>
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta name="baidu-site-verification" content="2WtclSxlwa" />
+<meta name="google-site-verification" content="-v1R6yxahUz-_HLWFSGNlUtQ5JburbSV6Ma_eU9eOXo" />
+<meta name="msvalidate.01" content="B593F889E6A9B7CAEB29758AD324E36B" />
+<meta name="360-site-verification" content="7347f8994b75a4f74367571b5d5b45a8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="编程之道,python," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="褚成志的博客" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="一杯敬自由，一杯敬死亡　　标题写的比较模糊拗口，简单来说本文就是介绍如何利用python将http的api接口做加密认证，防止不法分子乱用。这里有几个前提需要说明下，首先我们要实现的是http的加密认证，因此不考虑https。其次认证的目的是为了让一个http的api接口让正确的（通过认证的）人使用，而不是任何都可以用。  设计方案明白了http api认证的目的，那么就来设计方案吧！ 最偷懒的">
+<meta name="keywords" content="编程之道,python">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HTTP-API认证，Python实现方案">
+<meta property="og:url" content="http://chucz.club/2017/12/11/HTTP-API认证，Python实现方案/index.html">
+<meta property="og:site_name" content="褚成志的博客">
+<meta property="og:description" content="一杯敬自由，一杯敬死亡　　标题写的比较模糊拗口，简单来说本文就是介绍如何利用python将http的api接口做加密认证，防止不法分子乱用。这里有几个前提需要说明下，首先我们要实现的是http的加密认证，因此不考虑https。其次认证的目的是为了让一个http的api接口让正确的（通过认证的）人使用，而不是任何都可以用。  设计方案明白了http api认证的目的，那么就来设计方案吧！ 最偷懒的">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-09-28T08:51:24.508Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="HTTP-API认证，Python实现方案">
+<meta name="twitter:description" content="一杯敬自由，一杯敬死亡　　标题写的比较模糊拗口，简单来说本文就是介绍如何利用python将http的api接口做加密认证，防止不法分子乱用。这里有几个前提需要说明下，首先我们要实现的是http的加密认证，因此不考虑https。其次认证的目的是为了让一个http的api接口让正确的（通过认证的）人使用，而不是任何都可以用。  设计方案明白了http api认证的目的，那么就来设计方案吧！ 最偷懒的">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://chucz.club/2017/12/11/HTTP-API认证，Python实现方案/"/>
+
+
+
+
+
+  <title>HTTP-API认证，Python实现方案 | 褚成志的博客</title>
+  
+
+
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'livecityccz@gmail.com', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">褚成志的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">青青子衿, 悠悠我心</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://chucz.club/2017/12/11/HTTP-API认证，Python实现方案/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="褚成志">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="褚成志的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">HTTP-API认证，Python实现方案</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-11T01:53:04+00:00">
+                2017-12-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/2017/12/11/HTTP-API认证，Python实现方案/" class="leancloud_visitors" data-flag-title="HTTP-API认证，Python实现方案">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数&#58;</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  1.6k
+                </span>
+              
+
+              
+
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>一杯敬自由，一杯敬死亡<br>　　标题写的比较模糊拗口，简单来说本文就是介绍如何利用python将http的api接口做加密认证，防止不法分子乱用。这里有几个前提需要说明下，首先我们要实现的是http的加密认证，因此不考虑https。其次认证的目的是为了让一个http的api接口让正确的（通过认证的）人使用，而不是任何都可以用。<br><a id="more"></a></p>
+</blockquote>
+<h3 id="设计方案"><a href="#设计方案" class="headerlink" title="设计方案"></a><a href="#设计方案" title="设计方案"></a>设计方案</h3><p>明白了http api认证的目的，那么就来设计方案吧！</p>
+<h4 id="最偷懒的方案"><a href="#最偷懒的方案" class="headerlink" title="最偷懒的方案"></a><a href="#最偷懒的方案" title="最偷懒的方案"></a>最偷懒的方案</h4><p>我之前写过几个api接口，主要是自己用来传输一些数据库数据的，由于数据有一点敏感，因此使用了认证。当时为了偷懒，认证的方式写得特别简单无脑，即在api接口上增加了一个auth字段，字段的内容会在服务端进行校验，但其内容是一串写死的md5。这虽然也算是一种认证方式(不知道auth字段内容的朋友无法拿到api接口的数据)，但如果局域网内流量被监听，那这种方案就形同虚设了。</p>
+<h4 id="比较简单实用的设计方案"><a href="#比较简单实用的设计方案" class="headerlink" title="比较简单实用的设计方案"></a><a href="#比较简单实用的设计方案" title="比较简单实用的设计方案"></a>比较简单实用的设计方案</h4><p>一种比较好的设计方案，是在客户端与服务端实现一套加密算法，算法可自定义但最好复杂一点。如将请求的参数以及内容以一定的方式排列后，可以再加上时间戳，整体做一个hash运算。服务端将获取的参数同样做hash，与客户端传递的hash做对比。因为有了时间戳，即使被监听了流量，进行流量重放也是不能认证成功的。（因为时间戳存在差异）</p>
+<p><em>说明一下：本文介绍的是api的一个认证方式，这跟网站啥的认证还是有区别的。主要还是看api的应用场景，如果是给内部人员调用，而且调用的用户不多，其实以上认证方案足够了。因为用来加密的密钥（key）可以用其他安全的方式发送给用户（甚至可以写纸上，2333），而不必像https协议一样，使用非对称加密+对称加密，并且使用数字证书等一系列复杂的加密认证方式。</em></p>
+<hr>
+<p>好了，前文介绍了一些api认证的方案，那么接下来再写点啥呢？我不打算介绍怎么去开发一个认证方案的代码，我主要想推荐一个开源的项目—hawk，因为它就是用来实现http加密认证的，而且它有一个python的实现模块（mohawk），推荐它是因为它比较简单实用。</p>
+<p>因为之前研究过mohawk模块2个小时（真的是2个小时），因此本文主要介绍一下mohawk的用法。企业内部一般自己设计api的加密认证方案（一般是生成一个token密文，严格一点的会做双因子认证），因此这个模块适合给初学者练练手，也可以给打算自己设计认证方案的朋友提供一种思路。以下内容是我阅读mohawk文档总结的一些基础用法，更详细的可以参考下官网文档。</p>
+<h3 id="hawk介绍"><a href="#hawk介绍" class="headerlink" title="hawk介绍"></a><a href="#hawk介绍" title="hawk介绍"></a>hawk介绍</h3><p>hawk项目地址：<a href="https://github.com/hueniverse/hawk" target="_blank" rel="noopener">https://github.com/hueniverse/hawk</a><br>python实现：<a href="https://github.com/kumar303/mohawk" target="_blank" rel="noopener">https://github.com/kumar303/mohawk</a><br>官方文档：<a href="https://mohawk.readthedocs.io/en/latest/" target="_blank" rel="noopener">https://mohawk.readthedocs.io/en/latest/</a></p>
+<h4 id="安装hawk"><a href="#安装hawk" class="headerlink" title="安装hawk"></a><a href="#安装hawk" title="安装hawk"></a>安装hawk</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">pip install mohawk</div></pre></td></tr></table></figure>
+
+<h3 id="构建一个webserver"><a href="#构建一个webserver" class="headerlink" title="构建一个webserver"></a><a href="#构建一个webserver" title="构建一个webserver"></a>构建一个webserver</h3><p>这里我使用python的falcon框架来构建一个api webserver，如果对falcon框架不熟悉，可以先阅读：<a href="https://thief.one/2017/11/27/1/" target="_blank" rel="noopener">https://thief.one/2017/11/27/1/</a></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div></pre></td><td class="code"><pre><div class="line">import falcon</div><div class="line">from mohawk import Receiver <span class="comment"># 导入mohawk模块的Receiver方法</span></div><div class="line">from wsgiref import simple_server</div><div class="line"></div><div class="line"><span class="comment"># 认证字典,可以创建不同的用户，每个用户都可以用不同的密钥（key）</span></div><div class="line">allowed_senders=&#123;</div><div class="line"></div><div class="line">    <span class="string">“test”</span>:&#123;</div><div class="line"></div><div class="line">        <span class="string">‘id’</span>: <span class="string">‘test’</span>,</div><div class="line">        <span class="string">‘key’</span>: <span class="string">‘110’</span>,</div><div class="line">        <span class="string">‘algorithm’</span>: <span class="string">‘sha256’</span></div><div class="line"></div><div class="line">    &#125;, <span class="comment"># test 用户组</span></div><div class="line"></div><div class="line">    <span class="string">“nmask”</span>:&#123;</div><div class="line"></div><div class="line">        <span class="string">‘id’</span>: <span class="string">‘nmask’</span>,</div><div class="line">        <span class="string">‘key’</span>: <span class="string">‘112’</span>,</div><div class="line">        <span class="string">‘algorithm’</span>: <span class="string">‘sha256’</span></div><div class="line"></div><div class="line">    &#125;, <span class="comment"># nmask 用户组</span></div><div class="line"></div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line">def lookup_credentials(sender_id):</div><div class="line">    <span class="string">‘’</span><span class="string">‘ 验证用户是否在允许的范围内 ‘</span><span class="string">‘’</span></div><div class="line">    <span class="keyword">if</span> sender_id <span class="keyword">in</span> allowed_senders:</div><div class="line">        <span class="built_in">return</span> allowed_senders[sender_id]</div><div class="line">    <span class="keyword">else</span>:</div><div class="line">        raise LookupError(<span class="string">‘unknown sender’</span>)</div><div class="line"></div><div class="line"></div><div class="line">class Test(object):</div><div class="line">    def on_post(self, req, resp):</div><div class="line">    <span class="string">‘’</span><span class="string">‘ http post 方法 ‘</span><span class="string">‘’</span></div><div class="line">        try:</div><div class="line">            Receiver(</div><div class="line">                    lookup_credentials, </div><div class="line">                    req.headers.get(<span class="string">‘AUTHORIZATION’</span>), <span class="comment"># 请求时生成的密钥</span></div><div class="line">                    req.url,</div><div class="line">                    req.method,</div><div class="line">                    content= req.stream.read(),</div><div class="line">                    content_type=req.headers.get(<span class="string">‘CONTENT-TYPE’</span>)</div><div class="line">            )</div><div class="line">        except Exception,e:</div><div class="line">            <span class="string">‘’</span><span class="string">‘ 报错则说明认证失败 ‘</span><span class="string">‘’</span></div><div class="line">            <span class="built_in">print</span> e</div><div class="line">            resp.status = falcon.HTTP_403  <span class="comment"># This is the default status</span></div><div class="line">        <span class="keyword">else</span>:</div><div class="line">            resp.status = falcon.HTTP_200  <span class="comment"># This is the default status</span></div><div class="line">            resp.body = (<span class="string">‘Hello World!’</span>)</div><div class="line"></div><div class="line"></div><div class="line">    def on_get(self, req, resp):</div><div class="line">        <span class="string">‘’</span><span class="string">‘ http get 方法 ‘</span><span class="string">‘’</span></div><div class="line">        try:</div><div class="line">            Receiver(</div><div class="line">                    lookup_credentials,</div><div class="line">                    req.headers.get(<span class="string">‘AUTHORIZATION’</span>),</div><div class="line">                    req.url,</div><div class="line">                    req.method,</div><div class="line">                    content= req.stream.read(),</div><div class="line">                    content_type=req.headers.get(<span class="string">‘CONTENT-TYPE’</span>)</div><div class="line">            )</div><div class="line">        except Exception,e:</div><div class="line">            <span class="built_in">print</span> e</div><div class="line">            resp.status = falcon.HTTP_403  <span class="comment"># This is the default status</span></div><div class="line">            resp.body = (<span class="string">‘authorization fail!’</span>)</div><div class="line">        <span class="keyword">else</span>:</div><div class="line">            resp.status = falcon.HTTP_200  <span class="comment"># This is the default status</span></div><div class="line">            resp.body = (<span class="string">‘Hello World!’</span>)</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">app = falcon.API()</div><div class="line"><span class="built_in">test</span> = Test()</div><div class="line">app.add_route(<span class="string">‘/‘</span>, <span class="built_in">test</span>)</div><div class="line"></div><div class="line"></div><div class="line"><span class="keyword">if</span> <strong>name</strong> == <span class="string">‘<strong>main</strong>‘</span>:</div><div class="line">    httpd = simple_server.make_server(<span class="string">‘127.0.0.1’</span>, 8000, app)</div><div class="line">    httpd.serve_forever()</div></pre></td></tr></table></figure>
+
+<h3 id="构建一个http请求"><a href="#构建一个http请求" class="headerlink" title="构建一个http请求"></a><a href="#构建一个http请求" title="构建一个http请求"></a>构建一个http请求</h3><p>搭建好webserver以后，我们自然需要构建http请求，去验证请求是否经历了认证的过程，且认证的结果是否正确，这里使用requests包去构建。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div></pre></td><td class="code"><pre><div class="line">import json</div><div class="line">import requests</div><div class="line">from mohawk import Sender <span class="comment"># 导入mohawk模块的Sender方法</span></div><div class="line"></div><div class="line">url = <span class="string">“<a href="http://127.0.0.1:8000/&quot;" target="_blank" rel="noopener">http://127.0.0.1:8000/&quot;</a></span></div><div class="line">post_data = json.dumps(<span class="string">“”</span>) <span class="comment"># 如果是get请求，参数内容可以设置为””</span></div><div class="line">content_type = <span class="string">‘application/x-www-form-urlencoded’</span></div><div class="line"></div><div class="line"><span class="comment"># 用于认证的字典</span></div><div class="line">credentials = &#123;</div><div class="line"></div><div class="line">               <span class="string">‘id’</span>: <span class="string">‘test’</span>,</div><div class="line">               <span class="string">‘key’</span>: <span class="string">‘10’</span>,</div><div class="line">               <span class="string">‘algorithm’</span>: <span class="string">‘sha256’</span></div><div class="line">           &#125;</div><div class="line"></div><div class="line">sender = Sender(credentials,</div><div class="line">                url = url, <span class="comment"># 必填</span></div><div class="line">                method = <span class="string">‘POST’</span>, <span class="comment"># 必填 </span></div><div class="line">                content = post_data, <span class="comment"># 必填，如果是get请求，参数内容可以设置为””</span></div><div class="line">                content_type = content_type <span class="comment"># 必填</span></div><div class="line">            )</div><div class="line"></div><div class="line"><span class="built_in">print</span> sender.request_header <span class="comment"># 生成的密文，通过header的形式传递到服务端</span></div><div class="line"></div><div class="line">res=requests.post(</div><div class="line">                url = url,</div><div class="line">                data = post_data,</div><div class="line">                headers=&#123;</div><div class="line">                        <span class="string">‘Authorization’</span>: sender.request_header,</div><div class="line">                        <span class="string">‘Content-Type’</span>: content_type</div><div class="line">                        &#125;</div><div class="line">                )</div><div class="line"></div><div class="line"><span class="built_in">print</span> res.status_code</div><div class="line"><span class="built_in">print</span> res.text</div></pre></td></tr></table></figure>
+
+<h3 id="mohawk模块说明"><a href="#mohawk模块说明" class="headerlink" title="mohawk模块说明"></a><a href="#mohawk模块说明" title="mohawk模块说明"></a>mohawk模块说明</h3><p>mohawk是hawk的python实现，有几个主要方法：Sender、Receiver等，详细的可以去阅读源码。</p>
+<p>Sender方法用来生成在http请求认证中所需的密码，该方法需要传递几个参数，比如：url、method、content（post_data）、content_type、credentials(认证的字典，包含了id、key、加密方式)等，该方法会根据传递的参数值，生成一个密文密码，然后我们可以将其放在headers中传递到服务端。</p>
+<p>Receiver方法用来在服务端接收客户端传递的请求，根据获取的参数的内容计算出一个新的密文密码，与客户端传递的密文进行对比，达到认证的效果。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/编程之道/" rel="tag"><i class="fa fa-tag"></i> 编程之道</a>
+          
+            <a href="/tags/python/" rel="tag"><i class="fa fa-tag"></i> python</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/12/07/未授权访问漏洞的检测与利用/" rel="next" title="未授权访问漏洞的检测与利用">
+                <i class="fa fa-chevron-left"></i> 未授权访问漏洞的检测与利用
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/01/11/利用Whatweb获取Web指纹信息/" rel="prev" title="利用Whatweb获取Web指纹信息">
+                利用Whatweb获取Web指纹信息 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+  <div class="bdsharebuttonbox">
+    <a href="#" class="bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a href="#" class="bds_douban" data-cmd="douban" title="分享到豆瓣网"></a>
+    <a href="#" class="bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a>
+    <a href="#" class="bds_qzone" data-cmd="qzone" title="分享到QQ空间"></a>
+    <a href="#" class="bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+    <a href="#" class="bds_tieba" data-cmd="tieba" title="分享到百度贴吧"></a>
+    <a href="#" class="bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+    <a href="#" class="bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+    <a href="#" class="bds_more" data-cmd="more"></a>
+    <a class="bds_count" data-cmd="count"></a>
+  </div>
+  <script>
+    window._bd_share_config = {
+      "common": {
+        "bdText": "",
+        "bdMini": "2",
+        "bdMiniList": false,
+        "bdPic": ""
+      },
+      "share": {
+        "bdSize": "16",
+        "bdStyle": "0"
+      },
+      "image": {
+        "viewList": ["tsina", "douban", "sqq", "qzone", "weixin", "twi", "fbook"],
+        "viewText": "分享到：",
+        "viewSize": "16"
+      }
+    }
+  </script>
+
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">褚成志</p>
+              <p class="site-description motion-element" itemprop="description">关注互联网的科技博客</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">57</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-name">分类</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">38</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/livecityccz" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:livecityccz@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://plus.google.com/livecityccz" target="_blank" title="Google">
+                      
+                        <i class="fa fa-fw fa-google"></i>Google</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://twitter.com/livecityccz" target="_blank" title="Twitter">
+                      
+                        <i class="fa fa-fw fa-twitter"></i>Twitter</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.facebook.com/livecityccz" target="_blank" title="FB Page">
+                      
+                        <i class="fa fa-fw fa-facebook"></i>FB Page</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://youtube.com/livecityccz" target="_blank" title="YouTube">
+                      
+                        <i class="fa fa-fw fa-youtube"></i>YouTube</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#设计方案"><span class="nav-number">1.</span> <span class="nav-text">设计方案</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#最偷懒的方案"><span class="nav-number">1.1.</span> <span class="nav-text">最偷懒的方案</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#比较简单实用的设计方案"><span class="nav-number">1.2.</span> <span class="nav-text">比较简单实用的设计方案</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#hawk介绍"><span class="nav-number">2.</span> <span class="nav-text">hawk介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#安装hawk"><span class="nav-number">2.1.</span> <span class="nav-text">安装hawk</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#构建一个webserver"><span class="nav-number">3.</span> <span class="nav-text">构建一个webserver</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#构建一个http请求"><span class="nav-number">4.</span> <span class="nav-text">构建一个http请求</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#mohawk模块说明"><span class="nav-number">5.</span> <span class="nav-text">mohawk模块说明</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="heart">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">褚成志</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">Site words total count&#58;</span>
+    
+    <span title="Site words total count">77.9k</span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      <i class="fa fa-user"></i> 你是第
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      个小伙伴
+    </span>
+  
+
+  
+    <span class="site-pv">
+      <i class="fa fa-eye"></i> 总访问
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      人次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/three.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/canvas_sphere.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("", "");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+
+  
+
+  
+
+
+  <script type="text/javascript" src="/js/src/love.js"></script>
+
+</body>
+</html>
