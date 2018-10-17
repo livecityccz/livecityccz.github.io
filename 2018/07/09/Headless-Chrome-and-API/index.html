@@ -1,1 +1,860 @@
-<!-- build time:Wed Oct 17 2018 05:57:13 GMT+0000 (Coordinated Universal Time) --><!DOCTYPE html><html class="theme-next muse use-motion" lang="zh-Hans"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"><meta name="theme-color" content="#222"><meta http-equiv="Cache-Control" content="no-transform"><meta http-equiv="Cache-Control" content="no-siteapp"><link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"><link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css"><link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css"><link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4"><link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4"><link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4"><link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222"><meta name="keywords" content="爬虫技术,Headless Chrome,Puppeteer,pychrome,chromeless,"><link rel="alternate" href="/atom.xml" title="褚成志的博客" type="application/atom+xml"><meta name="description" content="我已爬遍了全世界，而你却迟迟不见自从Google在chrome59版本后加入了 Headless Chrome，类似phantomjs、selenium等工具作者都放弃了维护自身的产品（原因可参考文章 QtWebkit or Headless Chrome）。因此作为使用者的我们也是时候放弃phantomjs，转而研究Headless Chrome了。由于网上对于Headless Chrome的资"><meta name="keywords" content="爬虫技术,Headless Chrome,Puppeteer,pychrome,chromeless"><meta property="og:type" content="article"><meta property="og:title" content="Headless Chrome and API"><meta property="og:url" content="http://www.chucz.club/2018/07/09/Headless-Chrome-and-API/index.html"><meta property="og:site_name" content="褚成志的博客"><meta property="og:description" content="我已爬遍了全世界，而你却迟迟不见自从Google在chrome59版本后加入了 Headless Chrome，类似phantomjs、selenium等工具作者都放弃了维护自身的产品（原因可参考文章 QtWebkit or Headless Chrome）。因此作为使用者的我们也是时候放弃phantomjs，转而研究Headless Chrome了。由于网上对于Headless Chrome的资"><meta property="og:locale" content="zh-Hans"><meta property="og:updated_time" content="2018-09-28T08:51:24.508Z"><meta name="twitter:card" content="summary"><meta name="twitter:title" content="Headless Chrome and API"><meta name="twitter:description" content="我已爬遍了全世界，而你却迟迟不见自从Google在chrome59版本后加入了 Headless Chrome，类似phantomjs、selenium等工具作者都放弃了维护自身的产品（原因可参考文章 QtWebkit or Headless Chrome）。因此作为使用者的我们也是时候放弃phantomjs，转而研究Headless Chrome了。由于网上对于Headless Chrome的资"><script type="text/javascript" id="hexo.configurations">var NexT=window.NexT||{},CONFIG={root:"/",scheme:"Muse",version:"5.1.4",sidebar:{position:"left",display:"post",offset:12,b2t:!1,scrollpercent:!1,onmobile:!1},fancybox:!0,tabs:!0,motion:{enable:!0,async:!1,transition:{post_block:"fadeIn",post_header:"slideDownIn",post_body:"slideDownIn",coll_header:"slideLeftIn",sidebar:"slideUpIn"}},duoshuo:{userId:"0",author:"博主"},algolia:{applicationID:"ZM9CKN0W4R",apiKey:"5bc5819b162e1cd440b44b16ef207a44",indexName:"chucz.club",hits:{per_page:10},labels:{input_placeholder:"Search for Posts",hits_empty:"We didn't find any results for the search: ${query}",hits_stats:"${hits} results found in ${time} ms"}}}</script><link rel="canonical" href="http://www.chucz.club/2018/07/09/Headless-Chrome-and-API/"><title>Headless Chrome and API | 褚成志的博客</title></head><body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans"><div class="container sidebar-position-left page-post-detail"><div class="headband"></div><header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="header-inner"><div class="site-brand-wrapper"><div class="site-meta"><div class="custom-logo-site-title"><a href="/" class="brand" rel="start"><span class="logo-line-before"><i></i></span> <span class="site-title">褚成志的博客</span> <span class="logo-line-after"><i></i></span></a></div><p class="site-subtitle">青青子衿, 悠悠我心</p></div><div class="site-nav-toggle"><button><span class="btn-bar"></span> <span class="btn-bar"></span> <span class="btn-bar"></span></button></div></div><nav class="site-nav"><ul id="menu" class="menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i><br>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i><br>归档</a></li></ul></nav></div></header><main id="main" class="main"><div class="main-inner"><div class="content-wrap"><div id="content" class="content"><div id="posts" class="posts-expand"><article class="post post-type-normal" itemscope itemtype="http://schema.org/Article"><div class="post-block"><link itemprop="mainEntityOfPage" href="http://www.chucz.club/2018/07/09/Headless-Chrome-and-API/"><span hidden itemprop="author" itemscope itemtype="http://schema.org/Person"><meta itemprop="name" content="褚成志"><meta itemprop="description" content=""><meta itemprop="image" content="/images/avatar.gif"></span><span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization"><meta itemprop="name" content="褚成志的博客"></span><header class="post-header"><h1 class="post-title" itemprop="name headline">Headless Chrome and API</h1><div class="post-meta"><span class="post-time"><span class="post-meta-item-icon"><i class="fa fa-calendar-o"></i> </span><span class="post-meta-item-text">发表于</span> <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-09T00:59:10+00:00">2018-07-09</time></span></div></header><div class="post-body" itemprop="articleBody"><blockquote><p>我已爬遍了全世界，而你却迟迟不见</p></blockquote><p>自从Google在chrome59版本后加入了 <a href="https://chromium.googlesource.com/chromium/src/+/lkgr/headless/README.md" target="_blank" rel="noopener">Headless Chrome</a>，类似phantomjs、selenium等工具作者都放弃了维护自身的产品（原因可参考文章 <a href="https://paper.seebug.org/537/?from=timeline&amp;isappinstalled=0" target="_blank" rel="noopener">QtWebkit or Headless Chrome</a>）。因此作为使用者的我们也是时候放弃phantomjs，转而研究Headless Chrome了。由于网上对于Headless Chrome的资料还很少，因此我先收集整理一波，随后慢慢学习研究，渐渐将本篇内容补充完善。<br><a id="more"></a></p><h3 id="Headless-Chrome-介绍"><a href="#Headless-Chrome-介绍" class="headerlink" title="Headless Chrome 介绍"></a><a href="#Headless-Chrome-介绍" title="Headless Chrome 介绍"></a>Headless Chrome 介绍</h3><p>headless chrome意思是无头chrome浏览器，相对于传统的chrome浏览器，这是一个可以在后台用命令行操作浏览器的工具，对于爬虫编写以及web自动化测试都有很大的作用。相比较同类工具Phantomjs，其更加强大（主要因为其依赖的webkit更新）。</p><h3 id="Headless-Chrome-安装"><a href="#Headless-Chrome-安装" class="headerlink" title="Headless Chrome 安装"></a><a href="#Headless-Chrome-安装" title="Headless Chrome 安装"></a>Headless Chrome 安装</h3><p>目前只支持mac与linux系统，需要下载chrome浏览器并安装。</p><h4 id="mac-install-headless-chrome"><a href="#mac-install-headless-chrome" class="headerlink" title="mac install headless chrome"></a><a href="#mac-install-headless-chrome" title="mac install headless chrome"></a>mac install headless chrome</h4><p>mac下直接去官网下载安装包即可，mac下chrome浏览器位置，为了方便使用，用alias别名启动。</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">alias</span> chrome=<span class="string">“/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome”</span></div><div class="line"><span class="built_in">alias</span> chrome-canary=<span class="string">“/Applications/Google\ Chrome\ Canary.app/Contents/MacOS/Google\ Chrome\ Canary”</span></div><div class="line"><span class="built_in">alias</span> chromium=<span class="string">“/Applications/Chromium.app/Contents/MacOS/Chromium”</span></div></pre></td></tr></table></figure><p>下载<a href="https://www.google.com/chrome/browser/canary.html" target="_blank" rel="noopener">chrome-canary</a>版</p><p>说明：<code>Mac 和 Linux 上的 Chrome 59 都可以运行无需显示模式。对 Windows 的支持将在 Chrome 60 中提供。要检查你使用的 Chrome 版本，请在浏览器中打开 chrome://version。</code></p><h4 id="linux-install-headless-chrome"><a href="#linux-install-headless-chrome" class="headerlink" title="linux install headless chrome"></a><a href="#linux-install-headless-chrome" title="linux install headless chrome"></a>linux install headless chrome</h4><p>添加源：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">vim /etc/yum.repos.d/chrome.repo</div><div class="line">写入以下内容：</div><div class="line"></div><div class="line">[google-chrome]</div><div class="line">name=google-chrome</div><div class="line">baseurl=<a href="http://dl.google.com/linux/chrome/rpm/stable/" target="_blank" rel="noopener">http://dl.google.com/linux/chrome/rpm/stable/</a><span class="variable">$basearch</span></div><div class="line">enabled=1</div><div class="line">gpgcheck=0</div><div class="line">gpgkey=<a href="https://dl-ssl.google.com/linux/linux_signing_key.pub" target="_blank" rel="noopener">https://dl-ssl.google.com/linux/linux_signing_key.pub</a></div></pre></td></tr></table></figure><p>安装：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">yum install -y google-chrome-stable</div></pre></td></tr></table></figure><p>测试运行：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">google-chrome –headless –<span class="built_in">print</span>-to-pdf <a href="https://thief.one" target="_blank" rel="noopener">https://thief.one</a></div></pre></td></tr></table></figure><p>报错处理：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Running as root without –no-sandbox is not supported <span class="comment"># 错误信息</span></div></pre></td></tr></table></figure><p>解析方案：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">vim /opt/google/chrome/google-chrome</div><div class="line">找到 <span class="built_in">exec</span> -a <span class="string">“<span class="variable">$0</span>“</span> <span class="string">“<span class="variable">$HERE</span>/chrome”</span> <span class="string">“<span class="variable">$@</span>“</span></div><div class="line">改为 <span class="built_in">exec</span> -a <span class="string">“<span class="variable">$0</span>“</span> <span class="string">“<span class="variable">$HERE</span>/chrome”</span> <span class="string">“<span class="variable">$@</span>“</span> –user-data-dir –no-sandbox</div></pre></td></tr></table></figure><p><code>说明：若在安装过程中报错，则将源文件中的gpgcheck改为0</code></p><p>linux安装headless chrome参考：<a href="http://akai-tsuki.hatenablog.com/entry/2017/06/18/000000" target="_blank" rel="noopener">http://akai-tsuki.hatenablog.com/entry/2017/06/18/000000</a></p><h3 id="Headless-Chrome-基础用法"><a href="#Headless-Chrome-基础用法" class="headerlink" title="Headless Chrome 基础用法"></a><a href="#Headless-Chrome-基础用法" title="Headless Chrome 基础用法"></a>Headless Chrome 基础用法</h3><p>HELP信息：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">chrome \</div><div class="line">–headless \                   <span class="comment"># Runs Chrome in headless mode.</span></div><div class="line">–<span class="built_in">disable</span>-gpu \                <span class="comment"># Temporarily needed for now.</span></div><div class="line">–remote-debugging-address=127.0.0.1</div><div class="line">–remote-debugging-port=9222 \</div><div class="line"> <a href="https://thief.one" target="_blank" rel="noopener">https://thief.one</a>   <span class="comment"># URL to open. Defaults to about:blank.</span></div></pre></td></tr></table></figure><h4 id="访问一个网页获取源码"><a href="#访问一个网页获取源码" class="headerlink" title="访问一个网页获取源码"></a><a href="#访问一个网页获取源码" title="访问一个网页获取源码"></a>访问一个网页获取源码</h4><p>–dump-dom 标志将打印 document.body.innerHTML 到标准输出：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">chrome –headless –<span class="built_in">disable</span>-gpu –dump-dom <a href="https://thief.one/" target="_blank" rel="noopener">https://thief.one/</a></div></pre></td></tr></table></figure><h4 id="访问一个网页将源码创建成一个PDF"><a href="#访问一个网页将源码创建成一个PDF" class="headerlink" title="访问一个网页将源码创建成一个PDF"></a><a href="#访问一个网页将源码创建成一个PDF" title="访问一个网页将源码创建成一个PDF"></a>访问一个网页将源码创建成一个PDF</h4><p>–print-to-pdf 标志将页面转出为 PDF 文件：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">chrome –headless –<span class="built_in">disable</span>-gpu –<span class="built_in">print</span>-to-pdf <a href="https://thief.one/" target="_blank" rel="noopener">https://thief.one/</a></div></pre></td></tr></table></figure><h4 id="访问一个网页并截图"><a href="#访问一个网页并截图" class="headerlink" title="访问一个网页并截图"></a><a href="#访问一个网页并截图" title="访问一个网页并截图"></a>访问一个网页并截图</h4><p>使用–screenshot标志运行 Headless Chrome 将在当前工作目录中生成一个名为 screenshot.png的文件：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">chrome –headless –<span class="built_in">disable</span>-gpu –screenshot <a href="https://thief.one/" target="_blank" rel="noopener">https://thief.one/</a></div><div class="line"></div><div class="line"><span class="comment"># 设置图片大小</span></div><div class="line">chrome –headless –<span class="built_in">disable</span>-gpu –screenshot –window-size=1280,1696 <a href="https://thief.one/" target="_blank" rel="noopener">https://thief.one/</a></div></pre></td></tr></table></figure><h4 id="访问一个网页并进行js交互（REPL模式）"><a href="#访问一个网页并进行js交互（REPL模式）" class="headerlink" title="访问一个网页并进行js交互（REPL模式）"></a><a href="#访问一个网页并进行js交互（REPL模式）" title="访问一个网页并进行js交互（REPL模式）"></a>访问一个网页并进行js交互（REPL模式）</h4><p>–repl 标志可以使 Headless Chrome 运行在一个你可以使用浏览器评估 JS 表达式的模式下。执行下面的命令：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">chrome –headless –<span class="built_in">disable</span>-gpu –repl <a href="https://thief.one" target="_blank" rel="noopener">https://thief.one</a></div><div class="line">&gt;&gt;&gt; location.href</div><div class="line">&#123;<span class="string">“result”</span>:&#123;<span class="string">“type”</span>:<span class="string">“string”</span>,<span class="string">“value”</span>:<span class="string">“<a href="https://thief.one&quot;" target="_blank" rel="noopener">https://thief.one&quot;</a></span>&#125;&#125;</div><div class="line">&gt;&gt;&gt; quit</div></pre></td></tr></table></figure><h4 id="启动一个监听端口"><a href="#启动一个监听端口" class="headerlink" title="启动一个监听端口"></a><a href="#启动一个监听端口" title="启动一个监听端口"></a>启动一个监听端口</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">chrome –remote-debugging-port=9222 –remote-debugging-address=0.0.0.0</div></pre></td></tr></table></figure><p>可以通过浏览器打开：<a href="http://0.0.0.0:9222" target="_blank" rel="noopener">http://0.0.0.0:9222</a></p><h3 id="Headless-Chrome-API"><a href="#Headless-Chrome-API" class="headerlink" title="Headless Chrome API"></a><a href="#Headless-Chrome-API" title="Headless Chrome API"></a>Headless Chrome API</h3><p>以上演示了使用命令行的方式操作headless chrome，那么怎么在代码中使用它呢？<br>api工具如下：<br>官方：<a href="https://github.com/GoogleChrome/puppeteer" target="_blank" rel="noopener">puppeteer</a><br>底层：<a href="https://github.com/cyrus-and/chrome-remote-interface/" target="_blank" rel="noopener">chrome-remote-interface</a><br>活跃：<a href="https://github.com/graphcool/chromeless" target="_blank" rel="noopener">chromeless</a><br>非官方：<a href="https://github.com/yujiosaka/headless-chrome-crawler" target="_blank" rel="noopener">headless-chrome-crawler</a></p><p>Python相关的API：<br><a href="https://github.com/fate0/pychrome" target="_blank" rel="noopener">pychrome</a><br><a href="https://github.com/miyakogi/pyppeteer" target="_blank" rel="noopener">Pyppeteer 推荐</a><br><a href="https://github.com/iiSeymour/chromote" target="_blank" rel="noopener">chromote</a><br><a href="https://github.com/wasiher/chrome_remote_interface_python" target="_blank" rel="noopener">chrome_remote_interface_python</a></p><h4 id="puppeteer-介绍"><a href="#puppeteer-介绍" class="headerlink" title="puppeteer 介绍"></a><a href="#puppeteer-介绍" title="puppeteer 介绍"></a>puppeteer 介绍</h4><p>Puppeteer 是一个由 Chrome 团队开发的 Node 库。它提供了一个高层次的 API 来控制无需显示版（或 完全版）的 Chrome。它与其他自动化测试库，如 Phantom 和 NightmareJS 相类似，但是只适用于最新版本的 Chrome。</p><h4 id="puppeteer-安装"><a href="#puppeteer-安装" class="headerlink" title="puppeteer 安装"></a><a href="#puppeteer-安装" title="puppeteer 安装"></a>puppeteer 安装</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">mkdir puppeteer_test <span class="comment"># 创建一个项目目录</span></div><div class="line"><span class="built_in">cd</span> puppeteer_test</div><div class="line">npm init</div><div class="line">npm i –save puppeteer</div></pre></td></tr></table></figure><p>安装puppeteer前需要在系统上安装nodejs与npm；安装完puppeteer，默认会自动安装最新版本的chromium。<br>注意：<code>系统默认安装的npm与nodejs版本都很低，而使用puppeteer需要node6.4.0+，async/await需要node7.6.0+，因此建议安装node7.6.0版本，否则会导致无法使用。</code></p><h5 id="安装升级nodejs与npm"><a href="#安装升级nodejs与npm" class="headerlink" title="安装升级nodejs与npm"></a><a href="#安装升级nodejs与npm" title="安装升级nodejs与npm"></a>安装升级nodejs与npm</h5><p>要安装puppeteer，需要先安装npm与nodejs，而puppeteer对nodejs版本有要求，因此不能用系统默认安装的nodejs版本。</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">wget <a href="http://nodejs.org/dist/v7.6.0/node-v7.6.0-linux-x64.tar.gz" target="_blank" rel="noopener">http://nodejs.org/dist/v7.6.0/node-v7.6.0-linux-x64.tar.gz</a></div><div class="line">tar -zvxf node-v7.6.0-linux-x64.tar.gz</div></pre></td></tr></table></figure><p>共享至全局</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">rm -rf /usr/bin/node /usr/bin/npm</div><div class="line">ln -s /path/node-v7.6.0-linux-x64/bin/node /usr/bin/node  </div><div class="line">ln -s /path/node-v7.6.0-linux-x64/bin/npm /usr/bin/npm</div></pre></td></tr></table></figure><p>若用yum安装过nodejs，需要移除其他版本:</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">yum remove npm</div><div class="line">yum remove nodejs</div></pre></td></tr></table></figure><p>查看nodejs与npm版本：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">node -v</div><div class="line">npm -v</div></pre></td></tr></table></figure><p>安装升级nodejs过程参考：<a href="http://jeeinn.com/2017/02/236/" target="_blank" rel="noopener">http://jeeinn.com/2017/02/236/</a></p><h4 id="puppeteer-使用"><a href="#puppeteer-使用" class="headerlink" title="puppeteer 使用"></a><a href="#puppeteer-使用" title="puppeteer 使用"></a>puppeteer 使用</h4><p>在使用puppeteer前，先要确定puppeteer、nodejs、npm安装成功（版本正确），且headless chrome安装成功。<br>官方API文档：<a href="https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md" target="_blank" rel="noopener">https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md</a></p><h5 id="打印用户代理："><a href="#打印用户代理：" class="headerlink" title="打印用户代理："></a><a href="#打印用户代理：" title="打印用户代理："></a>打印用户代理：</h5><p>在puppeteer_test目录下创建一个example1.js文件，写入：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">const puppeteer = require(<span class="string">‘puppeteer’</span>);</div><div class="line"></div><div class="line">(async() =&gt; &#123;</div><div class="line"> const browser = await puppeteer.launch(&#123;</div><div class="line">    headless: <span class="literal">true</span>,</div><div class="line">    args: [<span class="string">‘–no-sandbox’</span>, <span class="string">‘–disable-setuid-sandbox’</span>],</div><div class="line">&#125;);</div><div class="line"> console.log(await browser.version());</div><div class="line"> browser.close();</div><div class="line">&#125;)();</div></pre></td></tr></table></figure><p>运行代码:</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">node example1.js</div></pre></td></tr></table></figure><h5 id="获取页面的屏幕截图："><a href="#获取页面的屏幕截图：" class="headerlink" title="获取页面的屏幕截图："></a><a href="#获取页面的屏幕截图：" title="获取页面的屏幕截图："></a>获取页面的屏幕截图：</h5><p>创建一个example2.js文件，写入：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">const puppeteer = require(<span class="string">‘puppeteer’</span>);</div><div class="line"></div><div class="line">(async() =&gt; &#123;</div><div class="line"></div><div class="line">const browser = await puppeteer.launch(&#123;</div><div class="line">    headless: <span class="literal">true</span>,</div><div class="line">    args: [<span class="string">‘–no-sandbox’</span>, <span class="string">‘–disable-setuid-sandbox’</span>],</div><div class="line">&#125;);</div><div class="line">const page = await browser.newPage();</div><div class="line">await page.goto(<span class="string">‘<a href="https://thief.one&#39;" target="_blank" rel="noopener">https://thief.one&#39;</a></span>, &#123;waitUntil: <span class="string">‘networkidle2’</span>&#125;);</div><div class="line">await page.pdf(&#123;path: <span class="string">‘screen.pdf’</span>, format: <span class="string">‘A4’</span>&#125;);</div><div class="line"></div><div class="line">browser.close();</div><div class="line">&#125;)();</div></pre></td></tr></table></figure><p>运行代码：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">node example2.js</div></pre></td></tr></table></figure><p>说明：在运行puppeteer之前不需要额外开启一个headless-chrome进程，因为其本身就会去开启。</p><h5 id="发送POST请求获取源码"><a href="#发送POST请求获取源码" class="headerlink" title="发送POST请求获取源码"></a><a href="#发送POST请求获取源码" title="发送POST请求获取源码"></a>发送POST请求获取源码</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">const puppeteer = require(<span class="string">‘puppeteer’</span>);</div><div class="line"></div><div class="line">puppeteer.launch(&#123;headless: <span class="literal">true</span>,args: [<span class="string">‘–no-sandbox’</span>, <span class="string">‘–disable-setuid-sandbox’</span>],&#125;).<span class="keyword">then</span>(async browser =&gt; &#123;</div><div class="line"></div><div class="line">  const page = await browser.newPage();</div><div class="line">  await page.setRequestInterception(<span class="literal">true</span>); // 开启请求捕捉</div><div class="line">  page.on(<span class="string">‘request’</span>, interceptedRequest =&gt; &#123;</div><div class="line">    const overrides = &#123;&#125;;</div><div class="line">    //console.log(interceptedRequest.url()); // 输出捕捉到的请求URL</div><div class="line">    <span class="keyword">if</span> (interceptedRequest.url()==<span class="string">‘<a href="http://127.0.0.1:8000/&#39;" target="_blank" rel="noopener">http://127.0.0.1:8000/&#39;</a></span>)&#123;</div><div class="line">       overrides.method = <span class="string">‘POST’</span>;</div><div class="line">       overrides.postData = <span class="string">‘&#123;”id”:”2”&#125;’</span>;</div><div class="line">    &#125;</div><div class="line">    interceptedRequest.continue(overrides); // 重放</div><div class="line">   &#125;);</div><div class="line">  await page.goto(<span class="string">‘<a href="http://127.0.0.1:8000/&#39;" target="_blank" rel="noopener">http://127.0.0.1:8000/&#39;</a></span>);</div><div class="line">  await console.log(await page.content()); // 输出源码</div><div class="line">  await browser.close();</div><div class="line">&#125;);</div></pre></td></tr></table></figure><h5 id="安装puppeteer报错"><a href="#安装puppeteer报错" class="headerlink" title="安装puppeteer报错"></a><a href="#安装puppeteer报错" title="安装puppeteer报错"></a>安装puppeteer报错</h5><p>在linux下安装puppeteer报错，即:</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">npm i –save puppeteer 命令没有运行成功</div></pre></td></tr></table></figure><p>失败原因可能是linux版本不支持，centos7下成功，centos6下测试失败。</p><h5 id="运行puppeteer报错处理"><a href="#运行puppeteer报错处理" class="headerlink" title="运行puppeteer报错处理"></a><a href="#运行puppeteer报错处理" title="运行puppeteer报错处理"></a>运行puppeteer报错处理</h5><p>报错如下，说明代码语法有问题，或者node版本太低，不符合要求：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">SyntaxError: Unexpected token <span class="keyword">function</span></div></pre></td></tr></table></figure><p>报错如下，说明代码中需要设置headless状态为true</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Failed to launch chrome</div></pre></td></tr></table></figure><p>解决方案，修改代码为如下：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">const browser = await puppeteer.launch(&#123;</div><div class="line">    headless: <span class="literal">true</span>,</div><div class="line">    args: [<span class="string">‘–no-sandbox’</span>, <span class="string">‘–disable-setuid-sandbox’</span>],</div><div class="line">  &#125;);</div></pre></td></tr></table></figure><p>报错如下，与上面解决方案一致：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">1025/084740.006078:ERROR:zygote_host_impl_linux.cc(88)] Running as root without –no-sandbox is not supported. See <a href="https://crbug.com/638180" target="_blank" rel="noopener">https://crbug.com/638180</a>.</div></pre></td></tr></table></figure><h4 id="pyppeteer"><a href="#pyppeteer" class="headerlink" title="pyppeteer"></a><a href="#pyppeteer" title="pyppeteer"></a>pyppeteer</h4><p>pyppeteer模版是对puppeteer的python封装，因为puppeteer是用nodejs写的，所以要在python中使用得用pyppeteer模块。</p><h5 id="pyppeteer安装"><a href="#pyppeteer安装" class="headerlink" title="pyppeteer安装"></a><a href="#pyppeteer安装" title="pyppeteer安装"></a>pyppeteer安装</h5><p>pyppeteer模版只支持python3.5以上版本。</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">python3 -m pip install pyppeteer</div></pre></td></tr></table></figure><h5 id="pyppeteer简单的例子"><a href="#pyppeteer简单的例子" class="headerlink" title="pyppeteer简单的例子"></a><a href="#pyppeteer简单的例子" title="pyppeteer简单的例子"></a>pyppeteer简单的例子</h5><p>截图：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">import asyncio</div><div class="line">from pyppeteer import launch</div><div class="line"></div><div class="line">async def main():</div><div class="line">    browser = await launch(args=[<span class="string">‘–no-sandbox’</span>])</div><div class="line">    page = await browser.newPage()</div><div class="line">    await page.goto(<span class="string">‘<a href="http://example.com&#39;" target="_blank" rel="noopener">http://example.com&#39;</a></span>)</div><div class="line">    await page.screenshot(&#123;<span class="string">‘path’</span>: <span class="string">‘example.png’</span>&#125;)</div><div class="line">    await browser.close()</div><div class="line"></div><div class="line">asyncio.get_event_loop().run_until_complete(main())</div></pre></td></tr></table></figure><p>说明：在使用pyppeteer时，不需要额外开启headless-chrome进程（与puppeteer一样）。更多pyppeteer模版使用方法，参考：<a href="https://miyakogi.github.io/pyppeteer/reference.html#page-class" target="_blank" rel="noopener">https://miyakogi.github.io/pyppeteer/reference.html#page-class</a></p><h5 id="pyppeteer报错处理"><a href="#pyppeteer报错处理" class="headerlink" title="pyppeteer报错处理"></a><a href="#pyppeteer报错处理" title="pyppeteer报错处理"></a>pyppeteer报错处理</h5><p>错误类似如下：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">pyppeteer.errors.BrowserError: Failed to connect to browser port: <a href="http://127.0.0.1:58871/json/version" target="_blank" rel="noopener">http://127.0.0.1:58871/json/version</a></div></pre></td></tr></table></figure><p>解决方案：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">加上：args=[<span class="string">‘–no-sandbox’</span>]，同puppeteer类似。</div><div class="line"></div><div class="line">browser = await launch(args=[<span class="string">‘–no-sandbox’</span>])</div></pre></td></tr></table></figure><h4 id="chrome-remote-interface工具"><a href="#chrome-remote-interface工具" class="headerlink" title="chrome-remote-interface工具"></a><a href="#chrome-remote-interface工具" title="chrome-remote-interface工具"></a>chrome-remote-interface工具</h4><p>可以用来分析渲染一个页面过程中所有的请求过程，包括获取所有的请求接口以及响应内容等。再运行chrome-remote-interface代码前，需要先启动headless chrome进程，即：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">chrome –headless –remote-debugging-port=9222</div></pre></td></tr></table></figure><p>安装chrome-remote-interface：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">npm install chrome-remote-interface</div></pre></td></tr></table></figure><p>然后编写代码：(以获取所有请求url为例)</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line">const CDP = require(<span class="string">‘chrome-remote-interface’</span>);</div><div class="line"></div><div class="line">// node nmask.js <a href="https://nmask.cn" target="_blank" rel="noopener">https://nmask.cn</a></div><div class="line"></div><div class="line">var options = process.argv;</div><div class="line">var target_url = options[2];</div><div class="line"></div><div class="line">CDP((client) =&gt; &#123;</div><div class="line">    // extract domains</div><div class="line">    const &#123;Network, Page&#125; = client;</div><div class="line">    </div><div class="line">    // setup handlers</div><div class="line">    Network.requestWillBeSent((params) =&gt; &#123;</div><div class="line">        console.log(params.request.url);</div><div class="line">    &#125;);</div><div class="line">    Page.loadEventFired(() =&gt; &#123;</div><div class="line">        client.close();</div><div class="line">    &#125;);</div><div class="line">    </div><div class="line">    // <span class="built_in">enable</span> events <span class="keyword">then</span> start!</div><div class="line">    Promise.all([</div><div class="line">        Network.enable(),</div><div class="line">        Page.enable()</div><div class="line">    ]).<span class="keyword">then</span>(() =&gt; &#123;</div><div class="line">        <span class="built_in">return</span> Page.navigate(&#123;url: target_url&#125;);//输出请求的url</div><div class="line">    &#125;).catch((err) =&gt; &#123;</div><div class="line">        console.error(err);</div><div class="line">        client.close();</div><div class="line">    &#125;);</div><div class="line">&#125;).on(<span class="string">‘error’</span>, (err) =&gt; &#123;</div><div class="line">    console.error(err);</div><div class="line">&#125;);</div></pre></td></tr></table></figure><p>运行这段代码：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">node nmask.js <a href="https://thief.one" target="_blank" rel="noopener">https://thief.one</a></div></pre></td></tr></table></figure><h4 id="chromeless介绍"><a href="#chromeless介绍" class="headerlink" title="chromeless介绍"></a><a href="#chromeless介绍" title="chromeless介绍"></a>chromeless介绍</h4><p>chromeless社区比较火热，代码更新也非常频繁，个人比较看好。</p><h4 id="chromeless安装"><a href="#chromeless安装" class="headerlink" title="chromeless安装"></a><a href="#chromeless安装" title="chromeless安装"></a>chromeless安装</h4><p>chromeless对nodejs版本要求是&gt;8.2(centos7下node7.6测试可以)，因此需要先升级nodejs，升级方法参考前文；升级完以后，再安装chromeless项目环境。</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">mkdir chromeless_test</div><div class="line"><span class="built_in">cd</span> chromeless_test</div><div class="line">npm init</div><div class="line">npm install chromeless</div></pre></td></tr></table></figure><h4 id="chromeless使用"><a href="#chromeless使用" class="headerlink" title="chromeless使用"></a><a href="#chromeless使用" title="chromeless使用"></a>chromeless使用</h4><p>官方API文档：<a href="https://github.com/graphcool/chromeless/blob/master/docs/api.md#api-goto" target="_blank" rel="noopener">https://github.com/graphcool/chromeless/blob/master/docs/api.md#api-goto</a><br>在线代码运行环境：<a href="https://chromeless.netlify.com/#src=" target="_blank" rel="noopener">https://chromeless.netlify.com</a></p><p>创建chromeless_test.js,写入：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">const &#123; Chromeless &#125; = require(<span class="string">‘chromeless’</span>)</div><div class="line"></div><div class="line">async <span class="keyword">function</span> <span class="function"><span class="title">run</span></span>() &#123;</div><div class="line">  const chromeless = new Chromeless()</div><div class="line"></div><div class="line">  const screenshot = await chromeless</div><div class="line">    .goto(<span class="string">‘<a href="https://www.baidu.com&#39;" target="_blank" rel="noopener">https://www.baidu.com&#39;</a></span>)</div><div class="line">    //.<span class="built_in">type</span>(<span class="string">‘chromeless’</span>, <span class="string">‘input[name=”q”]’</span>)</div><div class="line">    //.press(13)</div><div class="line">    //.<span class="built_in">wait</span>(<span class="string">‘#resultStats’</span>)</div><div class="line">    .screenshot()</div><div class="line"></div><div class="line">  console.log(screenshot) // prints <span class="built_in">local</span> file path or S3 url</div><div class="line"></div><div class="line">  await chromeless.end()</div><div class="line">&#125;</div><div class="line"></div><div class="line">run().catch(console.error.bind(console))</div></pre></td></tr></table></figure><p>运行代码：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">nohup google-chrome –headless –remote-debugging-port=9222 &amp; <span class="comment">#开启本地headless chrome</span></div><div class="line">node chromeless_test.js</div></pre></td></tr></table></figure><p><code>注意：在运行chromeless前，需要先安装headless chrome，并且需要在本地开启--remote-debugging-port=9222，监听本地9222端口；chromeless也支持使用远程的headless chrome</code></p><h4 id="pychrome工具"><a href="#pychrome工具" class="headerlink" title="pychrome工具"></a><a href="#pychrome工具" title="pychrome工具"></a>pychrome工具</h4><p><code>暂没有研究，尽情期待！</code></p><h3 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a><a href="#常见问题" title="常见问题"></a>常见问题</h3><h4 id="Linux截图中文字体变方块如何解决？"><a href="#Linux截图中文字体变方块如何解决？" class="headerlink" title="Linux截图中文字体变方块如何解决？"></a><a href="#Linux截图中文字体变方块如何解决？" title="Linux截图中文字体变方块如何解决？"></a>Linux截图中文字体变方块如何解决？</h4><p>出现这类问题主要是因为linux服务器字体缺失的问题，解决方案是将字体文件copy到linux服务器/usr/share/fonts/zh_CN目录下。</p><p>第一步：从windows或者mac上获取字体文件，mac上的字体文件地址为：/Library/Fonts，windows字体地址为：c盘下的Windows/Fonts。将Fonts目录打包上传到linux服务器/usr/share/fonts/zh_CN目录下，然后解压。</p><p>第二步：设置权限</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">chmod -R 755 /usr/share/fonts/zh_CN</div></pre></td></tr></table></figure><p>第三步：生成fonts.scale</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">yum -y install ttmkfdir</div><div class="line">ttmkfdir -e /usr/share/X11/fonts/encodings/encodings.dir</div></pre></td></tr></table></figure><p>第四步：修改字体配置文件</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">vim /etc/fonts/fonts.conf</div><div class="line"></div><div class="line"></div><div class="line">在&lt;dir&gt;….&lt;/dir&gt;列表中添加字体</div><div class="line"></div><div class="line">如：&lt;dir&gt;/usr/share/fonts/zh_CN/Fonts&lt;/dir&gt;</div></pre></td></tr></table></figure><p>第五步：刷新字体缓存</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">fc</span>-cache</div></pre></td></tr></table></figure><h4 id="命令行运行headless-chrome需要使用–disable-gpu参数吗？"><a href="#命令行运行headless-chrome需要使用–disable-gpu参数吗？" class="headerlink" title="命令行运行headless chrome需要使用–disable-gpu参数吗？"></a><a href="#命令行运行headless-chrome需要使用–disable-gpu参数吗？" title="命令行运行headless chrome需要使用–disable-gpu参数吗？"></a>命令行运行headless chrome需要使用–disable-gpu参数吗？</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">目前–<span class="built_in">disable</span>-gpu 标志在处理一些bug时是需要的，在未来版本的 Chrome 中就不需要了。</div></pre></td></tr></table></figure><h4 id="系统仍然需要安装Xvfb吗？"><a href="#系统仍然需要安装Xvfb吗？" class="headerlink" title="系统仍然需要安装Xvfb吗？"></a><a href="#系统仍然需要安装Xvfb吗？" title="系统仍然需要安装Xvfb吗？"></a>系统仍然需要安装Xvfb吗？</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">不需要，Headless Chrome 不使用窗口，所以不需要像 Xvfb 这样的显示服务器。</div><div class="line"></div><div class="line">你问什么是 Xvfb？</div><div class="line">Xvfb 是一个用于类 Unix 系统的运行于内存之内的显示服务器，可以让你运行图形应用程序（如 Chrome），而无需附加的物理显示器。许多人使用 Xvfb 运行早期版本的 Chrome 进行 “headless” 测试。</div></pre></td></tr></table></figure><h4 id="如何创建一个运行-Headless-Chrome-的-Docker-容器？"><a href="#如何创建一个运行-Headless-Chrome-的-Docker-容器？" class="headerlink" title="如何创建一个运行 Headless Chrome 的 Docker 容器？"></a><a href="#如何创建一个运行-Headless-Chrome-的-Docker-容器？" title="如何创建一个运行 Headless Chrome 的 Docker 容器？"></a>如何创建一个运行 Headless Chrome 的 Docker 容器？</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">查看 lighthouse-ci。它有一个使用 Ubuntu 作为基础镜像的 Dockerfile 示例，并且在 App Engine Flexible 容器中安装和运行了 Lighthouse。</div></pre></td></tr></table></figure><h4 id="headless-chrome和-PhantomJS-有什么关系？"><a href="#headless-chrome和-PhantomJS-有什么关系？" class="headerlink" title="headless chrome和 PhantomJS 有什么关系？"></a><a href="#headless-chrome和-PhantomJS-有什么关系？" title="headless chrome和 PhantomJS 有什么关系？"></a>headless chrome和 PhantomJS 有什么关系？</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Headless Chrome 和 PhantomJS 是类似的工具。它们都可以用来在无需显示的环境中进行自动化测试。两者的主要不同在于 Phantom 使用了一个较老版本的 WebKit 作为它的渲染引擎，而 Headless Chrome 使用了最新版本的 Blink。</div></pre></td></tr></table></figure><p><code>下篇将介绍分布式漏扫爬虫框架的设计与实现，以及写爬虫过程中需要注意的点</code></p><h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a><a href="#参考文章" title="参考文章"></a>参考文章</h3><p><a href="https://zhuanlan.zhihu.com/p/29207391" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/29207391</a><br><a href="https://developers.google.com/web/updates/2017/04/headless-chrome" target="_blank" rel="noopener">https://developers.google.com/web/updates/2017/04/headless-chrome</a><br><a href="https://juejin.im/entry/58fd5e645c497d005803b6a4" target="_blank" rel="noopener">https://juejin.im/entry/58fd5e645c497d005803b6a4</a><br><a href="http://csbun.github.io/blog/2017/09/puppeteer/" target="_blank" rel="noopener">http://csbun.github.io/blog/2017/09/puppeteer/</a></p></div><footer class="post-footer"><div class="post-tags"><a href="/tags/爬虫技术/" rel="tag"># 爬虫技术</a> <a href="/tags/Headless-Chrome/" rel="tag"># Headless Chrome</a> <a href="/tags/Puppeteer/" rel="tag"># Puppeteer</a> <a href="/tags/pychrome/" rel="tag"># pychrome</a> <a href="/tags/chromeless/" rel="tag"># chromeless</a></div><div class="post-nav"><div class="post-nav-next post-nav-item"><a href="/2018/06/24/Supervisord管理进程实践/" rel="next" title="Supervisord管理进程实践"><i class="fa fa-chevron-left"></i> Supervisord管理进程实践</a></div><span class="post-nav-divider"></span><div class="post-nav-prev post-nav-item"><a href="/2018/07/26/Nginx配置相关笔记/" rel="prev" title="Nginx配置相关笔记">Nginx配置相关笔记 <i class="fa fa-chevron-right"></i></a></div></div></footer></div></article><div class="post-spread"></div></div></div></div><div class="sidebar-toggle"><div class="sidebar-toggle-line-wrap"><span class="sidebar-toggle-line sidebar-toggle-line-first"></span> <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span> <span class="sidebar-toggle-line sidebar-toggle-line-last"></span></div></div><aside id="sidebar" class="sidebar"><div class="sidebar-inner"><ul class="sidebar-nav motion-element"><li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">文章目录</li><li class="sidebar-nav-overview" data-target="site-overview-wrap">站点概览</li></ul><section class="site-overview-wrap sidebar-panel"><div class="site-overview"><div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person"><p class="site-author-name" itemprop="name">褚成志</p><p class="site-description motion-element" itemprop="description">关注互联网的科技博客</p></div><nav class="site-state motion-element"><div class="site-state-item site-state-posts"><a href="/archives/"><span class="site-state-item-count">67</span> <span class="site-state-item-name">日志</span></a></div><div class="site-state-item site-state-categories"><span class="site-state-item-count">1</span> <span class="site-state-item-name">分类</span></div><div class="site-state-item site-state-tags"><span class="site-state-item-count">38</span> <span class="site-state-item-name">标签</span></div></nav><div class="feed-link motion-element"><a href="/atom.xml" rel="alternate"><i class="fa fa-rss"></i> RSS</a></div></div></section><section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active"><div class="post-toc"><div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Headless-Chrome-介绍"><span class="nav-number">1.</span> <span class="nav-text">Headless Chrome 介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Headless-Chrome-安装"><span class="nav-number">2.</span> <span class="nav-text">Headless Chrome 安装</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#mac-install-headless-chrome"><span class="nav-number">2.1.</span> <span class="nav-text">mac install headless chrome</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#linux-install-headless-chrome"><span class="nav-number">2.2.</span> <span class="nav-text">linux install headless chrome</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Headless-Chrome-基础用法"><span class="nav-number">3.</span> <span class="nav-text">Headless Chrome 基础用法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#访问一个网页获取源码"><span class="nav-number">3.1.</span> <span class="nav-text">访问一个网页获取源码</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#访问一个网页将源码创建成一个PDF"><span class="nav-number">3.2.</span> <span class="nav-text">访问一个网页将源码创建成一个PDF</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#访问一个网页并截图"><span class="nav-number">3.3.</span> <span class="nav-text">访问一个网页并截图</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#访问一个网页并进行js交互（REPL模式）"><span class="nav-number">3.4.</span> <span class="nav-text">访问一个网页并进行js交互（REPL模式）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#启动一个监听端口"><span class="nav-number">3.5.</span> <span class="nav-text">启动一个监听端口</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Headless-Chrome-API"><span class="nav-number">4.</span> <span class="nav-text">Headless Chrome API</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#puppeteer-介绍"><span class="nav-number">4.1.</span> <span class="nav-text">puppeteer 介绍</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#puppeteer-安装"><span class="nav-number">4.2.</span> <span class="nav-text">puppeteer 安装</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#安装升级nodejs与npm"><span class="nav-number">4.2.1.</span> <span class="nav-text">安装升级nodejs与npm</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#puppeteer-使用"><span class="nav-number">4.3.</span> <span class="nav-text">puppeteer 使用</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#打印用户代理："><span class="nav-number">4.3.1.</span> <span class="nav-text">打印用户代理：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#获取页面的屏幕截图："><span class="nav-number">4.3.2.</span> <span class="nav-text">获取页面的屏幕截图：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#发送POST请求获取源码"><span class="nav-number">4.3.3.</span> <span class="nav-text">发送POST请求获取源码</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#安装puppeteer报错"><span class="nav-number">4.3.4.</span> <span class="nav-text">安装puppeteer报错</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#运行puppeteer报错处理"><span class="nav-number">4.3.5.</span> <span class="nav-text">运行puppeteer报错处理</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#pyppeteer"><span class="nav-number">4.4.</span> <span class="nav-text">pyppeteer</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#pyppeteer安装"><span class="nav-number">4.4.1.</span> <span class="nav-text">pyppeteer安装</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#pyppeteer简单的例子"><span class="nav-number">4.4.2.</span> <span class="nav-text">pyppeteer简单的例子</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#pyppeteer报错处理"><span class="nav-number">4.4.3.</span> <span class="nav-text">pyppeteer报错处理</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#chrome-remote-interface工具"><span class="nav-number">4.5.</span> <span class="nav-text">chrome-remote-interface工具</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#chromeless介绍"><span class="nav-number">4.6.</span> <span class="nav-text">chromeless介绍</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#chromeless安装"><span class="nav-number">4.7.</span> <span class="nav-text">chromeless安装</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#chromeless使用"><span class="nav-number">4.8.</span> <span class="nav-text">chromeless使用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#pychrome工具"><span class="nav-number">4.9.</span> <span class="nav-text">pychrome工具</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#常见问题"><span class="nav-number">5.</span> <span class="nav-text">常见问题</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Linux截图中文字体变方块如何解决？"><span class="nav-number">5.1.</span> <span class="nav-text">Linux截图中文字体变方块如何解决？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#命令行运行headless-chrome需要使用–disable-gpu参数吗？"><span class="nav-number">5.2.</span> <span class="nav-text">命令行运行headless chrome需要使用–disable-gpu参数吗？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#系统仍然需要安装Xvfb吗？"><span class="nav-number">5.3.</span> <span class="nav-text">系统仍然需要安装Xvfb吗？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#如何创建一个运行-Headless-Chrome-的-Docker-容器？"><span class="nav-number">5.4.</span> <span class="nav-text">如何创建一个运行 Headless Chrome 的 Docker 容器？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#headless-chrome和-PhantomJS-有什么关系？"><span class="nav-number">5.5.</span> <span class="nav-text">headless chrome和 PhantomJS 有什么关系？</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考文章"><span class="nav-number">6.</span> <span class="nav-text">参考文章</span></a></li></ol></div></div></section></div></aside></div></main><footer id="footer" class="footer"><div class="footer-inner"><div class="copyright">&copy; <span itemprop="copyrightYear">2018</span> <span class="with-love"><i class="fa fa-user"></i> </span><span class="author" itemprop="copyrightHolder">褚成志</span></div><div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div><span class="post-meta-divider">|</span><div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div></div></footer><div class="back-to-top"><i class="fa fa-arrow-up"></i></div></div><script type="text/javascript">"[object Function]"!==Object.prototype.toString.call(window.Promise)&&(window.Promise=null)</script><script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script><script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script><script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script><script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script><script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script><script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script><script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script><script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script><script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script><script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script><script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script></body></html><!-- rebuild by neat -->
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="爬虫技术,Headless Chrome,Puppeteer,pychrome,chromeless," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="褚成志的博客" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="我已爬遍了全世界，而你却迟迟不见  　　自从Google在chrome59版本后加入了 Headless Chrome，类似phantomjs、selenium等工具作者都放弃了维护自身的产品（原因可参考文章 QtWebkit or Headless Chrome）。因此作为使用者的我们也是时候放弃phantomjs，转而研究Headless Chrome了。由于网上对于Headless Chr">
+<meta name="keywords" content="爬虫技术,Headless Chrome,Puppeteer,pychrome,chromeless">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Headless Chrome and API">
+<meta property="og:url" content="http://www.chucz.club/2018/07/09/Headless-Chrome-and-API/index.html">
+<meta property="og:site_name" content="褚成志的博客">
+<meta property="og:description" content="我已爬遍了全世界，而你却迟迟不见  　　自从Google在chrome59版本后加入了 Headless Chrome，类似phantomjs、selenium等工具作者都放弃了维护自身的产品（原因可参考文章 QtWebkit or Headless Chrome）。因此作为使用者的我们也是时候放弃phantomjs，转而研究Headless Chrome了。由于网上对于Headless Chr">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-09-28T08:51:24.508Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Headless Chrome and API">
+<meta name="twitter:description" content="我已爬遍了全世界，而你却迟迟不见  　　自从Google在chrome59版本后加入了 Headless Chrome，类似phantomjs、selenium等工具作者都放弃了维护自身的产品（原因可参考文章 QtWebkit or Headless Chrome）。因此作为使用者的我们也是时候放弃phantomjs，转而研究Headless Chrome了。由于网上对于Headless Chr">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'ZM9CKN0W4R',
+      apiKey: '5bc5819b162e1cd440b44b16ef207a44',
+      indexName: 'chucz.club',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.chucz.club/2018/07/09/Headless-Chrome-and-API/"/>
+
+
+
+
+
+  <title>Headless Chrome and API | 褚成志的博客</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">褚成志的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">青青子衿, 悠悠我心</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.chucz.club/2018/07/09/Headless-Chrome-and-API/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="褚成志">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="褚成志的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Headless Chrome and API</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-09T00:59:10+00:00">
+                2018-07-09
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>我已爬遍了全世界，而你却迟迟不见</p>
+</blockquote>
+<p>　　自从Google在chrome59版本后加入了 <a href="https://chromium.googlesource.com/chromium/src/+/lkgr/headless/README.md" target="_blank" rel="noopener">Headless Chrome</a>，类似phantomjs、selenium等工具作者都放弃了维护自身的产品（原因可参考文章 <a href="https://paper.seebug.org/537/?from=timeline&amp;isappinstalled=0" target="_blank" rel="noopener">QtWebkit or Headless Chrome</a>）。因此作为使用者的我们也是时候放弃phantomjs，转而研究Headless Chrome了。由于网上对于Headless Chrome的资料还很少，因此我先收集整理一波，随后慢慢学习研究，渐渐将本篇内容补充完善。<br><a id="more"></a></p>
+<h3 id="Headless-Chrome-介绍"><a href="#Headless-Chrome-介绍" class="headerlink" title="Headless Chrome 介绍"></a><a href="#Headless-Chrome-介绍" title="Headless Chrome 介绍"></a>Headless Chrome 介绍</h3><p>headless chrome意思是无头chrome浏览器，相对于传统的chrome浏览器，这是一个可以在后台用命令行操作浏览器的工具，对于爬虫编写以及web自动化测试都有很大的作用。相比较同类工具Phantomjs，其更加强大（主要因为其依赖的webkit更新）。</p>
+<h3 id="Headless-Chrome-安装"><a href="#Headless-Chrome-安装" class="headerlink" title="Headless Chrome 安装"></a><a href="#Headless-Chrome-安装" title="Headless Chrome 安装"></a>Headless Chrome 安装</h3><p>目前只支持mac与linux系统，需要下载chrome浏览器并安装。</p>
+<h4 id="mac-install-headless-chrome"><a href="#mac-install-headless-chrome" class="headerlink" title="mac install headless chrome"></a><a href="#mac-install-headless-chrome" title="mac install headless chrome"></a>mac install headless chrome</h4><p>mac下直接去官网下载安装包即可，mac下chrome浏览器位置，为了方便使用，用alias别名启动。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">alias</span> chrome=<span class="string">“/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome”</span></div><div class="line"><span class="built_in">alias</span> chrome-canary=<span class="string">“/Applications/Google\ Chrome\ Canary.app/Contents/MacOS/Google\ Chrome\ Canary”</span></div><div class="line"><span class="built_in">alias</span> chromium=<span class="string">“/Applications/Chromium.app/Contents/MacOS/Chromium”</span></div></pre></td></tr></table></figure>
+
+<p>下载<a href="https://www.google.com/chrome/browser/canary.html" target="_blank" rel="noopener">chrome-canary</a>版</p>
+<p>说明：<code>Mac 和 Linux 上的 Chrome 59 都可以运行无需显示模式。对 Windows 的支持将在 Chrome 60 中提供。要检查你使用的 Chrome 版本，请在浏览器中打开 chrome://version。</code></p>
+<h4 id="linux-install-headless-chrome"><a href="#linux-install-headless-chrome" class="headerlink" title="linux install headless chrome"></a><a href="#linux-install-headless-chrome" title="linux install headless chrome"></a>linux install headless chrome</h4><p>添加源：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line">vim /etc/yum.repos.d/chrome.repo</div><div class="line">写入以下内容：</div><div class="line"></div><div class="line">[google-chrome]</div><div class="line">name=google-chrome</div><div class="line">baseurl=<a href="http://dl.google.com/linux/chrome/rpm/stable/" target="_blank" rel="noopener">http://dl.google.com/linux/chrome/rpm/stable/</a><span class="variable">$basearch</span></div><div class="line">enabled=1</div><div class="line">gpgcheck=0</div><div class="line">gpgkey=<a href="https://dl-ssl.google.com/linux/linux_signing_key.pub" target="_blank" rel="noopener">https://dl-ssl.google.com/linux/linux_signing_key.pub</a></div></pre></td></tr></table></figure>
+
+<p>安装：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">yum install -y google-chrome-stable</div></pre></td></tr></table></figure>
+
+<p>测试运行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">google-chrome –headless –<span class="built_in">print</span>-to-pdf <a href="https://thief.one" target="_blank" rel="noopener">https://thief.one</a></div></pre></td></tr></table></figure>
+
+<p>报错处理：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Running as root without –no-sandbox is not supported <span class="comment"># 错误信息</span></div></pre></td></tr></table></figure>
+
+<p>解析方案：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">vim /opt/google/chrome/google-chrome</div><div class="line">找到 <span class="built_in">exec</span> -a <span class="string">“<span class="variable">$0</span>“</span> <span class="string">“<span class="variable">$HERE</span>/chrome”</span> <span class="string">“<span class="variable">$@</span>“</span></div><div class="line">改为 <span class="built_in">exec</span> -a <span class="string">“<span class="variable">$0</span>“</span> <span class="string">“<span class="variable">$HERE</span>/chrome”</span> <span class="string">“<span class="variable">$@</span>“</span> –user-data-dir –no-sandbox</div></pre></td></tr></table></figure>
+
+<p><code>说明：若在安装过程中报错，则将源文件中的gpgcheck改为0</code></p>
+<p>linux安装headless chrome参考：<a href="http://akai-tsuki.hatenablog.com/entry/2017/06/18/000000" target="_blank" rel="noopener">http://akai-tsuki.hatenablog.com/entry/2017/06/18/000000</a></p>
+<h3 id="Headless-Chrome-基础用法"><a href="#Headless-Chrome-基础用法" class="headerlink" title="Headless Chrome 基础用法"></a><a href="#Headless-Chrome-基础用法" title="Headless Chrome 基础用法"></a>Headless Chrome 基础用法</h3><p>HELP信息：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">chrome \</div><div class="line">–headless \                   <span class="comment"># Runs Chrome in headless mode.</span></div><div class="line">–<span class="built_in">disable</span>-gpu \                <span class="comment"># Temporarily needed for now.</span></div><div class="line">–remote-debugging-address=127.0.0.1</div><div class="line">–remote-debugging-port=9222 \</div><div class="line"> <a href="https://thief.one" target="_blank" rel="noopener">https://thief.one</a>   <span class="comment"># URL to open. Defaults to about:blank.</span></div></pre></td></tr></table></figure>
+
+<h4 id="访问一个网页获取源码"><a href="#访问一个网页获取源码" class="headerlink" title="访问一个网页获取源码"></a><a href="#访问一个网页获取源码" title="访问一个网页获取源码"></a>访问一个网页获取源码</h4><p>–dump-dom 标志将打印 document.body.innerHTML 到标准输出：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">chrome –headless –<span class="built_in">disable</span>-gpu –dump-dom <a href="https://thief.one/" target="_blank" rel="noopener">https://thief.one/</a></div></pre></td></tr></table></figure>
+
+<h4 id="访问一个网页将源码创建成一个PDF"><a href="#访问一个网页将源码创建成一个PDF" class="headerlink" title="访问一个网页将源码创建成一个PDF"></a><a href="#访问一个网页将源码创建成一个PDF" title="访问一个网页将源码创建成一个PDF"></a>访问一个网页将源码创建成一个PDF</h4><p>–print-to-pdf 标志将页面转出为 PDF 文件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">chrome –headless –<span class="built_in">disable</span>-gpu –<span class="built_in">print</span>-to-pdf <a href="https://thief.one/" target="_blank" rel="noopener">https://thief.one/</a></div></pre></td></tr></table></figure>
+
+<h4 id="访问一个网页并截图"><a href="#访问一个网页并截图" class="headerlink" title="访问一个网页并截图"></a><a href="#访问一个网页并截图" title="访问一个网页并截图"></a>访问一个网页并截图</h4><p>使用–screenshot标志运行 Headless Chrome 将在当前工作目录中生成一个名为 screenshot.png的文件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">chrome –headless –<span class="built_in">disable</span>-gpu –screenshot <a href="https://thief.one/" target="_blank" rel="noopener">https://thief.one/</a></div><div class="line"></div><div class="line"><span class="comment"># 设置图片大小</span></div><div class="line">chrome –headless –<span class="built_in">disable</span>-gpu –screenshot –window-size=1280,1696 <a href="https://thief.one/" target="_blank" rel="noopener">https://thief.one/</a></div></pre></td></tr></table></figure>
+
+<h4 id="访问一个网页并进行js交互（REPL模式）"><a href="#访问一个网页并进行js交互（REPL模式）" class="headerlink" title="访问一个网页并进行js交互（REPL模式）"></a><a href="#访问一个网页并进行js交互（REPL模式）" title="访问一个网页并进行js交互（REPL模式）"></a>访问一个网页并进行js交互（REPL模式）</h4><p>–repl 标志可以使 Headless Chrome 运行在一个你可以使用浏览器评估 JS 表达式的模式下。执行下面的命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">chrome –headless –<span class="built_in">disable</span>-gpu –repl <a href="https://thief.one" target="_blank" rel="noopener">https://thief.one</a></div><div class="line">&gt;&gt;&gt; location.href</div><div class="line">&#123;<span class="string">“result”</span>:&#123;<span class="string">“type”</span>:<span class="string">“string”</span>,<span class="string">“value”</span>:<span class="string">“<a href="https://thief.one&quot;" target="_blank" rel="noopener">https://thief.one&quot;</a></span>&#125;&#125;</div><div class="line">&gt;&gt;&gt; quit</div></pre></td></tr></table></figure>
+
+<h4 id="启动一个监听端口"><a href="#启动一个监听端口" class="headerlink" title="启动一个监听端口"></a><a href="#启动一个监听端口" title="启动一个监听端口"></a>启动一个监听端口</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">chrome –remote-debugging-port=9222 –remote-debugging-address=0.0.0.0</div></pre></td></tr></table></figure>
+
+<p>可以通过浏览器打开：<a href="http://0.0.0.0:9222" target="_blank" rel="noopener">http://0.0.0.0:9222</a> </p>
+<h3 id="Headless-Chrome-API"><a href="#Headless-Chrome-API" class="headerlink" title="Headless Chrome API"></a><a href="#Headless-Chrome-API" title="Headless Chrome API"></a>Headless Chrome API</h3><p>以上演示了使用命令行的方式操作headless chrome，那么怎么在代码中使用它呢？<br>api工具如下：<br>官方：<a href="https://github.com/GoogleChrome/puppeteer" target="_blank" rel="noopener">puppeteer</a><br>底层：<a href="https://github.com/cyrus-and/chrome-remote-interface/" target="_blank" rel="noopener">chrome-remote-interface</a><br>活跃：<a href="https://github.com/graphcool/chromeless" target="_blank" rel="noopener">chromeless</a><br>非官方：<a href="https://github.com/yujiosaka/headless-chrome-crawler" target="_blank" rel="noopener">headless-chrome-crawler</a></p>
+<p>Python相关的API：<br><a href="https://github.com/fate0/pychrome" target="_blank" rel="noopener">pychrome</a><br><a href="https://github.com/miyakogi/pyppeteer" target="_blank" rel="noopener">Pyppeteer 推荐</a><br><a href="https://github.com/iiSeymour/chromote" target="_blank" rel="noopener">chromote</a><br><a href="https://github.com/wasiher/chrome_remote_interface_python" target="_blank" rel="noopener">chrome_remote_interface_python</a></p>
+<h4 id="puppeteer-介绍"><a href="#puppeteer-介绍" class="headerlink" title="puppeteer 介绍"></a><a href="#puppeteer-介绍" title="puppeteer 介绍"></a>puppeteer 介绍</h4><p>Puppeteer 是一个由 Chrome 团队开发的 Node 库。它提供了一个高层次的 API 来控制无需显示版（或 完全版）的 Chrome。它与其他自动化测试库，如 Phantom 和 NightmareJS 相类似，但是只适用于最新版本的 Chrome。</p>
+<h4 id="puppeteer-安装"><a href="#puppeteer-安装" class="headerlink" title="puppeteer 安装"></a><a href="#puppeteer-安装" title="puppeteer 安装"></a>puppeteer 安装</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">mkdir puppeteer_test <span class="comment"># 创建一个项目目录</span></div><div class="line"><span class="built_in">cd</span> puppeteer_test</div><div class="line">npm init</div><div class="line">npm i –save puppeteer</div></pre></td></tr></table></figure>
+
+<p>安装puppeteer前需要在系统上安装nodejs与npm；安装完puppeteer，默认会自动安装最新版本的chromium。<br>注意：<code>系统默认安装的npm与nodejs版本都很低，而使用puppeteer需要node6.4.0+，async/await需要node7.6.0+，因此建议安装node7.6.0版本，否则会导致无法使用。</code></p>
+<h5 id="安装升级nodejs与npm"><a href="#安装升级nodejs与npm" class="headerlink" title="安装升级nodejs与npm"></a><a href="#安装升级nodejs与npm" title="安装升级nodejs与npm"></a>安装升级nodejs与npm</h5><p>要安装puppeteer，需要先安装npm与nodejs，而puppeteer对nodejs版本有要求，因此不能用系统默认安装的nodejs版本。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">wget <a href="http://nodejs.org/dist/v7.6.0/node-v7.6.0-linux-x64.tar.gz" target="_blank" rel="noopener">http://nodejs.org/dist/v7.6.0/node-v7.6.0-linux-x64.tar.gz</a></div><div class="line">tar -zvxf node-v7.6.0-linux-x64.tar.gz</div></pre></td></tr></table></figure>
+
+<p>共享至全局</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">rm -rf /usr/bin/node /usr/bin/npm</div><div class="line">ln -s /path/node-v7.6.0-linux-x64/bin/node /usr/bin/node  </div><div class="line">ln -s /path/node-v7.6.0-linux-x64/bin/npm /usr/bin/npm</div></pre></td></tr></table></figure>
+
+<p>若用yum安装过nodejs，需要移除其他版本:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">yum remove npm</div><div class="line">yum remove nodejs</div></pre></td></tr></table></figure>
+
+<p>查看nodejs与npm版本：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">node -v</div><div class="line">npm -v</div></pre></td></tr></table></figure>
+
+<p>安装升级nodejs过程参考：<a href="http://jeeinn.com/2017/02/236/" target="_blank" rel="noopener">http://jeeinn.com/2017/02/236/</a></p>
+<h4 id="puppeteer-使用"><a href="#puppeteer-使用" class="headerlink" title="puppeteer 使用"></a><a href="#puppeteer-使用" title="puppeteer 使用"></a>puppeteer 使用</h4><p>在使用puppeteer前，先要确定puppeteer、nodejs、npm安装成功（版本正确），且headless chrome安装成功。<br>官方API文档：<a href="https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md" target="_blank" rel="noopener">https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md</a></p>
+<h5 id="打印用户代理："><a href="#打印用户代理：" class="headerlink" title="打印用户代理："></a><a href="#打印用户代理：" title="打印用户代理："></a>打印用户代理：</h5><p>在puppeteer_test目录下创建一个example1.js文件，写入：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">const puppeteer = require(<span class="string">‘puppeteer’</span>);</div><div class="line"></div><div class="line">(async() =&gt; &#123;</div><div class="line"> const browser = await puppeteer.launch(&#123;</div><div class="line">    headless: <span class="literal">true</span>,</div><div class="line">    args: [<span class="string">‘–no-sandbox’</span>, <span class="string">‘–disable-setuid-sandbox’</span>],</div><div class="line">&#125;);</div><div class="line"> console.log(await browser.version());</div><div class="line"> browser.close();</div><div class="line">&#125;)();</div></pre></td></tr></table></figure>
+
+<p>运行代码:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">node example1.js</div></pre></td></tr></table></figure>
+
+<h5 id="获取页面的屏幕截图："><a href="#获取页面的屏幕截图：" class="headerlink" title="获取页面的屏幕截图："></a><a href="#获取页面的屏幕截图：" title="获取页面的屏幕截图："></a>获取页面的屏幕截图：</h5><p>创建一个example2.js文件，写入：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line">const puppeteer = require(<span class="string">‘puppeteer’</span>);</div><div class="line"></div><div class="line">(async() =&gt; &#123;</div><div class="line"></div><div class="line">const browser = await puppeteer.launch(&#123;</div><div class="line">    headless: <span class="literal">true</span>,</div><div class="line">    args: [<span class="string">‘–no-sandbox’</span>, <span class="string">‘–disable-setuid-sandbox’</span>],</div><div class="line">&#125;);</div><div class="line">const page = await browser.newPage();</div><div class="line">await page.goto(<span class="string">‘<a href="https://thief.one&#39;" target="_blank" rel="noopener">https://thief.one&#39;</a></span>, &#123;waitUntil: <span class="string">‘networkidle2’</span>&#125;);</div><div class="line">await page.pdf(&#123;path: <span class="string">‘screen.pdf’</span>, format: <span class="string">‘A4’</span>&#125;);</div><div class="line"></div><div class="line">browser.close();</div><div class="line">&#125;)();</div></pre></td></tr></table></figure>
+
+<p>运行代码：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">node example2.js</div></pre></td></tr></table></figure>
+
+<p>说明：在运行puppeteer之前不需要额外开启一个headless-chrome进程，因为其本身就会去开启。</p>
+<h5 id="发送POST请求获取源码"><a href="#发送POST请求获取源码" class="headerlink" title="发送POST请求获取源码"></a><a href="#发送POST请求获取源码" title="发送POST请求获取源码"></a>发送POST请求获取源码</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line">const puppeteer = require(<span class="string">‘puppeteer’</span>);</div><div class="line"></div><div class="line">puppeteer.launch(&#123;headless: <span class="literal">true</span>,args: [<span class="string">‘–no-sandbox’</span>, <span class="string">‘–disable-setuid-sandbox’</span>],&#125;).<span class="keyword">then</span>(async browser =&gt; &#123;</div><div class="line"></div><div class="line">  const page = await browser.newPage();</div><div class="line">  await page.setRequestInterception(<span class="literal">true</span>); // 开启请求捕捉</div><div class="line">  page.on(<span class="string">‘request’</span>, interceptedRequest =&gt; &#123;</div><div class="line">    const overrides = &#123;&#125;;</div><div class="line">    //console.log(interceptedRequest.url()); // 输出捕捉到的请求URL</div><div class="line">    <span class="keyword">if</span> (interceptedRequest.url()==<span class="string">‘<a href="http://127.0.0.1:8000/&#39;" target="_blank" rel="noopener">http://127.0.0.1:8000/&#39;</a></span>)&#123;</div><div class="line">       overrides.method = <span class="string">‘POST’</span>;</div><div class="line">       overrides.postData = <span class="string">‘&#123;”id”:”2”&#125;’</span>;</div><div class="line">    &#125;</div><div class="line">    interceptedRequest.continue(overrides); // 重放</div><div class="line">   &#125;);</div><div class="line">  await page.goto(<span class="string">‘<a href="http://127.0.0.1:8000/&#39;" target="_blank" rel="noopener">http://127.0.0.1:8000/&#39;</a></span>);</div><div class="line">  await console.log(await page.content()); // 输出源码</div><div class="line">  await browser.close();</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+
+<h5 id="安装puppeteer报错"><a href="#安装puppeteer报错" class="headerlink" title="安装puppeteer报错"></a><a href="#安装puppeteer报错" title="安装puppeteer报错"></a>安装puppeteer报错</h5><p>在linux下安装puppeteer报错，即:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">npm i –save puppeteer 命令没有运行成功</div></pre></td></tr></table></figure>
+
+<p>失败原因可能是linux版本不支持，centos7下成功，centos6下测试失败。</p>
+<h5 id="运行puppeteer报错处理"><a href="#运行puppeteer报错处理" class="headerlink" title="运行puppeteer报错处理"></a><a href="#运行puppeteer报错处理" title="运行puppeteer报错处理"></a>运行puppeteer报错处理</h5><p>报错如下，说明代码语法有问题，或者node版本太低，不符合要求：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">SyntaxError: Unexpected token <span class="keyword">function</span></div></pre></td></tr></table></figure>
+
+<p>报错如下，说明代码中需要设置headless状态为true</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Failed to launch chrome</div></pre></td></tr></table></figure>
+
+<p>解决方案，修改代码为如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">const browser = await puppeteer.launch(&#123;</div><div class="line">    headless: <span class="literal">true</span>,</div><div class="line">    args: [<span class="string">‘–no-sandbox’</span>, <span class="string">‘–disable-setuid-sandbox’</span>],</div><div class="line">  &#125;);</div></pre></td></tr></table></figure>
+
+<p>报错如下，与上面解决方案一致：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">1025/084740.006078:ERROR:zygote_host_impl_linux.cc(88)] Running as root without –no-sandbox is not supported. See <a href="https://crbug.com/638180" target="_blank" rel="noopener">https://crbug.com/638180</a>.</div></pre></td></tr></table></figure>
+
+<h4 id="pyppeteer"><a href="#pyppeteer" class="headerlink" title="pyppeteer"></a><a href="#pyppeteer" title="pyppeteer"></a>pyppeteer</h4><p>pyppeteer模版是对puppeteer的python封装，因为puppeteer是用nodejs写的，所以要在python中使用得用pyppeteer模块。</p>
+<h5 id="pyppeteer安装"><a href="#pyppeteer安装" class="headerlink" title="pyppeteer安装"></a><a href="#pyppeteer安装" title="pyppeteer安装"></a>pyppeteer安装</h5><p>pyppeteer模版只支持python3.5以上版本。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">python3 -m pip install pyppeteer</div></pre></td></tr></table></figure>
+
+<h5 id="pyppeteer简单的例子"><a href="#pyppeteer简单的例子" class="headerlink" title="pyppeteer简单的例子"></a><a href="#pyppeteer简单的例子" title="pyppeteer简单的例子"></a>pyppeteer简单的例子</h5><p>截图：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">import asyncio</div><div class="line">from pyppeteer import launch</div><div class="line"></div><div class="line">async def main():</div><div class="line">    browser = await launch(args=[<span class="string">‘–no-sandbox’</span>])</div><div class="line">    page = await browser.newPage()</div><div class="line">    await page.goto(<span class="string">‘<a href="http://example.com&#39;" target="_blank" rel="noopener">http://example.com&#39;</a></span>)</div><div class="line">    await page.screenshot(&#123;<span class="string">‘path’</span>: <span class="string">‘example.png’</span>&#125;)</div><div class="line">    await browser.close()</div><div class="line"></div><div class="line">asyncio.get_event_loop().run_until_complete(main())</div></pre></td></tr></table></figure>
+
+<p>说明：在使用pyppeteer时，不需要额外开启headless-chrome进程（与puppeteer一样）。更多pyppeteer模版使用方法，参考：<a href="https://miyakogi.github.io/pyppeteer/reference.html#page-class" target="_blank" rel="noopener">https://miyakogi.github.io/pyppeteer/reference.html#page-class</a></p>
+<h5 id="pyppeteer报错处理"><a href="#pyppeteer报错处理" class="headerlink" title="pyppeteer报错处理"></a><a href="#pyppeteer报错处理" title="pyppeteer报错处理"></a>pyppeteer报错处理</h5><p>错误类似如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">pyppeteer.errors.BrowserError: Failed to connect to browser port: <a href="http://127.0.0.1:58871/json/version" target="_blank" rel="noopener">http://127.0.0.1:58871/json/version</a></div></pre></td></tr></table></figure>
+
+<p>解决方案：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">加上：args=[<span class="string">‘–no-sandbox’</span>]，同puppeteer类似。</div><div class="line"></div><div class="line">browser = await launch(args=[<span class="string">‘–no-sandbox’</span>])</div></pre></td></tr></table></figure>
+
+<h4 id="chrome-remote-interface工具"><a href="#chrome-remote-interface工具" class="headerlink" title="chrome-remote-interface工具"></a><a href="#chrome-remote-interface工具" title="chrome-remote-interface工具"></a>chrome-remote-interface工具</h4><p>可以用来分析渲染一个页面过程中所有的请求过程，包括获取所有的请求接口以及响应内容等。再运行chrome-remote-interface代码前，需要先启动headless chrome进程，即：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">chrome –headless –remote-debugging-port=9222</div></pre></td></tr></table></figure>
+
+<p>安装chrome-remote-interface：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">npm install chrome-remote-interface</div></pre></td></tr></table></figure>
+
+<p>然后编写代码：(以获取所有请求url为例)</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line">const CDP = require(<span class="string">‘chrome-remote-interface’</span>);</div><div class="line"></div><div class="line">// node nmask.js <a href="https://nmask.cn" target="_blank" rel="noopener">https://nmask.cn</a></div><div class="line"></div><div class="line">var options = process.argv;</div><div class="line">var target_url = options[2];</div><div class="line"></div><div class="line">CDP((client) =&gt; &#123;</div><div class="line">    // extract domains</div><div class="line">    const &#123;Network, Page&#125; = client;</div><div class="line">    </div><div class="line">    // setup handlers</div><div class="line">    Network.requestWillBeSent((params) =&gt; &#123;</div><div class="line">        console.log(params.request.url);</div><div class="line">    &#125;);</div><div class="line">    Page.loadEventFired(() =&gt; &#123;</div><div class="line">        client.close();</div><div class="line">    &#125;);</div><div class="line">    </div><div class="line">    // <span class="built_in">enable</span> events <span class="keyword">then</span> start!</div><div class="line">    Promise.all([</div><div class="line">        Network.enable(),</div><div class="line">        Page.enable()</div><div class="line">    ]).<span class="keyword">then</span>(() =&gt; &#123;</div><div class="line">        <span class="built_in">return</span> Page.navigate(&#123;url: target_url&#125;);//输出请求的url</div><div class="line">    &#125;).catch((err) =&gt; &#123;</div><div class="line">        console.error(err);</div><div class="line">        client.close();</div><div class="line">    &#125;);</div><div class="line">&#125;).on(<span class="string">‘error’</span>, (err) =&gt; &#123;</div><div class="line">    console.error(err);</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+
+<p>运行这段代码：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">node nmask.js <a href="https://thief.one" target="_blank" rel="noopener">https://thief.one</a></div></pre></td></tr></table></figure>
+
+<h4 id="chromeless介绍"><a href="#chromeless介绍" class="headerlink" title="chromeless介绍"></a><a href="#chromeless介绍" title="chromeless介绍"></a>chromeless介绍</h4><p>chromeless社区比较火热，代码更新也非常频繁，个人比较看好。</p>
+<h4 id="chromeless安装"><a href="#chromeless安装" class="headerlink" title="chromeless安装"></a><a href="#chromeless安装" title="chromeless安装"></a>chromeless安装</h4><p>chromeless对nodejs版本要求是&gt;8.2(centos7下node7.6测试可以)，因此需要先升级nodejs，升级方法参考前文；升级完以后，再安装chromeless项目环境。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">mkdir chromeless_test</div><div class="line"><span class="built_in">cd</span> chromeless_test</div><div class="line">npm init</div><div class="line">npm install chromeless</div></pre></td></tr></table></figure>
+
+<h4 id="chromeless使用"><a href="#chromeless使用" class="headerlink" title="chromeless使用"></a><a href="#chromeless使用" title="chromeless使用"></a>chromeless使用</h4><p>官方API文档：<a href="https://github.com/graphcool/chromeless/blob/master/docs/api.md#api-goto" target="_blank" rel="noopener">https://github.com/graphcool/chromeless/blob/master/docs/api.md#api-goto</a><br>在线代码运行环境：<a href="https://chromeless.netlify.com/#src=" target="_blank" rel="noopener">https://chromeless.netlify.com</a></p>
+<p>创建chromeless_test.js,写入：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line">const &#123; Chromeless &#125; = require(<span class="string">‘chromeless’</span>)</div><div class="line"></div><div class="line">async <span class="keyword">function</span> <span class="function"><span class="title">run</span></span>() &#123;</div><div class="line">  const chromeless = new Chromeless()</div><div class="line"></div><div class="line">  const screenshot = await chromeless</div><div class="line">    .goto(<span class="string">‘<a href="https://www.baidu.com&#39;" target="_blank" rel="noopener">https://www.baidu.com&#39;</a></span>)</div><div class="line">    //.<span class="built_in">type</span>(<span class="string">‘chromeless’</span>, <span class="string">‘input[name=”q”]’</span>)</div><div class="line">    //.press(13)</div><div class="line">    //.<span class="built_in">wait</span>(<span class="string">‘#resultStats’</span>)</div><div class="line">    .screenshot()</div><div class="line"></div><div class="line">  console.log(screenshot) // prints <span class="built_in">local</span> file path or S3 url</div><div class="line"></div><div class="line">  await chromeless.end()</div><div class="line">&#125;</div><div class="line"></div><div class="line">run().catch(console.error.bind(console))</div></pre></td></tr></table></figure>
+
+<p>运行代码：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">nohup google-chrome –headless –remote-debugging-port=9222 &amp; <span class="comment">#开启本地headless chrome</span></div><div class="line">node chromeless_test.js</div></pre></td></tr></table></figure>
+
+<p><code>注意：在运行chromeless前，需要先安装headless chrome，并且需要在本地开启--remote-debugging-port=9222，监听本地9222端口；chromeless也支持使用远程的headless chrome</code></p>
+<h4 id="pychrome工具"><a href="#pychrome工具" class="headerlink" title="pychrome工具"></a><a href="#pychrome工具" title="pychrome工具"></a>pychrome工具</h4><p><code>暂没有研究，尽情期待！</code></p>
+<h3 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a><a href="#常见问题" title="常见问题"></a>常见问题</h3><h4 id="Linux截图中文字体变方块如何解决？"><a href="#Linux截图中文字体变方块如何解决？" class="headerlink" title="Linux截图中文字体变方块如何解决？"></a><a href="#Linux截图中文字体变方块如何解决？" title="Linux截图中文字体变方块如何解决？"></a>Linux截图中文字体变方块如何解决？</h4><p>出现这类问题主要是因为linux服务器字体缺失的问题，解决方案是将字体文件copy到linux服务器/usr/share/fonts/zh_CN目录下。</p>
+<p>第一步：从windows或者mac上获取字体文件，mac上的字体文件地址为：/Library/Fonts，windows字体地址为：c盘下的Windows/Fonts。将Fonts目录打包上传到linux服务器/usr/share/fonts/zh_CN目录下，然后解压。</p>
+<p>第二步：设置权限</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">chmod -R 755 /usr/share/fonts/zh_CN</div></pre></td></tr></table></figure>
+
+<p>第三步：生成fonts.scale</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">yum -y install ttmkfdir</div><div class="line">ttmkfdir -e /usr/share/X11/fonts/encodings/encodings.dir</div></pre></td></tr></table></figure>
+
+<p>第四步：修改字体配置文件</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">vim /etc/fonts/fonts.conf</div><div class="line"></div><div class="line"></div><div class="line">在&lt;dir&gt;….&lt;/dir&gt;列表中添加字体</div><div class="line"></div><div class="line">如：&lt;dir&gt;/usr/share/fonts/zh_CN/Fonts&lt;/dir&gt;</div></pre></td></tr></table></figure>
+
+<p>第五步：刷新字体缓存</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">fc</span>-cache</div></pre></td></tr></table></figure>
+
+<h4 id="命令行运行headless-chrome需要使用–disable-gpu参数吗？"><a href="#命令行运行headless-chrome需要使用–disable-gpu参数吗？" class="headerlink" title="命令行运行headless chrome需要使用–disable-gpu参数吗？"></a><a href="#命令行运行headless-chrome需要使用–disable-gpu参数吗？" title="命令行运行headless chrome需要使用–disable-gpu参数吗？"></a>命令行运行headless chrome需要使用–disable-gpu参数吗？</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">目前–<span class="built_in">disable</span>-gpu 标志在处理一些bug时是需要的，在未来版本的 Chrome 中就不需要了。</div></pre></td></tr></table></figure>
+
+<h4 id="系统仍然需要安装Xvfb吗？"><a href="#系统仍然需要安装Xvfb吗？" class="headerlink" title="系统仍然需要安装Xvfb吗？"></a><a href="#系统仍然需要安装Xvfb吗？" title="系统仍然需要安装Xvfb吗？"></a>系统仍然需要安装Xvfb吗？</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">不需要，Headless Chrome 不使用窗口，所以不需要像 Xvfb 这样的显示服务器。</div><div class="line"></div><div class="line">你问什么是 Xvfb？</div><div class="line">Xvfb 是一个用于类 Unix 系统的运行于内存之内的显示服务器，可以让你运行图形应用程序（如 Chrome），而无需附加的物理显示器。许多人使用 Xvfb 运行早期版本的 Chrome 进行 “headless” 测试。</div></pre></td></tr></table></figure>
+
+<h4 id="如何创建一个运行-Headless-Chrome-的-Docker-容器？"><a href="#如何创建一个运行-Headless-Chrome-的-Docker-容器？" class="headerlink" title="如何创建一个运行 Headless Chrome 的 Docker 容器？"></a><a href="#如何创建一个运行-Headless-Chrome-的-Docker-容器？" title="如何创建一个运行 Headless Chrome 的 Docker 容器？"></a>如何创建一个运行 Headless Chrome 的 Docker 容器？</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">查看 lighthouse-ci。它有一个使用 Ubuntu 作为基础镜像的 Dockerfile 示例，并且在 App Engine Flexible 容器中安装和运行了 Lighthouse。</div></pre></td></tr></table></figure>
+
+<h4 id="headless-chrome和-PhantomJS-有什么关系？"><a href="#headless-chrome和-PhantomJS-有什么关系？" class="headerlink" title="headless chrome和 PhantomJS 有什么关系？"></a><a href="#headless-chrome和-PhantomJS-有什么关系？" title="headless chrome和 PhantomJS 有什么关系？"></a>headless chrome和 PhantomJS 有什么关系？</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Headless Chrome 和 PhantomJS 是类似的工具。它们都可以用来在无需显示的环境中进行自动化测试。两者的主要不同在于 Phantom 使用了一个较老版本的 WebKit 作为它的渲染引擎，而 Headless Chrome 使用了最新版本的 Blink。</div></pre></td></tr></table></figure>
+
+<p><code>下篇将介绍分布式漏扫爬虫框架的设计与实现，以及写爬虫过程中需要注意的点</code></p>
+<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a><a href="#参考文章" title="参考文章"></a>参考文章</h3><p><a href="https://zhuanlan.zhihu.com/p/29207391" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/29207391</a><br><a href="https://developers.google.com/web/updates/2017/04/headless-chrome" target="_blank" rel="noopener">https://developers.google.com/web/updates/2017/04/headless-chrome</a><br><a href="https://juejin.im/entry/58fd5e645c497d005803b6a4" target="_blank" rel="noopener">https://juejin.im/entry/58fd5e645c497d005803b6a4</a><br><a href="http://csbun.github.io/blog/2017/09/puppeteer/" target="_blank" rel="noopener">http://csbun.github.io/blog/2017/09/puppeteer/</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/爬虫技术/" rel="tag"># 爬虫技术</a>
+          
+            <a href="/tags/Headless-Chrome/" rel="tag"># Headless Chrome</a>
+          
+            <a href="/tags/Puppeteer/" rel="tag"># Puppeteer</a>
+          
+            <a href="/tags/pychrome/" rel="tag"># pychrome</a>
+          
+            <a href="/tags/chromeless/" rel="tag"># chromeless</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/06/24/Supervisord管理进程实践/" rel="next" title="Supervisord管理进程实践">
+                <i class="fa fa-chevron-left"></i> Supervisord管理进程实践
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/07/26/Nginx配置相关笔记/" rel="prev" title="Nginx配置相关笔记">
+                Nginx配置相关笔记 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">褚成志</p>
+              <p class="site-description motion-element" itemprop="description">关注互联网的科技博客</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">67</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-name">分类</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">38</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Headless-Chrome-介绍"><span class="nav-number">1.</span> <span class="nav-text">Headless Chrome 介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Headless-Chrome-安装"><span class="nav-number">2.</span> <span class="nav-text">Headless Chrome 安装</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#mac-install-headless-chrome"><span class="nav-number">2.1.</span> <span class="nav-text">mac install headless chrome</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#linux-install-headless-chrome"><span class="nav-number">2.2.</span> <span class="nav-text">linux install headless chrome</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Headless-Chrome-基础用法"><span class="nav-number">3.</span> <span class="nav-text">Headless Chrome 基础用法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#访问一个网页获取源码"><span class="nav-number">3.1.</span> <span class="nav-text">访问一个网页获取源码</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#访问一个网页将源码创建成一个PDF"><span class="nav-number">3.2.</span> <span class="nav-text">访问一个网页将源码创建成一个PDF</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#访问一个网页并截图"><span class="nav-number">3.3.</span> <span class="nav-text">访问一个网页并截图</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#访问一个网页并进行js交互（REPL模式）"><span class="nav-number">3.4.</span> <span class="nav-text">访问一个网页并进行js交互（REPL模式）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#启动一个监听端口"><span class="nav-number">3.5.</span> <span class="nav-text">启动一个监听端口</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Headless-Chrome-API"><span class="nav-number">4.</span> <span class="nav-text">Headless Chrome API</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#puppeteer-介绍"><span class="nav-number">4.1.</span> <span class="nav-text">puppeteer 介绍</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#puppeteer-安装"><span class="nav-number">4.2.</span> <span class="nav-text">puppeteer 安装</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#安装升级nodejs与npm"><span class="nav-number">4.2.1.</span> <span class="nav-text">安装升级nodejs与npm</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#puppeteer-使用"><span class="nav-number">4.3.</span> <span class="nav-text">puppeteer 使用</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#打印用户代理："><span class="nav-number">4.3.1.</span> <span class="nav-text">打印用户代理：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#获取页面的屏幕截图："><span class="nav-number">4.3.2.</span> <span class="nav-text">获取页面的屏幕截图：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#发送POST请求获取源码"><span class="nav-number">4.3.3.</span> <span class="nav-text">发送POST请求获取源码</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#安装puppeteer报错"><span class="nav-number">4.3.4.</span> <span class="nav-text">安装puppeteer报错</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#运行puppeteer报错处理"><span class="nav-number">4.3.5.</span> <span class="nav-text">运行puppeteer报错处理</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#pyppeteer"><span class="nav-number">4.4.</span> <span class="nav-text">pyppeteer</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#pyppeteer安装"><span class="nav-number">4.4.1.</span> <span class="nav-text">pyppeteer安装</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#pyppeteer简单的例子"><span class="nav-number">4.4.2.</span> <span class="nav-text">pyppeteer简单的例子</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#pyppeteer报错处理"><span class="nav-number">4.4.3.</span> <span class="nav-text">pyppeteer报错处理</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#chrome-remote-interface工具"><span class="nav-number">4.5.</span> <span class="nav-text">chrome-remote-interface工具</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#chromeless介绍"><span class="nav-number">4.6.</span> <span class="nav-text">chromeless介绍</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#chromeless安装"><span class="nav-number">4.7.</span> <span class="nav-text">chromeless安装</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#chromeless使用"><span class="nav-number">4.8.</span> <span class="nav-text">chromeless使用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#pychrome工具"><span class="nav-number">4.9.</span> <span class="nav-text">pychrome工具</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#常见问题"><span class="nav-number">5.</span> <span class="nav-text">常见问题</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Linux截图中文字体变方块如何解决？"><span class="nav-number">5.1.</span> <span class="nav-text">Linux截图中文字体变方块如何解决？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#命令行运行headless-chrome需要使用–disable-gpu参数吗？"><span class="nav-number">5.2.</span> <span class="nav-text">命令行运行headless chrome需要使用–disable-gpu参数吗？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#系统仍然需要安装Xvfb吗？"><span class="nav-number">5.3.</span> <span class="nav-text">系统仍然需要安装Xvfb吗？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#如何创建一个运行-Headless-Chrome-的-Docker-容器？"><span class="nav-number">5.4.</span> <span class="nav-text">如何创建一个运行 Headless Chrome 的 Docker 容器？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#headless-chrome和-PhantomJS-有什么关系？"><span class="nav-number">5.5.</span> <span class="nav-text">headless chrome和 PhantomJS 有什么关系？</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考文章"><span class="nav-number">6.</span> <span class="nav-text">参考文章</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">褚成志</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,1 +1,744 @@
-<!-- build time:Wed Oct 17 2018 05:57:13 GMT+0000 (Coordinated Universal Time) --><!DOCTYPE html><html class="theme-next muse use-motion" lang="zh-Hans"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"><meta name="theme-color" content="#222"><meta http-equiv="Cache-Control" content="no-transform"><meta http-equiv="Cache-Control" content="no-siteapp"><link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"><link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css"><link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css"><link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4"><link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4"><link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4"><link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222"><meta name="keywords" content="tag1,tag2,"><link rel="alternate" href="/atom.xml" title="褚成志的博客" type="application/atom+xml"><meta name="description" content="This is a summary"><meta name="keywords" content="tag1,tag2"><meta property="og:type" content="article"><meta property="og:title" content="Nginx反向代理"><meta property="og:url" content="http://www.chucz.club/2017/03/21/Nginx反向代理/index.html"><meta property="og:site_name" content="褚成志的博客"><meta property="og:description" content="This is a summary"><meta property="og:locale" content="zh-Hans"><meta property="og:image" content="http://nginx.org/nginx.png"><meta property="og:updated_time" content="2018-09-29T10:11:30.775Z"><meta name="twitter:card" content="summary"><meta name="twitter:title" content="Nginx反向代理"><meta name="twitter:description" content="This is a summary"><meta name="twitter:image" content="http://nginx.org/nginx.png"><script type="text/javascript" id="hexo.configurations">var NexT=window.NexT||{},CONFIG={root:"/",scheme:"Muse",version:"5.1.4",sidebar:{position:"left",display:"post",offset:12,b2t:!1,scrollpercent:!1,onmobile:!1},fancybox:!0,tabs:!0,motion:{enable:!0,async:!1,transition:{post_block:"fadeIn",post_header:"slideDownIn",post_body:"slideDownIn",coll_header:"slideLeftIn",sidebar:"slideUpIn"}},duoshuo:{userId:"0",author:"博主"},algolia:{applicationID:"ZM9CKN0W4R",apiKey:"5bc5819b162e1cd440b44b16ef207a44",indexName:"chucz.club",hits:{per_page:10},labels:{input_placeholder:"Search for Posts",hits_empty:"We didn't find any results for the search: ${query}",hits_stats:"${hits} results found in ${time} ms"}}}</script><link rel="canonical" href="http://www.chucz.club/2017/03/21/Nginx反向代理/"><title>Nginx反向代理 | 褚成志的博客</title></head><body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans"><div class="container sidebar-position-left page-post-detail"><div class="headband"></div><header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="header-inner"><div class="site-brand-wrapper"><div class="site-meta"><div class="custom-logo-site-title"><a href="/" class="brand" rel="start"><span class="logo-line-before"><i></i></span> <span class="site-title">褚成志的博客</span> <span class="logo-line-after"><i></i></span></a></div><p class="site-subtitle">青青子衿, 悠悠我心</p></div><div class="site-nav-toggle"><button><span class="btn-bar"></span> <span class="btn-bar"></span> <span class="btn-bar"></span></button></div></div><nav class="site-nav"><ul id="menu" class="menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i><br>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i><br>归档</a></li></ul></nav></div></header><main id="main" class="main"><div class="main-inner"><div class="content-wrap"><div id="content" class="content"><div id="posts" class="posts-expand"><article class="post post-type-normal" itemscope itemtype="http://schema.org/Article"><div class="post-block"><link itemprop="mainEntityOfPage" href="http://www.chucz.club/2017/03/21/Nginx反向代理/"><span hidden itemprop="author" itemscope itemtype="http://schema.org/Person"><meta itemprop="name" content="褚成志"><meta itemprop="description" content=""><meta itemprop="image" content="/images/avatar.gif"></span><span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization"><meta itemprop="name" content="褚成志的博客"></span><header class="post-header"><h1 class="post-title" itemprop="name headline">Nginx反向代理</h1><div class="post-meta"><span class="post-time"><span class="post-meta-item-icon"><i class="fa fa-calendar-o"></i> </span><span class="post-meta-item-text">发表于</span> <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-21T22:39:50+00:00">2017-03-22 </time></span><span class="post-category"><span class="post-meta-divider">|</span> <span class="post-meta-item-icon"><i class="fa fa-folder-o"></i> </span><span class="post-meta-item-text">分类于</span> <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/NLP/" itemprop="url" rel="index"><span itemprop="name">NLP</span></a></span></span></div></header><div class="post-body" itemprop="articleBody"><p>This is a summary<br><a id="more"></a></p><h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a><a href="#引言" title="引言"></a>引言</h2><p><img src="http://nginx.org/nginx.png" alt="Nginx"><br>网上讲Nginx的文章也很多，各种入门的深入的也都有，这里不做太多过深的研究，只是罗列一下我在配置过程中遇到的问题以及如何解决的。</p><h2 id="反向代理"><a href="#反向代理" class="headerlink" title="反向代理"></a><a href="#反向代理" title="反向代理"></a>反向代理</h2><p>代理估计大家也都知道是什么意思，按照字面意思反向代理的意思也不难理解，Nginx作为一个高性能的HTTP和反向代理服务器，现在已经被各大互联网公司采用，也可以作负载均衡，它的性能各方面比Apache优势要明显很多，所以这也是它现在这么受欢迎的原因。</p><h2 id="端口的转发"><a href="#端口的转发" class="headerlink" title="端口的转发"></a><a href="#端口的转发" title="端口的转发"></a>端口的转发</h2><p>如果你的Server不安装Nginx，那么备案之后，以及默认配置，外网访问的都是80端口，当然你也可以把服务启动起来，指定80端口就好了，外面用户敲域名回车也能访问你的网站。但是如果一台Server想通过多个不同端口启动多个服务，配置很多的子域名打到对应的端口的服务的时候，Nginx就必须搞起来了。</p><h2 id="安装Nginx"><a href="#安装Nginx" class="headerlink" title="安装Nginx"></a><a href="#安装Nginx" title="安装Nginx"></a>安装Nginx</h2><p>一般新买的服务器都会有Yum环境，如果没有，自行安装下，Yum命令是在Fedora和RedHat以及SUSE中基于rpm的软件包管理器，主要是方便系统管理人员更精细化更快速的管理和安装各种软件包，Yum环境有了之后，就可以按照这个链接<a href="https://mos.meituan.com/library/18/how-to-install-lnmp-on-centos7/" target="_blank" rel="noopener">Nginx安装教程</a>给的教程安装了。</p><h2 id="增加子域名"><a href="#增加子域名" class="headerlink" title="增加子域名"></a><a href="#增加子域名" title="增加子域名"></a>增加子域名</h2><p>域名在哪里买的，就去那个服务商网站登录，进入域名解析设置里面，多设置一个A记录类型，主机记录是你起的子域名名称(举个 🌰 ：你设成abc，那么你就有了一个abc.domain.com的子域名)，然后记录值还是你的Server的公网ip地址，TTL选择最短的时间，然后保存，一般很快就能生效了，这样你就给你的域名开了一个新的子域名。</p><h2 id="Nginx-conf如何配置"><a href="#Nginx-conf如何配置" class="headerlink" title="Nginx.conf如何配置"></a><a href="#Nginx-conf如何配置" title="Nginx.conf如何配置"></a>Nginx.conf如何配置</h2><p>举个 🌰 ，就拿我自己的站点来说，除了默认的codefilled.com和www以外，我还有一个<a href="http://m.codefilled.com/" target="_blank" rel="noopener">m.codefilled.com</a>的子域，现在我想启动两个服务，端口号一个是4000和3000，主站服务端口号4000（但是用户默认访问的是80），m站的端口指到3000端口上面启动的服务，这样的需求，Nginx应该如何配置，可以看一下下面的配置代码:</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">include /etc/nginx/conf.d/<em>.conf;</em></span><br><span class="line">server_names_<span class="built_in">hash</span>_bucket_size 64;</span><br><span class="line">server &#123;</span><br><span class="line">    listen       80 default_server;</span><br><span class="line">    listen       [::]:80 default_server;</span><br><span class="line">    server_name  codefilled.com   <a href="http://www.codefilled.com" target="_blank" rel="noopener">www.codefilled.com</a>; /配置多个，也可以拿正则来匹配，例如：www.<em> </em>/</span><br><span class="line">    <span class="comment"># Load configuration files for the default server block.</span></span><br><span class="line">    include /etc/nginx/default.d/*.conf;</span><br><span class="line"></span><br><span class="line">    location / &#123;</span><br><span class="line">       proxy_pass  <a href="http://127.0.0.1:4000" target="_blank" rel="noopener">http://127.0.0.1:4000</a>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    error_page 404 /404.html;</span><br><span class="line">        location = /40x.html &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    error_page 500 502 503 504 /50x.html;</span><br><span class="line">        location = /50x.html &#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>*注：上面的配置是监听的80端口，3w和没有3w的80统一都转发到4000端口的服务，server_names_hash_bucket_size 64 增加这行的原因是添加多个server_name之后，保存Nginx配置会提示server_names_hash_bucket_size不足，把size变大之后就能解决，如果64不够，你再用128这样就可以了。</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    listen 80;</span><br><span class="line">    server_name m.codefilled.com;</span><br><span class="line"></span><br><span class="line">    include /etc/nginx/default.d/*.conf;</span><br><span class="line"></span><br><span class="line">    location / &#123;</span><br><span class="line">         proxy_pass <a href="http://127.0.0.1:3000" target="_blank" rel="noopener">http://127.0.0.1:3000</a>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>*注：上面这是配置是把m站的80端口代理到3000。</p><p>修改完etc/nginx/nginx.conf之后，保存，执行下面的命令:</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ nginx <span class="_">-s</span> reload</span><br></pre></td></tr></table></figure><p>就能生效了，然后启动各自服务的守护进程，就能正常访问了。</p><h2 id="Nginx配置整站gzip压缩"><a href="#Nginx配置整站gzip压缩" class="headerlink" title="Nginx配置整站gzip压缩"></a><a href="#Nginx配置整站gzip压缩" title="Nginx配置整站gzip压缩"></a>Nginx配置整站gzip压缩</h2><p>gzip是一种改进web应用程序性能的一种压缩技术，大流量的WEB站点常常使用GZIP压缩技术来让用户感受更快的速度。这一般是指服务器中安装的一个功能，当有人来访问这个服务器中的网站时，服务器中的这个功能就将网页内容压缩后传输到来访的电脑浏览器中显示出来。一般对纯文本内容可压缩到原大小的40%左右。这样传输就快了，效果就是你点击网址后会很快的显示出来。配置的代码如下：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># open gzip</span></span><br><span class="line">gzip                on;</span><br><span class="line">gzip_min_length     1k;</span><br><span class="line">gzip_buffers        4 16k;</span><br><span class="line"><span class="comment"># gzip_http_version 1.0;</span></span><br><span class="line">gzip_comp_level     2;</span><br><span class="line">gzip_types   text/plain application/x-javascript application/javascript  text/css application/xml text/javascript image/jpeg image/jpg image/png image/gif</span><br><span class="line">gzip_vary    on;</span><br><span class="line">gzip_<span class="built_in">disable</span> <span class="string">“MSIE [1-6].“</span>;</span><br></pre></td></tr></table></figure><p>大致意思就是开启gzip，大于1K的才进行压缩，压缩级别1-10，压缩类型js、主文档、jpg、png、css、gif，IE1~6对gzip支持不好，关闭。</p><h2 id="查看Nginx哪些端口被占用"><a href="#查看Nginx哪些端口被占用" class="headerlink" title="查看Nginx哪些端口被占用"></a><a href="#查看Nginx哪些端口被占用" title="查看Nginx哪些端口被占用"></a>查看Nginx哪些端口被占用</h2><p>执行 $ss -tnl</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$ss</span> -tnl</span><br><span class="line">State      Recv-Q Send-Q         Local Address:Port        Peer Address:Port</span><br><span class="line">LISTEN     0      128            <em>:80                      </em>:<em></em></span><br><span class="line">LISTEN     0      128            :22                      <em>:</em></span><br><span class="line">LISTEN     0      100            127.0.0.1:25              <em>:</em></span><br><span class="line">LISTEN     0      128            <em>:4000                    </em>:<em></em></span><br><span class="line">LISTEN     0      128            :::8080                   :::</span><br><span class="line">LISTEN     0      128            :::80                     :::<em></em></span><br><span class="line">LISTEN     0      128            :::22                     :::</span><br><span class="line">LISTEN     0      128            :::3000                   :::*</span><br></pre></td></tr></table></figure><p>就能看到结果列表了</p><p>完…</p></div><footer class="post-footer"><div class="post-tags"><a href="/tags/tag1/" rel="tag"># tag1</a> <a href="/tags/tag2/" rel="tag"># tag2</a></div><div class="post-nav"><div class="post-nav-next post-nav-item"><a href="/2016/10/01/关于微信小程序的思考/" rel="next" title="关于微信小程序的思考"><i class="fa fa-chevron-left"></i> 关于微信小程序的思考</a></div><span class="post-nav-divider"></span><div class="post-nav-prev post-nav-item"><a href="/2017/03/22/参加Velocity-2016感受和收获/" rel="prev" title="参加Velocity-2016感受和收获">参加Velocity-2016感受和收获 <i class="fa fa-chevron-right"></i></a></div></div></footer></div></article><div class="post-spread"></div></div></div></div><div class="sidebar-toggle"><div class="sidebar-toggle-line-wrap"><span class="sidebar-toggle-line sidebar-toggle-line-first"></span> <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span> <span class="sidebar-toggle-line sidebar-toggle-line-last"></span></div></div><aside id="sidebar" class="sidebar"><div class="sidebar-inner"><ul class="sidebar-nav motion-element"><li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">文章目录</li><li class="sidebar-nav-overview" data-target="site-overview-wrap">站点概览</li></ul><section class="site-overview-wrap sidebar-panel"><div class="site-overview"><div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person"><p class="site-author-name" itemprop="name">褚成志</p><p class="site-description motion-element" itemprop="description">关注互联网的科技博客</p></div><nav class="site-state motion-element"><div class="site-state-item site-state-posts"><a href="/archives/"><span class="site-state-item-count">67</span> <span class="site-state-item-name">日志</span></a></div><div class="site-state-item site-state-categories"><span class="site-state-item-count">1</span> <span class="site-state-item-name">分类</span></div><div class="site-state-item site-state-tags"><span class="site-state-item-count">38</span> <span class="site-state-item-name">标签</span></div></nav><div class="feed-link motion-element"><a href="/atom.xml" rel="alternate"><i class="fa fa-rss"></i> RSS</a></div></div></section><section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active"><div class="post-toc"><div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#引言"><span class="nav-number">1.</span> <span class="nav-text">引言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#反向代理"><span class="nav-number">2.</span> <span class="nav-text">反向代理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#端口的转发"><span class="nav-number">3.</span> <span class="nav-text">端口的转发</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装Nginx"><span class="nav-number">4.</span> <span class="nav-text">安装Nginx</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#增加子域名"><span class="nav-number">5.</span> <span class="nav-text">增加子域名</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Nginx-conf如何配置"><span class="nav-number">6.</span> <span class="nav-text">Nginx.conf如何配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Nginx配置整站gzip压缩"><span class="nav-number">7.</span> <span class="nav-text">Nginx配置整站gzip压缩</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#查看Nginx哪些端口被占用"><span class="nav-number">8.</span> <span class="nav-text">查看Nginx哪些端口被占用</span></a></li></ol></div></div></section></div></aside></div></main><footer id="footer" class="footer"><div class="footer-inner"><div class="copyright">&copy; <span itemprop="copyrightYear">2018</span> <span class="with-love"><i class="fa fa-user"></i> </span><span class="author" itemprop="copyrightHolder">褚成志</span></div><div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div><span class="post-meta-divider">|</span><div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div></div></footer><div class="back-to-top"><i class="fa fa-arrow-up"></i></div></div><script type="text/javascript">"[object Function]"!==Object.prototype.toString.call(window.Promise)&&(window.Promise=null)</script><script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script><script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script><script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script><script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script><script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script><script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script><script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script><script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script><script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script><script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script><script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script></body></html><!-- rebuild by neat -->
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="tag1,tag2," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="褚成志的博客" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="This is a summary">
+<meta name="keywords" content="tag1,tag2">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Nginx反向代理">
+<meta property="og:url" content="http://www.chucz.club/2017/03/21/Nginx反向代理/index.html">
+<meta property="og:site_name" content="褚成志的博客">
+<meta property="og:description" content="This is a summary">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://nginx.org/nginx.png">
+<meta property="og:updated_time" content="2018-09-29T10:11:30.775Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Nginx反向代理">
+<meta name="twitter:description" content="This is a summary">
+<meta name="twitter:image" content="http://nginx.org/nginx.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'ZM9CKN0W4R',
+      apiKey: '5bc5819b162e1cd440b44b16ef207a44',
+      indexName: 'chucz.club',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.chucz.club/2017/03/21/Nginx反向代理/"/>
+
+
+
+
+
+  <title>Nginx反向代理 | 褚成志的博客</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">褚成志的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">青青子衿, 悠悠我心</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.chucz.club/2017/03/21/Nginx反向代理/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="褚成志">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="褚成志的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Nginx反向代理</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-21T22:39:50+00:00">
+                2017-03-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/NLP/" itemprop="url" rel="index">
+                    <span itemprop="name">NLP</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p> This is a summary<br><a id="more"></a></p>
+<h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a><a href="#引言" title="引言"></a>引言</h2><p><img src="http://nginx.org/nginx.png" alt="Nginx"><br>网上讲Nginx的文章也很多，各种入门的深入的也都有，这里不做太多过深的研究，只是罗列一下我在配置过程中遇到的问题以及如何解决的。</p>
+<h2 id="反向代理"><a href="#反向代理" class="headerlink" title="反向代理"></a><a href="#反向代理" title="反向代理"></a>反向代理</h2><p>代理估计大家也都知道是什么意思，按照字面意思反向代理的意思也不难理解，Nginx作为一个高性能的HTTP和反向代理服务器，现在已经被各大互联网公司采用，也可以作负载均衡，它的性能各方面比Apache优势要明显很多，所以这也是它现在这么受欢迎的原因。</p>
+<h2 id="端口的转发"><a href="#端口的转发" class="headerlink" title="端口的转发"></a><a href="#端口的转发" title="端口的转发"></a>端口的转发</h2><p>如果你的Server不安装Nginx，那么备案之后，以及默认配置，外网访问的都是80端口，当然你也可以把服务启动起来，指定80端口就好了，外面用户敲域名回车也能访问你的网站。但是如果一台Server想通过多个不同端口启动多个服务，配置很多的子域名打到对应的端口的服务的时候，Nginx就必须搞起来了。</p>
+<h2 id="安装Nginx"><a href="#安装Nginx" class="headerlink" title="安装Nginx"></a><a href="#安装Nginx" title="安装Nginx"></a>安装Nginx</h2><p>一般新买的服务器都会有Yum环境，如果没有，自行安装下，Yum命令是在Fedora和RedHat以及SUSE中基于rpm的软件包管理器，主要是方便系统管理人员更精细化更快速的管理和安装各种软件包，Yum环境有了之后，就可以按照这个链接<a href="https://mos.meituan.com/library/18/how-to-install-lnmp-on-centos7/" target="_blank" rel="noopener">Nginx安装教程</a>给的教程安装了。</p>
+<h2 id="增加子域名"><a href="#增加子域名" class="headerlink" title="增加子域名"></a><a href="#增加子域名" title="增加子域名"></a>增加子域名</h2><p>域名在哪里买的，就去那个服务商网站登录，进入域名解析设置里面，多设置一个A记录类型，主机记录是你起的子域名名称(举个 🌰 ：你设成abc，那么你就有了一个abc.domain.com的子域名)，然后记录值还是你的Server的公网ip地址，TTL选择最短的时间，然后保存，一般很快就能生效了，这样你就给你的域名开了一个新的子域名。</p>
+<h2 id="Nginx-conf如何配置"><a href="#Nginx-conf如何配置" class="headerlink" title="Nginx.conf如何配置"></a><a href="#Nginx-conf如何配置" title="Nginx.conf如何配置"></a>Nginx.conf如何配置</h2><p>举个 🌰 ，就拿我自己的站点来说，除了默认的codefilled.com和www以外，我还有一个<a href="http://m.codefilled.com/" target="_blank" rel="noopener">m.codefilled.com</a>的子域，现在我想启动两个服务，端口号一个是4000和3000，主站服务端口号4000（但是用户默认访问的是80），m站的端口指到3000端口上面启动的服务，这样的需求，Nginx应该如何配置，可以看一下下面的配置代码:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">include /etc/nginx/conf.d/<em>.conf;</em></span><br><span class="line">server_names_<span class="built_in">hash</span>_bucket_size 64;</span><br><span class="line">server &#123;</span><br><span class="line">    listen       80 default_server;</span><br><span class="line">    listen       [::]:80 default_server;</span><br><span class="line">    server_name  codefilled.com   <a href="http://www.codefilled.com" target="_blank" rel="noopener">www.codefilled.com</a>; /配置多个，也可以拿正则来匹配，例如：www.<em> </em>/</span><br><span class="line">    <span class="comment"># Load configuration files for the default server block.</span></span><br><span class="line">    include /etc/nginx/default.d/*.conf;</span><br><span class="line"></span><br><span class="line">    location / &#123;</span><br><span class="line">       proxy_pass  <a href="http://127.0.0.1:4000" target="_blank" rel="noopener">http://127.0.0.1:4000</a>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    error_page 404 /404.html;</span><br><span class="line">        location = /40x.html &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    error_page 500 502 503 504 /50x.html;</span><br><span class="line">        location = /50x.html &#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>*注：上面的配置是监听的80端口，3w和没有3w的80统一都转发到4000端口的服务，server_names_hash_bucket_size 64 增加这行的原因是添加多个server_name之后，保存Nginx配置会提示server_names_hash_bucket_size不足，把size变大之后就能解决，如果64不够，你再用128这样就可以了。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">server &#123;</span><br><span class="line">    listen 80;</span><br><span class="line">    server_name m.codefilled.com;</span><br><span class="line"></span><br><span class="line">    include /etc/nginx/default.d/*.conf;</span><br><span class="line"></span><br><span class="line">    location / &#123;</span><br><span class="line">         proxy_pass <a href="http://127.0.0.1:3000" target="_blank" rel="noopener">http://127.0.0.1:3000</a>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>*注：上面这是配置是把m站的80端口代理到3000。</p>
+<p>修改完etc/nginx/nginx.conf之后，保存，执行下面的命令:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ nginx <span class="_">-s</span> reload</span><br></pre></td></tr></table></figure>
+
+<p>就能生效了，然后启动各自服务的守护进程，就能正常访问了。</p>
+<h2 id="Nginx配置整站gzip压缩"><a href="#Nginx配置整站gzip压缩" class="headerlink" title="Nginx配置整站gzip压缩"></a><a href="#Nginx配置整站gzip压缩" title="Nginx配置整站gzip压缩"></a>Nginx配置整站gzip压缩</h2><p>gzip是一种改进web应用程序性能的一种压缩技术，大流量的WEB站点常常使用GZIP压缩技术来让用户感受更快的速度。这一般是指服务器中安装的一个功能，当有人来访问这个服务器中的网站时，服务器中的这个功能就将网页内容压缩后传输到来访的电脑浏览器中显示出来。一般对纯文本内容可压缩到原大小的40%左右。这样传输就快了，效果就是你点击网址后会很快的显示出来。配置的代码如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># open gzip</span></span><br><span class="line">gzip                on;</span><br><span class="line">gzip_min_length     1k;</span><br><span class="line">gzip_buffers        4 16k;</span><br><span class="line"><span class="comment"># gzip_http_version 1.0;</span></span><br><span class="line">gzip_comp_level     2;</span><br><span class="line">gzip_types   text/plain application/x-javascript application/javascript  text/css application/xml text/javascript image/jpeg image/jpg image/png image/gif</span><br><span class="line">gzip_vary    on;</span><br><span class="line">gzip_<span class="built_in">disable</span> <span class="string">“MSIE [1-6].“</span>;</span><br></pre></td></tr></table></figure>
+
+<p>大致意思就是开启gzip，大于1K的才进行压缩，压缩级别1-10，压缩类型js、主文档、jpg、png、css、gif，IE1~6对gzip支持不好，关闭。</p>
+<h2 id="查看Nginx哪些端口被占用"><a href="#查看Nginx哪些端口被占用" class="headerlink" title="查看Nginx哪些端口被占用"></a><a href="#查看Nginx哪些端口被占用" title="查看Nginx哪些端口被占用"></a>查看Nginx哪些端口被占用</h2><p>执行 $ss -tnl</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$ss</span> -tnl</span><br><span class="line">State      Recv-Q Send-Q         Local Address:Port        Peer Address:Port</span><br><span class="line">LISTEN     0      128            <em>:80                      </em>:<em></em></span><br><span class="line">LISTEN     0      128            :22                      <em>:</em></span><br><span class="line">LISTEN     0      100            127.0.0.1:25              <em>:</em></span><br><span class="line">LISTEN     0      128            <em>:4000                    </em>:<em></em></span><br><span class="line">LISTEN     0      128            :::8080                   :::</span><br><span class="line">LISTEN     0      128            :::80                     :::<em></em></span><br><span class="line">LISTEN     0      128            :::22                     :::</span><br><span class="line">LISTEN     0      128            :::3000                   :::*</span><br></pre></td></tr></table></figure>
+
+<p>就能看到结果列表了</p>
+<p>完…</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/tag1/" rel="tag"># tag1</a>
+          
+            <a href="/tags/tag2/" rel="tag"># tag2</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/10/01/关于微信小程序的思考/" rel="next" title="关于微信小程序的思考">
+                <i class="fa fa-chevron-left"></i> 关于微信小程序的思考
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/03/22/参加Velocity-2016感受和收获/" rel="prev" title="参加Velocity-2016感受和收获">
+                参加Velocity-2016感受和收获 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">褚成志</p>
+              <p class="site-description motion-element" itemprop="description">关注互联网的科技博客</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">67</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-name">分类</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">38</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#引言"><span class="nav-number">1.</span> <span class="nav-text">引言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#反向代理"><span class="nav-number">2.</span> <span class="nav-text">反向代理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#端口的转发"><span class="nav-number">3.</span> <span class="nav-text">端口的转发</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装Nginx"><span class="nav-number">4.</span> <span class="nav-text">安装Nginx</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#增加子域名"><span class="nav-number">5.</span> <span class="nav-text">增加子域名</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Nginx-conf如何配置"><span class="nav-number">6.</span> <span class="nav-text">Nginx.conf如何配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Nginx配置整站gzip压缩"><span class="nav-number">7.</span> <span class="nav-text">Nginx配置整站gzip压缩</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#查看Nginx哪些端口被占用"><span class="nav-number">8.</span> <span class="nav-text">查看Nginx哪些端口被占用</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">褚成志</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

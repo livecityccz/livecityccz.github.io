@@ -1,1 +1,774 @@
-<!-- build time:Wed Oct 17 2018 05:57:12 GMT+0000 (Coordinated Universal Time) --><!DOCTYPE html><html class="theme-next muse use-motion" lang="zh-Hans"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"><meta name="theme-color" content="#222"><meta http-equiv="Cache-Control" content="no-transform"><meta http-equiv="Cache-Control" content="no-siteapp"><link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"><link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css"><link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css"><link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4"><link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4"><link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4"><link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222"><meta name="keywords" content="ELK,"><link rel="alternate" href="/atom.xml" title="褚成志的博客" type="application/atom+xml"><meta name="description" content="自定义内置账号账户elastic为elasticsearch超级管理员，拥有所有权限账户kibana用于kibana组件获取相关信息用于web展示账户logstash_system用于logstash服务获取elasticsearch的监控数据注意：此步骤需先启动elasticsearch服务12345678910111213141516[elasticsearch@elasticsearch e"><meta name="keywords" content="ELK"><meta property="og:type" content="article"><meta property="og:title" content="ES内置账号密码修改、自定义角色自定义账号、ldap及AD认证"><meta property="og:url" content="http://www.chucz.club/2018/08/19/ES内置账号密码修改、自定义角色自定义账号、ldap及AD认证/index.html"><meta property="og:site_name" content="褚成志的博客"><meta property="og:description" content="自定义内置账号账户elastic为elasticsearch超级管理员，拥有所有权限账户kibana用于kibana组件获取相关信息用于web展示账户logstash_system用于logstash服务获取elasticsearch的监控数据注意：此步骤需先启动elasticsearch服务12345678910111213141516[elasticsearch@elasticsearch e"><meta property="og:locale" content="zh-Hans"><meta property="og:image" content="https://cos.leiyawu.com/img/elk/es_user.png"><meta property="og:updated_time" content="2018-09-28T08:25:28.616Z"><meta name="twitter:card" content="summary"><meta name="twitter:title" content="ES内置账号密码修改、自定义角色自定义账号、ldap及AD认证"><meta name="twitter:description" content="自定义内置账号账户elastic为elasticsearch超级管理员，拥有所有权限账户kibana用于kibana组件获取相关信息用于web展示账户logstash_system用于logstash服务获取elasticsearch的监控数据注意：此步骤需先启动elasticsearch服务12345678910111213141516[elasticsearch@elasticsearch e"><meta name="twitter:image" content="https://cos.leiyawu.com/img/elk/es_user.png"><script type="text/javascript" id="hexo.configurations">var NexT=window.NexT||{},CONFIG={root:"/",scheme:"Muse",version:"5.1.4",sidebar:{position:"left",display:"post",offset:12,b2t:!1,scrollpercent:!1,onmobile:!1},fancybox:!0,tabs:!0,motion:{enable:!0,async:!1,transition:{post_block:"fadeIn",post_header:"slideDownIn",post_body:"slideDownIn",coll_header:"slideLeftIn",sidebar:"slideUpIn"}},duoshuo:{userId:"0",author:"博主"},algolia:{applicationID:"ZM9CKN0W4R",apiKey:"5bc5819b162e1cd440b44b16ef207a44",indexName:"chucz.club",hits:{per_page:10},labels:{input_placeholder:"Search for Posts",hits_empty:"We didn't find any results for the search: ${query}",hits_stats:"${hits} results found in ${time} ms"}}}</script><link rel="canonical" href="http://www.chucz.club/2018/08/19/ES内置账号密码修改、自定义角色自定义账号、ldap及AD认证/"><title>ES内置账号密码修改、自定义角色自定义账号、ldap及AD认证 | 褚成志的博客</title></head><body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans"><div class="container sidebar-position-left page-post-detail"><div class="headband"></div><header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="header-inner"><div class="site-brand-wrapper"><div class="site-meta"><div class="custom-logo-site-title"><a href="/" class="brand" rel="start"><span class="logo-line-before"><i></i></span> <span class="site-title">褚成志的博客</span> <span class="logo-line-after"><i></i></span></a></div><p class="site-subtitle">青青子衿, 悠悠我心</p></div><div class="site-nav-toggle"><button><span class="btn-bar"></span> <span class="btn-bar"></span> <span class="btn-bar"></span></button></div></div><nav class="site-nav"><ul id="menu" class="menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i><br>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i><br>归档</a></li></ul></nav></div></header><main id="main" class="main"><div class="main-inner"><div class="content-wrap"><div id="content" class="content"><div id="posts" class="posts-expand"><article class="post post-type-normal" itemscope itemtype="http://schema.org/Article"><div class="post-block"><link itemprop="mainEntityOfPage" href="http://www.chucz.club/2018/08/19/ES内置账号密码修改、自定义角色自定义账号、ldap及AD认证/"><span hidden itemprop="author" itemscope itemtype="http://schema.org/Person"><meta itemprop="name" content="褚成志"><meta itemprop="description" content=""><meta itemprop="image" content="/images/avatar.gif"></span><span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization"><meta itemprop="name" content="褚成志的博客"></span><header class="post-header"><h1 class="post-title" itemprop="name headline">ES内置账号密码修改、自定义角色自定义账号、ldap及AD认证</h1><div class="post-meta"><span class="post-time"><span class="post-meta-item-icon"><i class="fa fa-calendar-o"></i> </span><span class="post-meta-item-text">发表于</span> <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-19T01:55:58+00:00">2018-08-19</time></span></div></header><div class="post-body" itemprop="articleBody"><h2 id="自定义内置账号"><a href="#自定义内置账号" class="headerlink" title="自定义内置账号"></a><a href="#自定义内置账号" title="自定义内置账号"></a>自定义内置账号</h2><ul><li>账户elastic为elasticsearch超级管理员，拥有所有权限</li><li>账户kibana用于kibana组件获取相关信息用于web展示</li><li>账户logstash_system用于logstash服务获取elasticsearch的监控数据</li><li>注意：此步骤需先启动elasticsearch服务</li></ul><p><img src="https://cos.leiyawu.com/img/elk/es_user.png" alt="es_user"></p><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">[elasticsearch@elasticsearch elasticsearch-6.0.0]$ ./bin/x-pack/setup-passwords interactive</span><br><span class="line">Initiating the setup of reserved<span class="built_in"> user </span>elastic,kibana,logstash_system passwords.</span><br><span class="line">You will be prompted <span class="keyword">to</span> enter passwords as the process progresses.</span><br><span class="line">Please confirm that you would like <span class="keyword">to</span> continue [y/N]y</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Enter password <span class="keyword">for</span> [elastic]: </span><br><span class="line">Reenter password <span class="keyword">for</span> [elastic]: </span><br><span class="line">Enter password <span class="keyword">for</span> [kibana]: </span><br><span class="line">Reenter password <span class="keyword">for</span> [kibana]: </span><br><span class="line">Enter password <span class="keyword">for</span> [logstash_system]: </span><br><span class="line">Reenter password <span class="keyword">for</span> [logstash_system]: </span><br><span class="line">Changed password <span class="keyword">for</span><span class="built_in"> user </span>[kibana]</span><br><span class="line">Changed password <span class="keyword">for</span><span class="built_in"> user </span>[logstash_system]</span><br><span class="line">Changed password <span class="keyword">for</span><span class="built_in"> user </span>[elastic]</span><br><span class="line">[elasticsearch@elasticsearch elasticsearch-6.0.0]$</span><br></pre></td></tr></table></figure><h2 id="验证内置账户访问"><a href="#验证内置账户访问" class="headerlink" title="验证内置账户访问"></a><a href="#验证内置账户访问" title="验证内置账户访问"></a>验证内置账户访问</h2><ul><li><p>若不提供用户名密码则返回401</p><figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">[elasticsearch@elasticsearch elasticsearch-<span class="number">6.0</span>.<span class="number">0</span>]$ curl <span class="string">‘<a href="http://10.59.30.96:9200/_cat/indices?pretty&#39;" target="_blank" rel="noopener">http://10.59.30.96:9200/_cat/indices?pretty&#39;</a></span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="string">“error”</span> : &#123;</span><br><span class="line">    <span class="string">“root_cause”</span> : [</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="string">“type”</span> : <span class="string">“security_exception”</span>,</span><br><span class="line">        <span class="string">“reason”</span> : <span class="string">“missing authentication token for REST request [/_cat/indices?pretty]”</span>,</span><br><span class="line">        <span class="string">“header”</span> : &#123;</span><br><span class="line">          <span class="string">“WWW-Authenticate”</span> : <span class="string">“Basic realm=\”</span>security\<span class="string">“ charset=\”</span>UTF-<span class="number">8</span>\<span class="string">“”</span></span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    ],</span><br><span class="line">    <span class="string">“type”</span> : <span class="string">“security_exception”</span>,</span><br><span class="line">    <span class="string">“reason”</span> : <span class="string">“missing authentication token for REST request [/_cat/indices?pretty]”</span>,</span><br><span class="line">    <span class="string">“header”</span> : &#123;</span><br><span class="line">      <span class="string">“WWW-Authenticate”</span> : <span class="string">“Basic realm=\”</span>security\<span class="string">“ charset=\”</span>UTF-<span class="number">8</span>\<span class="string">“”</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="string">“status”</span> : <span class="number">401</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p></p></li><li><p>提供相应用户信息后可访问，若用户权限不足则返回403</p></li></ul><p>使用logstash_system用户访问</p><figure class="highlight ada"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">[elasticsearch@elasticsearch elasticsearch-<span class="number">6.0</span>.<span class="number">0</span>]$ curl <span class="symbol">‘http</span>://<span class="number">10.59</span>.<span class="number">30.96</span>:<span class="number">9200</span>/_cat/indices?pretty’ -u logstash_system:logstash_system</span><br><span class="line">&#123;</span><br><span class="line">  <span class="string">“error”</span> : &#123;</span><br><span class="line">    <span class="string">“root_cause”</span> : [</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="string">“type”</span> : “<span class="type">security_exception</span><span class="string">“,</span></span><br><span class="line"><span class="string">        “</span>reason<span class="string">“ : “</span>action [indices:monitor/stats] <span class="keyword">is</span> unauthorized <span class="keyword">for</span> user [logstash_system]<span class="string">“</span></span><br><span class="line"><span class="string">      &#125;</span></span><br><span class="line"><span class="string">    ],</span></span><br><span class="line"><span class="string">    “</span><span class="keyword">type</span><span class="string">“ : “</span>security_exception<span class="string">“,</span></span><br><span class="line"><span class="string">    “</span>reason<span class="string">“ : “</span>action [indices:monitor/stats] <span class="keyword">is</span> unauthorized <span class="keyword">for</span> user [logstash_system]<span class="string">“</span></span><br><span class="line"><span class="string">  &#125;,</span></span><br><span class="line"><span class="string">  “</span>status<span class="string">“ : 403</span></span><br><span class="line"><span class="string">&#125;</span></span><br><span class="line"><span class="string">[elasticsearch@elasticsearch elasticsearch-6.0.0]$</span></span><br></pre></td></tr></table></figure><p></p><ul><li>使用kibana用户访问<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[elasticsearch@elasticsearch elasticsearch-<span class="number">6.0</span>.<span class="number">0</span>]$ curl <span class="string">‘<a href="http://10.59.30.96:9200/_cat/indices?pretty&#39;" target="_blank" rel="noopener">http://10.59.30.96:9200/_cat/indices?pretty&#39;</a></span> -u kibana:kibana</span><br><span class="line">yellow open <span class="selector-class">.monitoring-es-6-2018</span>.<span class="number">01.10</span>   nND6-i_rR5iLEYVccBGj8w <span class="number">1</span> <span class="number">1</span>    </span><br><span class="line">yellow open <span class="selector-class">.triggered_watches</span>            BtygGZisSDqiL3Y2TaQGqQ <span class="number">1</span> <span class="number">1</span>    </span><br><span class="line">green  open <span class="selector-class">.security-6</span>                   QVRL1mcFSAilryHGEhen7Q <span class="number">1</span> <span class="number">0</span>    </span><br><span class="line">yellow open <span class="selector-class">.watcher-history-6-2018</span>.<span class="number">01.10</span> SBGiHDAnTPiXFoHU65VY_g <span class="number">1</span> <span class="number">1</span>    </span><br><span class="line">yellow open <span class="selector-class">.watches</span>                      kMzN4j5cQySZQQSDVPww8w <span class="number">1</span> <span class="number">1</span>    </span><br><span class="line">yellow open <span class="selector-class">.monitoring-alerts-6</span>          VygY6VN9R3S0PR_jrGy50Q <span class="number">1</span> <span class="number">1</span>    </span><br><span class="line">[elasticsearch@elasticsearch elasticsearch-<span class="number">6.0</span>.<span class="number">0</span>]$</span><br></pre></td></tr></table></figure><a id="more"></a></li></ul><h2 id="添加自定义角色"><a href="#添加自定义角色" class="headerlink" title="添加自定义角色"></a><a href="#添加自定义角色" title="添加自定义角色"></a>添加自定义角色</h2><ul><li>添加角色接口为 POST /_xpack/security/role/<rolename></rolename></li></ul><p>下述示例为添加超级管理员角色的方法</p><figure class="highlight ada"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">[elasticsearch@elasticsearch elasticsearch-<span class="number">6.0</span>.<span class="number">0</span>]$ curl -XPOST -H <span class="symbol">‘Content</span>-<span class="keyword">type</span>: application/json’ -u elastic:elastic <span class="symbol">‘http</span>://<span class="number">10.59</span>.<span class="number">30.96</span>:<span class="number">9200</span>/_xpack/security/role/admin?pretty’ -d ‘&#123;</span><br><span class="line">&gt;   <span class="string">“run_as”</span>: [ <span class="string">“elastic”</span> ],</span><br><span class="line">&gt;   <span class="string">“cluster”</span>: [ <span class="string">“all”</span> ],</span><br><span class="line">&gt;   <span class="string">“indices”</span>: [</span><br><span class="line">&gt;     &#123;</span><br><span class="line">&gt;       <span class="string">“names”</span>: [ <span class="string">“<em>“</em></span> ],</span><br><span class="line">&gt;       <span class="string">“privileges”</span>: [ <span class="string">“all”</span> ]</span><br><span class="line">&gt;     &#125;</span><br><span class="line">&gt;   ]</span><br><span class="line">&gt; &#125;’</span><br><span class="line">&#123;</span><br><span class="line">  <span class="string">“role”</span> : &#123;</span><br><span class="line">    <span class="string">“created”</span> : <span class="type">true</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">[elasticsearch@elasticsearch elasticsearch-<span class="number">6.0</span>.<span class="number">0</span>]$ curl -XGET -H <span class="symbol">‘Content</span>-<span class="keyword">type</span>: application/json’ -u elastic:elastic <span class="symbol">‘http</span>://<span class="number">10.59</span>.<span class="number">30.96</span>:<span class="number">9200</span>/_xpack/security/role/admin?pretty’</span><br><span class="line">&#123;</span><br><span class="line">  <span class="string">“admin”</span> : &#123;</span><br><span class="line">    <span class="string">“cluster”</span> : [</span><br><span class="line">      <span class="string">“all”</span></span><br><span class="line">    ],</span><br><span class="line">    <span class="string">“indices”</span> : [</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="string">“names”</span> : [</span><br><span class="line">          <span class="string">““</span></span><br><span class="line">        ],</span><br><span class="line">        <span class="string">“privileges”</span> : [</span><br><span class="line">          <span class="string">“all”</span></span><br><span class="line">        ]</span><br><span class="line">      &#125;</span><br><span class="line">    ],</span><br><span class="line">    <span class="string">“run_as”</span> : [</span><br><span class="line">      <span class="string">“elastic”</span></span><br><span class="line">    ],</span><br><span class="line">    <span class="string">“metadata”</span> : &#123; &#125;,</span><br><span class="line">    <span class="string">“transient_metadata”</span> : &#123;</span><br><span class="line">      <span class="string">“enabled”</span> : <span class="type">true</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">[elasticsearch@elasticsearch elasticsearch-<span class="number">6.0</span>.<span class="number">0</span>]$</span><br></pre></td></tr></table></figure><p></p><h2 id="添加自定义账户"><a href="#添加自定义账户" class="headerlink" title="添加自定义账户"></a><a href="#添加自定义账户" title="添加自定义账户"></a>添加自定义账户</h2><ul><li>添加用户接口为 POST /_xpack/security/user/<username></username></li></ul><p>下述为添加martin账户并添加至admin角色操作方法</p><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">[elasticsearch<span class="meta">@elasticsearch</span> elasticsearch<span class="number">-6.0</span><span class="number">.0</span>]$ curl -<span class="type">XPOST</span> -<span class="type">H</span> <span class="symbol">‘Content</span>-<span class="class"><span class="keyword">type</span></span>: application/json’ -u elastic:elastic <span class="symbol">‘http</span>:<span class="comment">//10.59.30.96:9200/_xpack/security/user/martin?pretty’ -d ‘&#123;</span></span><br><span class="line">&gt;   <span class="string">“password”</span> : <span class="string">“123456”</span>,</span><br><span class="line">&gt;   <span class="string">“full_name”</span> : <span class="string">“Martin Lei”</span>,</span><br><span class="line">&gt;   <span class="string">“roles”</span> : [<span class="string">“admin”</span>],</span><br><span class="line">&gt;   <span class="string">“email”</span> : <span class="string">“<a href="mailto:martin@martin.com" target="_blank" rel="noopener">martin@martin.com</a>“</span></span><br><span class="line">&gt; &#125;’</span><br><span class="line">&#123;</span><br><span class="line">  <span class="string">“user”</span> : &#123;</span><br><span class="line">    <span class="string">“created”</span> : <span class="literal">true</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">[elasticsearch<span class="meta">@elasticsearch</span> elasticsearch<span class="number">-6.0</span><span class="number">.0</span>]$ curl -<span class="type">XGET</span> -<span class="type">H</span> <span class="symbol">‘Content</span>-<span class="class"><span class="keyword">type</span></span>: application/json’ -u elastic:elastic <span class="symbol">‘http</span>:<span class="comment">//10.59.30.96:9200/_xpack/security/user/martin?pretty’</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="string">“rocshen”</span> : &#123;</span><br><span class="line">    <span class="string">“username”</span> : <span class="string">“martin”</span>,</span><br><span class="line">    <span class="string">“roles”</span> : [</span><br><span class="line">      <span class="string">“admin”</span></span><br><span class="line">    ],</span><br><span class="line">    <span class="string">“full_name”</span> : <span class="string">“Martin Lei”</span>,</span><br><span class="line">    <span class="string">“email”</span> : <span class="string">“<a href="mailto:martin@martin.com" target="_blank" rel="noopener">martin@martin.com</a>“</span>,</span><br><span class="line">    <span class="string">“metadata”</span> : &#123; &#125;,</span><br><span class="line">    <span class="string">“enabled”</span> : <span class="literal">true</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">[elasticsearch<span class="meta">@elasticsearch</span> elasticsearch<span class="number">-6.0</span><span class="number">.0</span>]$ curl -<span class="type">XGET</span> -<span class="type">H</span> <span class="symbol">‘Content</span>-<span class="class"><span class="keyword">type</span></span>: application/json’ -u martin:<span class="number">123456</span> <span class="symbol">‘http</span>:<span class="comment">//10.59.30.96:9200/_cat/indices?pretty’</span></span><br><span class="line">yellow open .monitoring-es<span class="number">-6</span><span class="number">-2018.01</span><span class="number">.10</span>   nND6-i_rR5iLEYVccBGj8w <span class="number">1</span> <span class="number">1</span> <span class="number">4883</span> <span class="number">88</span>   <span class="number">2.5</span>mb   <span class="number">2.5</span>mb</span><br><span class="line">yellow open .triggered_watches            <span class="type">BtygGZisSDqiL3Y2TaQGqQ</span> <span class="number">1</span> <span class="number">1</span>    <span class="number">0</span>  <span class="number">0</span>  <span class="number">24.2</span>kb  <span class="number">24.2</span>kb</span><br><span class="line">green  open .security<span class="number">-6</span>                   <span class="type">QVRL1mcFSAilryHGEhen7Q</span> <span class="number">1</span> <span class="number">0</span>                        </span><br><span class="line">yellow open .watcher-history<span class="number">-6</span><span class="number">-2018.01</span><span class="number">.10</span> <span class="type">SBGiHDAnTPiXFoHU65VY_g</span> <span class="number">1</span> <span class="number">1</span>  <span class="number">630</span>  <span class="number">0</span> <span class="number">703.3</span>kb <span class="number">703.3</span>kb</span><br><span class="line">yellow open .watches                      kMzN4j5cQySZQQSDVPww8w <span class="number">1</span> <span class="number">1</span>    <span class="number">5</span>  <span class="number">0</span>  <span class="number">33.3</span>kb  <span class="number">33.3</span>kb</span><br><span class="line">yellow open .monitoring-alerts<span class="number">-6</span>          <span class="type">VygY6VN9R3S0PR_jrGy50Q</span> <span class="number">1</span> <span class="number">1</span>    <span class="number">1</span>  <span class="number">0</span>   <span class="number">6.5</span>kb   <span class="number">6.5</span>kb</span><br><span class="line">[elasticsearch<span class="meta">@elasticsearch</span> elasticsearch<span class="number">-6.0</span><span class="number">.0</span>]$</span><br></pre></td></tr></table></figure><p></p><h2 id="修改账户密码"><a href="#修改账户密码" class="headerlink" title="修改账户密码"></a><a href="#修改账户密码" title="修改账户密码"></a>修改账户密码</h2><ol><li>修改密码需使用超级管理员权限即elastic账户，接口为POST _xpack/security/user/<username>/_password</username></li></ol><p>curl参数含义如下</p><ul><li>-XPOST 使用post方法传递参数</li><li>-H 指定http协议的header信息</li><li>-u 指定用于认证的用户信息用户名与密码使用冒号分隔</li><li>-d 指定具体要传递的参数信息<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[elasticsearch<span class="meta">@elasticsearch</span> elasticsearch<span class="number">-6.0</span><span class="number">.0</span>]$ curl -<span class="type">XPOST</span> -<span class="type">H</span> <span class="symbol">‘Content</span>-<span class="class"><span class="keyword">type</span></span>: application/json’ -u elastic:elastic <span class="symbol">‘http</span>:<span class="comment">//10.59.30.96:9200/_xpack/security/user/kibana/_password?pretty’ -d ‘&#123;”password”: “123456”&#125;’</span></span><br><span class="line">&#123; &#125;</span><br></pre></td></tr></table></figure></li></ul><ol><li>密码修改后使用老密码访问则返回401，使用更新后的密码则正常<figure class="highlight cos"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">[elasticsearch@elasticsearch elasticsearch-<span class="number">6.0</span>.0]$ curl ‘http:<span class="comment">//10.59.30.96:9200/_cat/indices?pretty’ -u kibana:kibana</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="string">“error”</span> : &#123;</span><br><span class="line">    <span class="string">“root_cause”</span> : [</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="string">“type”</span> : <span class="string">“security_exception”</span>,</span><br><span class="line">        <span class="string">“reason”</span> : <span class="string">“failed to authenticate user [kibana]”</span>,</span><br><span class="line">        <span class="string">“header”</span> : &#123;</span><br><span class="line">          <span class="string">“WWW-Authenticate”</span> : <span class="string">“Basic realm=\”</span>security\<span class="string">“ charset=\”</span>UTF-<span class="number">8</span>\<span class="string">“”</span></span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    ],</span><br><span class="line">    <span class="string">“type”</span> : <span class="string">“security_exception”</span>,</span><br><span class="line">    <span class="string">“reason”</span> : <span class="string">“failed to authenticate user [kibana]”</span>,</span><br><span class="line">    <span class="string">“header”</span> : &#123;</span><br><span class="line">      <span class="string">“WWW-Authenticate”</span> : <span class="string">“Basic realm=\”</span>security\<span class="string">“ charset=\”</span>UTF-<span class="number">8</span>\<span class="string">“”</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="string">“status”</span> : <span class="number">401</span></span><br><span class="line">&#125;</span><br><span class="line">[elasticsearch@elasticsearch elasticsearch-<span class="number">6.0</span>.0]$ curl ‘http:<span class="comment">//10.59.30.96:9200/_cat/indices?pretty’ -u kibana:123456</span></span><br><span class="line">yellow <span class="keyword">open</span> .monitoring-es-<span class="number">6</span>-<span class="number">2018.01</span>.10   nND6-i_rR5iLEYVccBGj8w <span class="number">1</span> <span class="number">1</span>    </span><br><span class="line">yellow <span class="keyword">open</span> .triggered_watches            BtygGZisSDqiL3Y2TaQGqQ <span class="number">1</span> <span class="number">1</span>    </span><br><span class="line">green  <span class="keyword">open</span> .security-<span class="number">6</span>                   QVRL1mcFSAilryHGEhen7Q <span class="number">1</span> <span class="number">0</span>    </span><br><span class="line">yellow <span class="keyword">open</span> .watcher-history-<span class="number">6</span>-<span class="number">2018.01</span>.10 SBGiHDAnTPiXFoHU65VY_g <span class="number">1</span> <span class="number">1</span>    </span><br><span class="line">yellow <span class="keyword">open</span> .watches                      kMzN4j5cQySZQQSDVPww8w <span class="number">1</span> <span class="number">1</span>    </span><br><span class="line">yellow <span class="keyword">open</span> .monitoring-alerts-<span class="number">6</span>          VygY6VN9R3S0PR_jrGy50Q <span class="number">1</span> <span class="number">1</span>    </span><br><span class="line">[elasticsearch@elasticsearch elasticsearch-<span class="number">6.0</span>.0]$</span><br></pre></td></tr></table></figure></li></ol><h2 id="配置ldap帐号认证"><a href="#配置ldap帐号认证" class="headerlink" title="配置ldap帐号认证"></a><a href="#配置ldap帐号认证" title="配置ldap帐号认证"></a>配置ldap帐号认证</h2><p>ldap服务安装可参考：<a href="https://segmentfault.com/a/11.." target="_blank" rel="noopener">https://segmentfault.com/a/11..</a>.</p><p>添加下述ldap相关述配置 bind_dn为ldap的管理DN</p><ul><li>bind_password为管理dn的密码</li><li>user_search.base_dn为linux系统账户信息导入ldap的信息</li><li>user_search.attribute为账户在ldap中的标识信息</li><li>group_search.base_dn为linux系统组信息导入ldap的信息<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">[elasticsearch@elasticsearch elasticsearch-<span class="number">6.0</span>.<span class="number">0</span>]$ vim config/elasticsearch<span class="selector-class">.yml</span> </span><br><span class="line"></span><br><span class="line">……</span><br><span class="line"></span><br><span class="line">network<span class="selector-class">.host</span>: <span class="number">10.59</span>.<span class="number">30.96</span></span><br><span class="line">bootstrap<span class="selector-class">.system_call_filter</span>: false</span><br><span class="line"></span><br><span class="line">xpack<span class="selector-class">.ssl</span><span class="selector-class">.key</span>: elasticsearch/elasticsearch.key</span><br><span class="line">xpack<span class="selector-class">.ssl</span><span class="selector-class">.certificate</span>: elasticsearch/elasticsearch.crt</span><br><span class="line">xpack<span class="selector-class">.ssl</span><span class="selector-class">.certificate_authorities</span>: ca/ca.crt</span><br><span class="line">xpack<span class="selector-class">.security</span><span class="selector-class">.transport</span><span class="selector-class">.ssl</span><span class="selector-class">.enabled</span>: true</span><br><span class="line"></span><br><span class="line">xpack:</span><br><span class="line">  security:</span><br><span class="line">    authc:</span><br><span class="line">      realms:</span><br><span class="line">        ldap1:</span><br><span class="line">          type: ldap</span><br><span class="line">          <span class="attribute">order</span>: <span class="number">0</span></span><br><span class="line">          url: <span class="string">“ldap://10.59.30.95”</span></span><br><span class="line">          bind_dn: <span class="string">“cn=Manager, dc=martin, dc=com”</span></span><br><span class="line">          bind_password: <span class="number">123456</span></span><br><span class="line">          user_search:</span><br><span class="line">            base_dn: <span class="string">“ou=People,dc=martin,dc=com”</span></span><br><span class="line">            attribute: uid</span><br><span class="line">          group_search:</span><br><span class="line">            base_dn: <span class="string">“ou=Group,dc=martin,dc=com”</span></span><br><span class="line">          unmapped_groups_as_roles: false</span><br></pre></td></tr></table></figure></li></ul><h2 id="配置AD域帐号认证"><a href="#配置AD域帐号认证" class="headerlink" title="配置AD域帐号认证"></a><a href="#配置AD域帐号认证" title="配置AD域帐号认证"></a>配置AD域帐号认证</h2><p>添加下ldap相关述配置至elasticsearch.yml，此处为接着上述LDAP配置添加，如果只需配置AD认证请将ldap相关配置删除即可；</p><ul><li>domain_name为AD域的域名</li><li>url为AD域的地址</li><li>bind_dnw为随意的域账户名称（格式为user@domain）</li><li>bind_password为上述账户的密码<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">xpack</span>:</span><br><span class="line">  <span class="attribute">security</span>:</span><br><span class="line">    <span class="attribute">authc</span>:</span><br><span class="line">      <span class="attribute">realms</span>:</span><br><span class="line">        <span class="attribute">ldap1</span>:</span><br><span class="line">          <span class="attribute">type</span>: ldap</span><br><span class="line">          <span class="attribute">order</span>: <span class="number">0</span></span><br><span class="line">          <span class="attribute">url</span>: <span class="string">“ldap://10.59.30.94”</span></span><br><span class="line">          <span class="attribute">bind_dn</span>: <span class="string">“cn=Manager, dc=martin, dc=com”</span></span><br><span class="line">          <span class="attribute">bind_password</span>: <span class="number">123456</span></span><br><span class="line">          <span class="attribute">user_search</span>:</span><br><span class="line">            <span class="attribute">base_dn</span>: <span class="string">“ou=People,dc=martin,dc=com”</span></span><br><span class="line">            <span class="attribute">attribute</span>: uid</span><br><span class="line">          <span class="attribute">group_search</span>:</span><br><span class="line">            <span class="attribute">base_dn</span>: <span class="string">“ou=Group,dc=martin,dc=com”</span></span><br><span class="line">          <span class="attribute">unmapped_groups_as_roles</span>: false</span><br><span class="line">        <span class="attribute">active_directory</span>:</span><br><span class="line">          <span class="attribute">type</span>: active_directory</span><br><span class="line">          <span class="attribute">order</span>: <span class="number">1</span></span><br><span class="line">          <span class="attribute">domain_name</span>: martin.com</span><br><span class="line">          <span class="attribute">url</span>: <span class="attribute">ldap</span>:<span class="comment">//ad.martin.com</span></span><br><span class="line">          <span class="attribute">bind_dn</span>: martin<span class="variable">@martin</span>.com</span><br><span class="line">          <span class="attribute">bind_password</span>: AD.<span class="number">123456</span></span><br></pre></td></tr></table></figure></li></ul><p>重启elasticsearch服务并使用ldap域账户user01登录</p><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">[elasticsearch<span class="meta">@elasticsearch</span> elasticsearch<span class="number">-6.0</span><span class="number">.0</span>]$ killall java</span><br><span class="line">[elasticsearch<span class="meta">@elasticsearch</span> elasticsearch<span class="number">-6.0</span><span class="number">.0</span>]$ .<span class="regexp">/bin/</span>elasticsearch -d</span><br><span class="line">[elasticsearch<span class="meta">@elasticsearch</span> elasticsearch<span class="number">-6.0</span><span class="number">.0</span>]$ curl -XGET -u <span class="string">user01:</span>user01 <span class="string">‘<a href="http://10.59.30.96:9200/_cat?pretty&#39;" target="_blank" rel="noopener">http://10.59.30.96:9200/_cat?pretty&#39;</a></span></span><br><span class="line">=^.^=</span><br><span class="line"><span class="regexp">/_cat/</span>allocation</span><br><span class="line"><span class="regexp">/_cat/</span>shards</span><br><span class="line"><span class="regexp">/_cat/</span>shards/&#123;index&#125;</span><br><span class="line"><span class="regexp">/_cat/</span>master</span><br><span class="line"><span class="regexp">/_cat/</span>nodes</span><br><span class="line"><span class="regexp">/_cat/</span>tasks</span><br><span class="line"><span class="regexp">/_cat/</span>indices</span><br><span class="line"><span class="regexp">/_cat/</span>indices/&#123;index&#125;</span><br><span class="line"><span class="regexp">/_cat/</span>segments</span><br><span class="line"><span class="regexp">/_cat/</span>segments/&#123;index&#125;</span><br><span class="line"><span class="regexp">/_cat/</span>count</span><br><span class="line"><span class="regexp">/_cat/</span>count/&#123;index&#125;</span><br><span class="line"><span class="regexp">/_cat/</span>recovery</span><br><span class="line"><span class="regexp">/_cat/</span>recovery/&#123;index&#125;</span><br><span class="line"><span class="regexp">/_cat/</span>health</span><br><span class="line"><span class="regexp">/_cat/</span>pending_tasks</span><br><span class="line"><span class="regexp">/_cat/</span>aliases</span><br><span class="line"><span class="regexp">/_cat/</span>aliases/&#123;alias&#125;</span><br><span class="line"><span class="regexp">/_cat/</span>thread_pool</span><br><span class="line"><span class="regexp">/_cat/</span>thread_pool/&#123;thread_pools&#125;</span><br><span class="line"><span class="regexp">/_cat/</span>plugins</span><br><span class="line"><span class="regexp">/_cat/</span>fielddata</span><br><span class="line"><span class="regexp">/_cat/</span>fielddata/&#123;fields&#125;</span><br><span class="line"><span class="regexp">/_cat/</span>nodeattrs</span><br><span class="line"><span class="regexp">/_cat/</span>repositories</span><br><span class="line"><span class="regexp">/_cat/</span>snapshots/&#123;repository&#125;</span><br><span class="line"><span class="regexp">/_cat/</span>templates</span><br><span class="line">[elasticsearch<span class="meta">@elasticsearch</span> elasticsearch<span class="number">-6.0</span><span class="number">.0</span>]$</span><br></pre></td></tr></table></figure><p>使用AD域账户martin登录</p><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">[elasticsearch<span class="meta">@elasticsearch</span> elasticsearch<span class="number">-6.0</span><span class="number">.0</span>]$ curl <span class="string">http:</span><span class="comment">//10.59.30.96:9200/_cat?pretty -u martin:AD.123456</span></span><br><span class="line">=^.^=</span><br><span class="line"><span class="regexp">/_cat/</span>allocation</span><br><span class="line"><span class="regexp">/_cat/</span>shards</span><br><span class="line"><span class="regexp">/_cat/</span>shards/&#123;index&#125;</span><br><span class="line"><span class="regexp">/_cat/</span>master</span><br><span class="line"><span class="regexp">/_cat/</span>nodes</span><br><span class="line"><span class="regexp">/_cat/</span>tasks</span><br><span class="line"><span class="regexp">/_cat/</span>indices</span><br><span class="line"><span class="regexp">/_cat/</span>indices/&#123;index&#125;</span><br><span class="line"><span class="regexp">/_cat/</span>segments</span><br><span class="line"><span class="regexp">/_cat/</span>segments/&#123;index&#125;</span><br><span class="line"><span class="regexp">/_cat/</span>count</span><br><span class="line"><span class="regexp">/_cat/</span>count/&#123;index&#125;</span><br><span class="line"><span class="regexp">/_cat/</span>recovery</span><br><span class="line"><span class="regexp">/_cat/</span>recovery/&#123;index&#125;</span><br><span class="line"><span class="regexp">/_cat/</span>health</span><br><span class="line"><span class="regexp">/_cat/</span>pending_tasks</span><br><span class="line"><span class="regexp">/_cat/</span>aliases</span><br><span class="line"><span class="regexp">/_cat/</span>aliases/&#123;alias&#125;</span><br><span class="line"><span class="regexp">/_cat/</span>thread_pool</span><br><span class="line"><span class="regexp">/_cat/</span>thread_pool/&#123;thread_pools&#125;</span><br><span class="line"><span class="regexp">/_cat/</span>plugins</span><br><span class="line"><span class="regexp">/_cat/</span>fielddata</span><br><span class="line"><span class="regexp">/_cat/</span>fielddata/&#123;fields&#125;</span><br><span class="line"><span class="regexp">/_cat/</span>nodeattrs</span><br><span class="line"><span class="regexp">/_cat/</span>repositories</span><br><span class="line"><span class="regexp">/_cat/</span>snapshots/&#123;repository&#125;</span><br><span class="line"><span class="regexp">/_cat/</span>templates</span><br><span class="line">[elasticsearch<span class="meta">@elasticsearch</span> elasticsearch<span class="number">-6.0</span><span class="number">.0</span>]$</span><br></pre></td></tr></table></figure><h2 id="为域账户信息映射角色"><a href="#为域账户信息映射角色" class="headerlink" title="为域账户信息映射角色"></a><a href="#为域账户信息映射角色" title="为域账户信息映射角色"></a>为域账户信息映射角色</h2><p>接口为：POST /_xpack/security/role_mapping/<name></name></p><p>下述为映射user1*账户为管理员角色的操作步骤</p><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">[elasticsearch<span class="meta">@elasticsearch</span> elasticsearch<span class="number">-6.0</span><span class="number">.0</span>]$ curl -<span class="type">XPOST</span> -<span class="type">H</span> <span class="symbol">‘Content</span>-<span class="class"><span class="keyword">type</span></span>: application/json’ -u elastic:elastic <span class="symbol">‘http</span>:<span class="comment">//10.59.30.96:9200/_xpack/security/role_mapping/ldap_user_admin?pretty’ -d ‘&#123;</span></span><br><span class="line">&gt;   <span class="string">“roles”</span>: [ <span class="string">“admin”</span> ],</span><br><span class="line">&gt;   <span class="string">“enabled”</span>: <span class="literal">true</span>,</span><br><span class="line">&gt;   <span class="string">“rules”</span>: &#123;</span><br><span class="line">&gt;     <span class="string">“any”</span>: [</span><br><span class="line">&gt;       &#123;</span><br><span class="line">&gt;         <span class="string">“field”</span>: &#123;</span><br><span class="line">&gt;           <span class="string">“username”</span>: <span class="string">“/user1<em>/“</em></span></span><br><span class="line">&gt;         &#125;</span><br><span class="line">&gt;       &#125;</span><br><span class="line">&gt;     ]</span><br><span class="line">&gt;   &#125;</span><br><span class="line">&gt; &#125;’</span><br><span class="line">&#123;</span><br><span class="line">  <span class="string">“role_mapping”</span> : &#123;</span><br><span class="line">    <span class="string">“created”</span> : <span class="literal">true</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">[elasticsearch<span class="meta">@elasticsearch</span> elasticsearch<span class="number">-6.0</span><span class="number">.0</span>]$ curl -<span class="type">XGET</span> -<span class="type">H</span> <span class="symbol">‘Content</span>-<span class="class"><span class="keyword">type</span></span>: application/json’ -u elastic:elastic <span class="symbol">‘http</span>:<span class="comment">//10.59.30.96:9200/_xpack/security/role_mapping/ldap_user_admin?pretty’</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="string">“ldap_user_admin”</span> : &#123;</span><br><span class="line">    <span class="string">“enabled”</span> : <span class="literal">true</span>,</span><br><span class="line">    <span class="string">“roles”</span> : [</span><br><span class="line">      <span class="string">“admin”</span></span><br><span class="line">    ],</span><br><span class="line">    <span class="string">“rules”</span> : &#123;</span><br><span class="line">      <span class="string">“any”</span> : [</span><br><span class="line">        &#123;</span><br><span class="line">          <span class="string">“field”</span> : &#123;</span><br><span class="line">            <span class="string">“username”</span> : <span class="string">“/user1/“</span></span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">      ]</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="string">“metadata”</span> : &#123; &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">[elasticsearch<span class="meta">@elasticsearch</span> elasticsearch<span class="number">-6.0</span><span class="number">.0</span>]$</span><br></pre></td></tr></table></figure><p>验证域账户权限，使用user01无权访问indices接口，使用user11可以访问；</p><figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">[elasticsearch@elasticsearch elasticsearch-<span class="number">6.0</span>.<span class="number">0</span>]$ curl -XGET -u user01:user01 <span class="string">‘<a href="http://10.59.30.96:9200/_cat/indices?pretty&#39;" target="_blank" rel="noopener">http://10.59.30.96:9200/_cat/indices?pretty&#39;</a></span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="string">“error”</span> : &#123;</span><br><span class="line">    <span class="string">“root_cause”</span> : [</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="string">“type”</span> : <span class="string">“security_exception”</span>,</span><br><span class="line">        <span class="string">“reason”</span> : <span class="string">“action [cluster:monitor/state] is unauthorized for user [user01]”</span></span><br><span class="line">      &#125;</span><br><span class="line">    ],</span><br><span class="line">    <span class="string">“type”</span> : <span class="string">“security_exception”</span>,</span><br><span class="line">    <span class="string">“reason”</span> : <span class="string">“action [cluster:monitor/state] is unauthorized for user [user01]”</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="string">“status”</span> : <span class="number">403</span></span><br><span class="line">&#125;</span><br><span class="line">[elasticsearch@elasticsearch elasticsearch-<span class="number">6.0</span>.<span class="number">0</span>]$ curl -XGET -u user11:user11 <span class="string">‘<a href="http://10.59.30.96:9200/_cat/indices?pretty&#39;" target="_blank" rel="noopener">http://10.59.30.96:9200/_cat/indices?pretty&#39;</a></span></span><br><span class="line">yellow open <span class="selector-class">.monitoring-es-6-2018</span>.<span class="number">01.10</span>   nND6-i_rR5iLEYVccBGj8w <span class="number">1</span> <span class="number">1</span> <span class="number">6178</span> <span class="number">44</span>  <span class="number">5.9</span>mb  <span class="number">5.9</span>mb</span><br><span class="line">yellow open <span class="selector-class">.triggered_watches</span>            BtygGZisSDqiL3Y2TaQGqQ <span class="number">1</span> <span class="number">1</span>    <span class="number">0</span>  <span class="number">0</span> <span class="number">11.7</span>kb <span class="number">11.7</span>kb</span><br><span class="line">green  open <span class="selector-class">.security-6</span>                   QVRL1mcFSAilryHGEhen7Q <span class="number">1</span> <span class="number">0</span>                      </span><br><span class="line">yellow open <span class="selector-class">.watcher-history-6-2018</span>.<span class="number">01.10</span> SBGiHDAnTPiXFoHU65VY_g <span class="number">1</span> <span class="number">1</span>  <span class="number">777</span>  <span class="number">0</span>  <span class="number">1.1</span>mb  <span class="number">1.1</span>mb</span><br><span class="line">yellow open <span class="selector-class">.watches</span>                      kMzN4j5cQySZQQSDVPww8w <span class="number">1</span> <span class="number">1</span>    <span class="number">5</span>  <span class="number">0</span> <span class="number">40.2</span>kb <span class="number">40.2</span>kb</span><br><span class="line">yellow open <span class="selector-class">.monitoring-alerts-6</span>          VygY6VN9R3S0PR_jrGy50Q <span class="number">1</span> <span class="number">1</span>    <span class="number">1</span>  <span class="number">0</span> <span class="number">12.8</span>kb <span class="number">12.8</span>kb</span><br><span class="line">[elasticsearch@elasticsearch elasticsearch-<span class="number">6.0</span>.<span class="number">0</span>]$</span><br></pre></td></tr></table></figure><h2 id="常见报错"><a href="#常见报错" class="headerlink" title="常见报错"></a><a href="#常见报错" title="常见报错"></a>常见报错</h2><p>No subject alternative names matching IP address</p><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[2018-01-10T19:19:35,483][WARN ][o.e.x.s.t.n.SecurityNetty4Transport] [fzP4t-4] exception caught on transport layer [[id: 0x5d97fe48, L:/0:0:0:0:0:0:0:1:49121 ! R:/0:0:0:0:0:0:0:1:9300]], closing connection</span><br><span class="line">    io.netty.handler.codec.DecoderException: javax.net.ssl.SSLHandshakeException: General SSLEngine problem</span><br><span class="line"><span class="built_in">..</span><span class="built_in">..</span><span class="built_in">..</span></span><br><span class="line">Caused by: java.security.cert.CertificateException: <span class="literal">No</span> subject alternative names matching<span class="built_in"> IP address </span>0:0:0:0:0:0:0:1 found</span><br></pre></td></tr></table></figure><p>解决方案为一种是关闭IPv6地址，另一种是修改ES_HOME/config/elasticsearch.yml中的network.host值为本机eth0的IP</p><h2 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a><a href="#参考文档" title="参考文档"></a>参考文档</h2><ul><li>官方安装步骤：<a href="https://www.elastic.co/guide/.." target="_blank" rel="noopener">https://www.elastic.co/guide/..</a>.</li><li>配置内置账户密码：<br><a href="https://www.elastic.co/guide/.." target="_blank" rel="noopener">https://www.elastic.co/guide/..</a>.</li><li>修改账户密码：<br><a href="https://www.elastic.co/guide/.." target="_blank" rel="noopener">https://www.elastic.co/guide/..</a>.</li><li>用户相关操作：<br><a href="https://www.elastic.co/guide/.." target="_blank" rel="noopener">https://www.elastic.co/guide/..</a>.</li><li>使用LDAP认证： <a href="https://www.elastic.co/guide/.." target="_blank" rel="noopener">https://www.elastic.co/guide/..</a>.</li><li>用户角色映射： <a href="https://www.elastic.co/guide/.." target="_blank" rel="noopener">https://www.elastic.co/guide/..</a>.</li></ul></div><footer class="post-footer"><div class="post-tags"><a href="/tags/ELK/" rel="tag"># ELK</a></div><div class="post-nav"><div class="post-nav-next post-nav-item"><a href="/2018/08/19/crontab、anacron、logrotate-relationship/" rel="next" title="crontab、anacron、logrotate relationship"><i class="fa fa-chevron-left"></i> crontab、anacron、logrotate relationship</a></div><span class="post-nav-divider"></span><div class="post-nav-prev post-nav-item"><a href="/2018/08/19/ElasticSearch-索引查询使用指南/" rel="prev" title="ElasticSearch 索引查询使用指南">ElasticSearch 索引查询使用指南 <i class="fa fa-chevron-right"></i></a></div></div></footer></div></article><div class="post-spread"></div></div></div></div><div class="sidebar-toggle"><div class="sidebar-toggle-line-wrap"><span class="sidebar-toggle-line sidebar-toggle-line-first"></span> <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span> <span class="sidebar-toggle-line sidebar-toggle-line-last"></span></div></div><aside id="sidebar" class="sidebar"><div class="sidebar-inner"><ul class="sidebar-nav motion-element"><li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">文章目录</li><li class="sidebar-nav-overview" data-target="site-overview-wrap">站点概览</li></ul><section class="site-overview-wrap sidebar-panel"><div class="site-overview"><div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person"><p class="site-author-name" itemprop="name">褚成志</p><p class="site-description motion-element" itemprop="description">关注互联网的科技博客</p></div><nav class="site-state motion-element"><div class="site-state-item site-state-posts"><a href="/archives/"><span class="site-state-item-count">67</span> <span class="site-state-item-name">日志</span></a></div><div class="site-state-item site-state-categories"><span class="site-state-item-count">1</span> <span class="site-state-item-name">分类</span></div><div class="site-state-item site-state-tags"><span class="site-state-item-count">38</span> <span class="site-state-item-name">标签</span></div></nav><div class="feed-link motion-element"><a href="/atom.xml" rel="alternate"><i class="fa fa-rss"></i> RSS</a></div></div></section><section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active"><div class="post-toc"><div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#自定义内置账号"><span class="nav-number">1.</span> <span class="nav-text">自定义内置账号</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#验证内置账户访问"><span class="nav-number">2.</span> <span class="nav-text">验证内置账户访问</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#添加自定义角色"><span class="nav-number">3.</span> <span class="nav-text">添加自定义角色</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#添加自定义账户"><span class="nav-number">4.</span> <span class="nav-text">添加自定义账户</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#修改账户密码"><span class="nav-number">5.</span> <span class="nav-text">修改账户密码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置ldap帐号认证"><span class="nav-number">6.</span> <span class="nav-text">配置ldap帐号认证</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置AD域帐号认证"><span class="nav-number">7.</span> <span class="nav-text">配置AD域帐号认证</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#为域账户信息映射角色"><span class="nav-number">8.</span> <span class="nav-text">为域账户信息映射角色</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#常见报错"><span class="nav-number">9.</span> <span class="nav-text">常见报错</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考文档"><span class="nav-number">10.</span> <span class="nav-text">参考文档</span></a></li></ol></div></div></section></div></aside></div></main><footer id="footer" class="footer"><div class="footer-inner"><div class="copyright">&copy; <span itemprop="copyrightYear">2018</span> <span class="with-love"><i class="fa fa-user"></i> </span><span class="author" itemprop="copyrightHolder">褚成志</span></div><div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div><span class="post-meta-divider">|</span><div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div></div></footer><div class="back-to-top"><i class="fa fa-arrow-up"></i></div></div><script type="text/javascript">"[object Function]"!==Object.prototype.toString.call(window.Promise)&&(window.Promise=null)</script><script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script><script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script><script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script><script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script><script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script><script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script><script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script><script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script><script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script><script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script><script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script></body></html><!-- rebuild by neat -->
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="ELK," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="褚成志的博客" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="自定义内置账号 账户elastic为elasticsearch超级管理员，拥有所有权限 账户kibana用于kibana组件获取相关信息用于web展示 账户logstash_system用于logstash服务获取elasticsearch的监控数据 注意：此步骤需先启动elasticsearch服务   12345678910111213141516[elasticsearch@elastics">
+<meta name="keywords" content="ELK">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ES内置账号密码修改、自定义角色自定义账号、ldap及AD认证">
+<meta property="og:url" content="http://www.chucz.club/2018/08/19/ES内置账号密码修改、自定义角色自定义账号、ldap及AD认证/index.html">
+<meta property="og:site_name" content="褚成志的博客">
+<meta property="og:description" content="自定义内置账号 账户elastic为elasticsearch超级管理员，拥有所有权限 账户kibana用于kibana组件获取相关信息用于web展示 账户logstash_system用于logstash服务获取elasticsearch的监控数据 注意：此步骤需先启动elasticsearch服务   12345678910111213141516[elasticsearch@elastics">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://cos.leiyawu.com/img/elk/es_user.png">
+<meta property="og:updated_time" content="2018-09-28T08:25:28.616Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ES内置账号密码修改、自定义角色自定义账号、ldap及AD认证">
+<meta name="twitter:description" content="自定义内置账号 账户elastic为elasticsearch超级管理员，拥有所有权限 账户kibana用于kibana组件获取相关信息用于web展示 账户logstash_system用于logstash服务获取elasticsearch的监控数据 注意：此步骤需先启动elasticsearch服务   12345678910111213141516[elasticsearch@elastics">
+<meta name="twitter:image" content="https://cos.leiyawu.com/img/elk/es_user.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'ZM9CKN0W4R',
+      apiKey: '5bc5819b162e1cd440b44b16ef207a44',
+      indexName: 'chucz.club',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.chucz.club/2018/08/19/ES内置账号密码修改、自定义角色自定义账号、ldap及AD认证/"/>
+
+
+
+
+
+  <title>ES内置账号密码修改、自定义角色自定义账号、ldap及AD认证 | 褚成志的博客</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">褚成志的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">青青子衿, 悠悠我心</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.chucz.club/2018/08/19/ES内置账号密码修改、自定义角色自定义账号、ldap及AD认证/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="褚成志">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="褚成志的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">ES内置账号密码修改、自定义角色自定义账号、ldap及AD认证</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-19T01:55:58+00:00">
+                2018-08-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="自定义内置账号"><a href="#自定义内置账号" class="headerlink" title="自定义内置账号"></a><a href="#自定义内置账号" title="自定义内置账号"></a>自定义内置账号</h2><ul>
+<li>账户elastic为elasticsearch超级管理员，拥有所有权限</li>
+<li>账户kibana用于kibana组件获取相关信息用于web展示</li>
+<li>账户logstash_system用于logstash服务获取elasticsearch的监控数据</li>
+<li>注意：此步骤需先启动elasticsearch服务</li>
+</ul>
+<p><img src="https://cos.leiyawu.com/img/elk/es_user.png" alt="es_user"></p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">[elasticsearch@elasticsearch elasticsearch-6.0.0]$ ./bin/x-pack/setup-passwords interactive</span><br><span class="line">Initiating the setup of reserved<span class="built_in"> user </span>elastic,kibana,logstash_system passwords.</span><br><span class="line">You will be prompted <span class="keyword">to</span> enter passwords as the process progresses.</span><br><span class="line">Please confirm that you would like <span class="keyword">to</span> continue [y/N]y</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Enter password <span class="keyword">for</span> [elastic]: </span><br><span class="line">Reenter password <span class="keyword">for</span> [elastic]: </span><br><span class="line">Enter password <span class="keyword">for</span> [kibana]: </span><br><span class="line">Reenter password <span class="keyword">for</span> [kibana]: </span><br><span class="line">Enter password <span class="keyword">for</span> [logstash_system]: </span><br><span class="line">Reenter password <span class="keyword">for</span> [logstash_system]: </span><br><span class="line">Changed password <span class="keyword">for</span><span class="built_in"> user </span>[kibana]</span><br><span class="line">Changed password <span class="keyword">for</span><span class="built_in"> user </span>[logstash_system]</span><br><span class="line">Changed password <span class="keyword">for</span><span class="built_in"> user </span>[elastic]</span><br><span class="line">[elasticsearch@elasticsearch elasticsearch-6.0.0]$</span><br></pre></td></tr></table></figure>
+
+<h2 id="验证内置账户访问"><a href="#验证内置账户访问" class="headerlink" title="验证内置账户访问"></a><a href="#验证内置账户访问" title="验证内置账户访问"></a>验证内置账户访问</h2><ul>
+<li><p>若不提供用户名密码则返回401<figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">[elasticsearch@elasticsearch elasticsearch-<span class="number">6.0</span>.<span class="number">0</span>]$ curl <span class="string">‘<a href="http://10.59.30.96:9200/_cat/indices?pretty&#39;" target="_blank" rel="noopener">http://10.59.30.96:9200/_cat/indices?pretty&#39;</a></span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="string">“error”</span> : &#123;</span><br><span class="line">    <span class="string">“root_cause”</span> : [</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="string">“type”</span> : <span class="string">“security_exception”</span>,</span><br><span class="line">        <span class="string">“reason”</span> : <span class="string">“missing authentication token for REST request [/_cat/indices?pretty]”</span>,</span><br><span class="line">        <span class="string">“header”</span> : &#123;</span><br><span class="line">          <span class="string">“WWW-Authenticate”</span> : <span class="string">“Basic realm=\”</span>security\<span class="string">“ charset=\”</span>UTF-<span class="number">8</span>\<span class="string">“”</span></span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    ],</span><br><span class="line">    <span class="string">“type”</span> : <span class="string">“security_exception”</span>,</span><br><span class="line">    <span class="string">“reason”</span> : <span class="string">“missing authentication token for REST request [/_cat/indices?pretty]”</span>,</span><br><span class="line">    <span class="string">“header”</span> : &#123;</span><br><span class="line">      <span class="string">“WWW-Authenticate”</span> : <span class="string">“Basic realm=\”</span>security\<span class="string">“ charset=\”</span>UTF-<span class="number">8</span>\<span class="string">“”</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="string">“status”</span> : <span class="number">401</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+</li>
+<li><p>提供相应用户信息后可访问，若用户权限不足则返回403</p>
+</li>
+</ul>
+<p>使用logstash_system用户访问<figure class="highlight ada"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">[elasticsearch@elasticsearch elasticsearch-<span class="number">6.0</span>.<span class="number">0</span>]$ curl <span class="symbol">‘http</span>://<span class="number">10.59</span>.<span class="number">30.96</span>:<span class="number">9200</span>/_cat/indices?pretty’ -u logstash_system:logstash_system</span><br><span class="line">&#123;</span><br><span class="line">  <span class="string">“error”</span> : &#123;</span><br><span class="line">    <span class="string">“root_cause”</span> : [</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="string">“type”</span> : “<span class="type">security_exception</span><span class="string">“,</span></span><br><span class="line"><span class="string">        “</span>reason<span class="string">“ : “</span>action [indices:monitor/stats] <span class="keyword">is</span> unauthorized <span class="keyword">for</span> user [logstash_system]<span class="string">“</span></span><br><span class="line"><span class="string">      &#125;</span></span><br><span class="line"><span class="string">    ],</span></span><br><span class="line"><span class="string">    “</span><span class="keyword">type</span><span class="string">“ : “</span>security_exception<span class="string">“,</span></span><br><span class="line"><span class="string">    “</span>reason<span class="string">“ : “</span>action [indices:monitor/stats] <span class="keyword">is</span> unauthorized <span class="keyword">for</span> user [logstash_system]<span class="string">“</span></span><br><span class="line"><span class="string">  &#125;,</span></span><br><span class="line"><span class="string">  “</span>status<span class="string">“ : 403</span></span><br><span class="line"><span class="string">&#125;</span></span><br><span class="line"><span class="string">[elasticsearch@elasticsearch elasticsearch-6.0.0]$</span></span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>使用kibana用户访问<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[elasticsearch@elasticsearch elasticsearch-<span class="number">6.0</span>.<span class="number">0</span>]$ curl <span class="string">‘<a href="http://10.59.30.96:9200/_cat/indices?pretty&#39;" target="_blank" rel="noopener">http://10.59.30.96:9200/_cat/indices?pretty&#39;</a></span> -u kibana:kibana</span><br><span class="line">yellow open <span class="selector-class">.monitoring-es-6-2018</span>.<span class="number">01.10</span>   nND6-i_rR5iLEYVccBGj8w <span class="number">1</span> <span class="number">1</span>    </span><br><span class="line">yellow open <span class="selector-class">.triggered_watches</span>            BtygGZisSDqiL3Y2TaQGqQ <span class="number">1</span> <span class="number">1</span>    </span><br><span class="line">green  open <span class="selector-class">.security-6</span>                   QVRL1mcFSAilryHGEhen7Q <span class="number">1</span> <span class="number">0</span>    </span><br><span class="line">yellow open <span class="selector-class">.watcher-history-6-2018</span>.<span class="number">01.10</span> SBGiHDAnTPiXFoHU65VY_g <span class="number">1</span> <span class="number">1</span>    </span><br><span class="line">yellow open <span class="selector-class">.watches</span>                      kMzN4j5cQySZQQSDVPww8w <span class="number">1</span> <span class="number">1</span>    </span><br><span class="line">yellow open <span class="selector-class">.monitoring-alerts-6</span>          VygY6VN9R3S0PR_jrGy50Q <span class="number">1</span> <span class="number">1</span>    </span><br><span class="line">[elasticsearch@elasticsearch elasticsearch-<span class="number">6.0</span>.<span class="number">0</span>]$</span><br></pre></td></tr></table></figure><a id="more"></a></li>
+</ul>
+<h2 id="添加自定义角色"><a href="#添加自定义角色" class="headerlink" title="添加自定义角色"></a><a href="#添加自定义角色" title="添加自定义角色"></a>添加自定义角色</h2><ul>
+<li>添加角色接口为 POST /_xpack/security/role/<rolename></rolename></li>
+</ul>
+<p>下述示例为添加超级管理员角色的方法<figure class="highlight ada"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">[elasticsearch@elasticsearch elasticsearch-<span class="number">6.0</span>.<span class="number">0</span>]$ curl -XPOST -H <span class="symbol">‘Content</span>-<span class="keyword">type</span>: application/json’ -u elastic:elastic <span class="symbol">‘http</span>://<span class="number">10.59</span>.<span class="number">30.96</span>:<span class="number">9200</span>/_xpack/security/role/admin?pretty’ -d ‘&#123;</span><br><span class="line">&gt;   <span class="string">“run_as”</span>: [ <span class="string">“elastic”</span> ],</span><br><span class="line">&gt;   <span class="string">“cluster”</span>: [ <span class="string">“all”</span> ],</span><br><span class="line">&gt;   <span class="string">“indices”</span>: [</span><br><span class="line">&gt;     &#123;</span><br><span class="line">&gt;       <span class="string">“names”</span>: [ <span class="string">“<em>“</em></span> ],</span><br><span class="line">&gt;       <span class="string">“privileges”</span>: [ <span class="string">“all”</span> ]</span><br><span class="line">&gt;     &#125;</span><br><span class="line">&gt;   ]</span><br><span class="line">&gt; &#125;’</span><br><span class="line">&#123;</span><br><span class="line">  <span class="string">“role”</span> : &#123;</span><br><span class="line">    <span class="string">“created”</span> : <span class="type">true</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">[elasticsearch@elasticsearch elasticsearch-<span class="number">6.0</span>.<span class="number">0</span>]$ curl -XGET -H <span class="symbol">‘Content</span>-<span class="keyword">type</span>: application/json’ -u elastic:elastic <span class="symbol">‘http</span>://<span class="number">10.59</span>.<span class="number">30.96</span>:<span class="number">9200</span>/_xpack/security/role/admin?pretty’</span><br><span class="line">&#123;</span><br><span class="line">  <span class="string">“admin”</span> : &#123;</span><br><span class="line">    <span class="string">“cluster”</span> : [</span><br><span class="line">      <span class="string">“all”</span></span><br><span class="line">    ],</span><br><span class="line">    <span class="string">“indices”</span> : [</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="string">“names”</span> : [</span><br><span class="line">          <span class="string">““</span></span><br><span class="line">        ],</span><br><span class="line">        <span class="string">“privileges”</span> : [</span><br><span class="line">          <span class="string">“all”</span></span><br><span class="line">        ]</span><br><span class="line">      &#125;</span><br><span class="line">    ],</span><br><span class="line">    <span class="string">“run_as”</span> : [</span><br><span class="line">      <span class="string">“elastic”</span></span><br><span class="line">    ],</span><br><span class="line">    <span class="string">“metadata”</span> : &#123; &#125;,</span><br><span class="line">    <span class="string">“transient_metadata”</span> : &#123;</span><br><span class="line">      <span class="string">“enabled”</span> : <span class="type">true</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">[elasticsearch@elasticsearch elasticsearch-<span class="number">6.0</span>.<span class="number">0</span>]$</span><br></pre></td></tr></table></figure></p>
+<h2 id="添加自定义账户"><a href="#添加自定义账户" class="headerlink" title="添加自定义账户"></a><a href="#添加自定义账户" title="添加自定义账户"></a>添加自定义账户</h2><ul>
+<li>添加用户接口为 POST /_xpack/security/user/<username></username></li>
+</ul>
+<p>下述为添加martin账户并添加至admin角色操作方法<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">[elasticsearch<span class="meta">@elasticsearch</span> elasticsearch<span class="number">-6.0</span><span class="number">.0</span>]$ curl -<span class="type">XPOST</span> -<span class="type">H</span> <span class="symbol">‘Content</span>-<span class="class"><span class="keyword">type</span></span>: application/json’ -u elastic:elastic <span class="symbol">‘http</span>:<span class="comment">//10.59.30.96:9200/_xpack/security/user/martin?pretty’ -d ‘&#123;</span></span><br><span class="line">&gt;   <span class="string">“password”</span> : <span class="string">“123456”</span>,</span><br><span class="line">&gt;   <span class="string">“full_name”</span> : <span class="string">“Martin Lei”</span>,</span><br><span class="line">&gt;   <span class="string">“roles”</span> : [<span class="string">“admin”</span>],</span><br><span class="line">&gt;   <span class="string">“email”</span> : <span class="string">“<a href="mailto:martin@martin.com" target="_blank" rel="noopener">martin@martin.com</a>“</span></span><br><span class="line">&gt; &#125;’</span><br><span class="line">&#123;</span><br><span class="line">  <span class="string">“user”</span> : &#123;</span><br><span class="line">    <span class="string">“created”</span> : <span class="literal">true</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">[elasticsearch<span class="meta">@elasticsearch</span> elasticsearch<span class="number">-6.0</span><span class="number">.0</span>]$ curl -<span class="type">XGET</span> -<span class="type">H</span> <span class="symbol">‘Content</span>-<span class="class"><span class="keyword">type</span></span>: application/json’ -u elastic:elastic <span class="symbol">‘http</span>:<span class="comment">//10.59.30.96:9200/_xpack/security/user/martin?pretty’</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="string">“rocshen”</span> : &#123;</span><br><span class="line">    <span class="string">“username”</span> : <span class="string">“martin”</span>,</span><br><span class="line">    <span class="string">“roles”</span> : [</span><br><span class="line">      <span class="string">“admin”</span></span><br><span class="line">    ],</span><br><span class="line">    <span class="string">“full_name”</span> : <span class="string">“Martin Lei”</span>,</span><br><span class="line">    <span class="string">“email”</span> : <span class="string">“<a href="mailto:martin@martin.com" target="_blank" rel="noopener">martin@martin.com</a>“</span>,</span><br><span class="line">    <span class="string">“metadata”</span> : &#123; &#125;,</span><br><span class="line">    <span class="string">“enabled”</span> : <span class="literal">true</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">[elasticsearch<span class="meta">@elasticsearch</span> elasticsearch<span class="number">-6.0</span><span class="number">.0</span>]$ curl -<span class="type">XGET</span> -<span class="type">H</span> <span class="symbol">‘Content</span>-<span class="class"><span class="keyword">type</span></span>: application/json’ -u martin:<span class="number">123456</span> <span class="symbol">‘http</span>:<span class="comment">//10.59.30.96:9200/_cat/indices?pretty’</span></span><br><span class="line">yellow open .monitoring-es<span class="number">-6</span><span class="number">-2018.01</span><span class="number">.10</span>   nND6-i_rR5iLEYVccBGj8w <span class="number">1</span> <span class="number">1</span> <span class="number">4883</span> <span class="number">88</span>   <span class="number">2.5</span>mb   <span class="number">2.5</span>mb</span><br><span class="line">yellow open .triggered_watches            <span class="type">BtygGZisSDqiL3Y2TaQGqQ</span> <span class="number">1</span> <span class="number">1</span>    <span class="number">0</span>  <span class="number">0</span>  <span class="number">24.2</span>kb  <span class="number">24.2</span>kb</span><br><span class="line">green  open .security<span class="number">-6</span>                   <span class="type">QVRL1mcFSAilryHGEhen7Q</span> <span class="number">1</span> <span class="number">0</span>                        </span><br><span class="line">yellow open .watcher-history<span class="number">-6</span><span class="number">-2018.01</span><span class="number">.10</span> <span class="type">SBGiHDAnTPiXFoHU65VY_g</span> <span class="number">1</span> <span class="number">1</span>  <span class="number">630</span>  <span class="number">0</span> <span class="number">703.3</span>kb <span class="number">703.3</span>kb</span><br><span class="line">yellow open .watches                      kMzN4j5cQySZQQSDVPww8w <span class="number">1</span> <span class="number">1</span>    <span class="number">5</span>  <span class="number">0</span>  <span class="number">33.3</span>kb  <span class="number">33.3</span>kb</span><br><span class="line">yellow open .monitoring-alerts<span class="number">-6</span>          <span class="type">VygY6VN9R3S0PR_jrGy50Q</span> <span class="number">1</span> <span class="number">1</span>    <span class="number">1</span>  <span class="number">0</span>   <span class="number">6.5</span>kb   <span class="number">6.5</span>kb</span><br><span class="line">[elasticsearch<span class="meta">@elasticsearch</span> elasticsearch<span class="number">-6.0</span><span class="number">.0</span>]$</span><br></pre></td></tr></table></figure></p>
+<h2 id="修改账户密码"><a href="#修改账户密码" class="headerlink" title="修改账户密码"></a><a href="#修改账户密码" title="修改账户密码"></a>修改账户密码</h2><ol>
+<li>修改密码需使用超级管理员权限即elastic账户，接口为POST _xpack/security/user/<username>/_password</username></li>
+</ol>
+<p>curl参数含义如下</p>
+<ul>
+<li>-XPOST 使用post方法传递参数</li>
+<li>-H 指定http协议的header信息</li>
+<li>-u 指定用于认证的用户信息用户名与密码使用冒号分隔</li>
+<li>-d 指定具体要传递的参数信息<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[elasticsearch<span class="meta">@elasticsearch</span> elasticsearch<span class="number">-6.0</span><span class="number">.0</span>]$ curl -<span class="type">XPOST</span> -<span class="type">H</span> <span class="symbol">‘Content</span>-<span class="class"><span class="keyword">type</span></span>: application/json’ -u elastic:elastic <span class="symbol">‘http</span>:<span class="comment">//10.59.30.96:9200/_xpack/security/user/kibana/_password?pretty’ -d ‘&#123;”password”: “123456”&#125;’</span></span><br><span class="line">&#123; &#125;</span><br></pre></td></tr></table></figure></li>
+</ul>
+<ol>
+<li>密码修改后使用老密码访问则返回401，使用更新后的密码则正常<figure class="highlight cos"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">[elasticsearch@elasticsearch elasticsearch-<span class="number">6.0</span>.0]$ curl ‘http:<span class="comment">//10.59.30.96:9200/_cat/indices?pretty’ -u kibana:kibana</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="string">“error”</span> : &#123;</span><br><span class="line">    <span class="string">“root_cause”</span> : [</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="string">“type”</span> : <span class="string">“security_exception”</span>,</span><br><span class="line">        <span class="string">“reason”</span> : <span class="string">“failed to authenticate user [kibana]”</span>,</span><br><span class="line">        <span class="string">“header”</span> : &#123;</span><br><span class="line">          <span class="string">“WWW-Authenticate”</span> : <span class="string">“Basic realm=\”</span>security\<span class="string">“ charset=\”</span>UTF-<span class="number">8</span>\<span class="string">“”</span></span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    ],</span><br><span class="line">    <span class="string">“type”</span> : <span class="string">“security_exception”</span>,</span><br><span class="line">    <span class="string">“reason”</span> : <span class="string">“failed to authenticate user [kibana]”</span>,</span><br><span class="line">    <span class="string">“header”</span> : &#123;</span><br><span class="line">      <span class="string">“WWW-Authenticate”</span> : <span class="string">“Basic realm=\”</span>security\<span class="string">“ charset=\”</span>UTF-<span class="number">8</span>\<span class="string">“”</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="string">“status”</span> : <span class="number">401</span></span><br><span class="line">&#125;</span><br><span class="line">[elasticsearch@elasticsearch elasticsearch-<span class="number">6.0</span>.0]$ curl ‘http:<span class="comment">//10.59.30.96:9200/_cat/indices?pretty’ -u kibana:123456</span></span><br><span class="line">yellow <span class="keyword">open</span> .monitoring-es-<span class="number">6</span>-<span class="number">2018.01</span>.10   nND6-i_rR5iLEYVccBGj8w <span class="number">1</span> <span class="number">1</span>    </span><br><span class="line">yellow <span class="keyword">open</span> .triggered_watches            BtygGZisSDqiL3Y2TaQGqQ <span class="number">1</span> <span class="number">1</span>    </span><br><span class="line">green  <span class="keyword">open</span> .security-<span class="number">6</span>                   QVRL1mcFSAilryHGEhen7Q <span class="number">1</span> <span class="number">0</span>    </span><br><span class="line">yellow <span class="keyword">open</span> .watcher-history-<span class="number">6</span>-<span class="number">2018.01</span>.10 SBGiHDAnTPiXFoHU65VY_g <span class="number">1</span> <span class="number">1</span>    </span><br><span class="line">yellow <span class="keyword">open</span> .watches                      kMzN4j5cQySZQQSDVPww8w <span class="number">1</span> <span class="number">1</span>    </span><br><span class="line">yellow <span class="keyword">open</span> .monitoring-alerts-<span class="number">6</span>          VygY6VN9R3S0PR_jrGy50Q <span class="number">1</span> <span class="number">1</span>    </span><br><span class="line">[elasticsearch@elasticsearch elasticsearch-<span class="number">6.0</span>.0]$</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="配置ldap帐号认证"><a href="#配置ldap帐号认证" class="headerlink" title="配置ldap帐号认证"></a><a href="#配置ldap帐号认证" title="配置ldap帐号认证"></a>配置ldap帐号认证</h2><p>ldap服务安装可参考：<a href="https://segmentfault.com/a/11.." target="_blank" rel="noopener">https://segmentfault.com/a/11..</a>.</p>
+<p>添加下述ldap相关述配置 bind_dn为ldap的管理DN</p>
+<ul>
+<li>bind_password为管理dn的密码</li>
+<li>user_search.base_dn为linux系统账户信息导入ldap的信息</li>
+<li>user_search.attribute为账户在ldap中的标识信息</li>
+<li>group_search.base_dn为linux系统组信息导入ldap的信息<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">[elasticsearch@elasticsearch elasticsearch-<span class="number">6.0</span>.<span class="number">0</span>]$ vim config/elasticsearch<span class="selector-class">.yml</span> </span><br><span class="line"></span><br><span class="line">……</span><br><span class="line"></span><br><span class="line">network<span class="selector-class">.host</span>: <span class="number">10.59</span>.<span class="number">30.96</span></span><br><span class="line">bootstrap<span class="selector-class">.system_call_filter</span>: false</span><br><span class="line"></span><br><span class="line">xpack<span class="selector-class">.ssl</span><span class="selector-class">.key</span>: elasticsearch/elasticsearch.key</span><br><span class="line">xpack<span class="selector-class">.ssl</span><span class="selector-class">.certificate</span>: elasticsearch/elasticsearch.crt</span><br><span class="line">xpack<span class="selector-class">.ssl</span><span class="selector-class">.certificate_authorities</span>: ca/ca.crt</span><br><span class="line">xpack<span class="selector-class">.security</span><span class="selector-class">.transport</span><span class="selector-class">.ssl</span><span class="selector-class">.enabled</span>: true</span><br><span class="line"></span><br><span class="line">xpack:</span><br><span class="line">  security:</span><br><span class="line">    authc:</span><br><span class="line">      realms:</span><br><span class="line">        ldap1:</span><br><span class="line">          type: ldap</span><br><span class="line">          <span class="attribute">order</span>: <span class="number">0</span></span><br><span class="line">          url: <span class="string">“ldap://10.59.30.95”</span></span><br><span class="line">          bind_dn: <span class="string">“cn=Manager, dc=martin, dc=com”</span></span><br><span class="line">          bind_password: <span class="number">123456</span></span><br><span class="line">          user_search:</span><br><span class="line">            base_dn: <span class="string">“ou=People,dc=martin,dc=com”</span></span><br><span class="line">            attribute: uid</span><br><span class="line">          group_search:</span><br><span class="line">            base_dn: <span class="string">“ou=Group,dc=martin,dc=com”</span></span><br><span class="line">          unmapped_groups_as_roles: false</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="配置AD域帐号认证"><a href="#配置AD域帐号认证" class="headerlink" title="配置AD域帐号认证"></a><a href="#配置AD域帐号认证" title="配置AD域帐号认证"></a>配置AD域帐号认证</h2><p>添加下ldap相关述配置至elasticsearch.yml，此处为接着上述LDAP配置添加，如果只需配置AD认证请将ldap相关配置删除即可；</p>
+<ul>
+<li>domain_name为AD域的域名</li>
+<li>url为AD域的地址</li>
+<li>bind_dnw为随意的域账户名称（格式为user@domain）</li>
+<li>bind_password为上述账户的密码<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">xpack</span>:</span><br><span class="line">  <span class="attribute">security</span>:</span><br><span class="line">    <span class="attribute">authc</span>:</span><br><span class="line">      <span class="attribute">realms</span>:</span><br><span class="line">        <span class="attribute">ldap1</span>:</span><br><span class="line">          <span class="attribute">type</span>: ldap</span><br><span class="line">          <span class="attribute">order</span>: <span class="number">0</span></span><br><span class="line">          <span class="attribute">url</span>: <span class="string">“ldap://10.59.30.94”</span></span><br><span class="line">          <span class="attribute">bind_dn</span>: <span class="string">“cn=Manager, dc=martin, dc=com”</span></span><br><span class="line">          <span class="attribute">bind_password</span>: <span class="number">123456</span></span><br><span class="line">          <span class="attribute">user_search</span>:</span><br><span class="line">            <span class="attribute">base_dn</span>: <span class="string">“ou=People,dc=martin,dc=com”</span></span><br><span class="line">            <span class="attribute">attribute</span>: uid</span><br><span class="line">          <span class="attribute">group_search</span>:</span><br><span class="line">            <span class="attribute">base_dn</span>: <span class="string">“ou=Group,dc=martin,dc=com”</span></span><br><span class="line">          <span class="attribute">unmapped_groups_as_roles</span>: false</span><br><span class="line">        <span class="attribute">active_directory</span>:</span><br><span class="line">          <span class="attribute">type</span>: active_directory</span><br><span class="line">          <span class="attribute">order</span>: <span class="number">1</span></span><br><span class="line">          <span class="attribute">domain_name</span>: martin.com</span><br><span class="line">          <span class="attribute">url</span>: <span class="attribute">ldap</span>:<span class="comment">//ad.martin.com</span></span><br><span class="line">          <span class="attribute">bind_dn</span>: martin<span class="variable">@martin</span>.com</span><br><span class="line">          <span class="attribute">bind_password</span>: AD.<span class="number">123456</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<p>重启elasticsearch服务并使用ldap域账户user01登录</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">[elasticsearch<span class="meta">@elasticsearch</span> elasticsearch<span class="number">-6.0</span><span class="number">.0</span>]$ killall java</span><br><span class="line">[elasticsearch<span class="meta">@elasticsearch</span> elasticsearch<span class="number">-6.0</span><span class="number">.0</span>]$ .<span class="regexp">/bin/</span>elasticsearch -d</span><br><span class="line">[elasticsearch<span class="meta">@elasticsearch</span> elasticsearch<span class="number">-6.0</span><span class="number">.0</span>]$ curl -XGET -u <span class="string">user01:</span>user01 <span class="string">‘<a href="http://10.59.30.96:9200/_cat?pretty&#39;" target="_blank" rel="noopener">http://10.59.30.96:9200/_cat?pretty&#39;</a></span></span><br><span class="line">=^.^=</span><br><span class="line"><span class="regexp">/_cat/</span>allocation</span><br><span class="line"><span class="regexp">/_cat/</span>shards</span><br><span class="line"><span class="regexp">/_cat/</span>shards/&#123;index&#125;</span><br><span class="line"><span class="regexp">/_cat/</span>master</span><br><span class="line"><span class="regexp">/_cat/</span>nodes</span><br><span class="line"><span class="regexp">/_cat/</span>tasks</span><br><span class="line"><span class="regexp">/_cat/</span>indices</span><br><span class="line"><span class="regexp">/_cat/</span>indices/&#123;index&#125;</span><br><span class="line"><span class="regexp">/_cat/</span>segments</span><br><span class="line"><span class="regexp">/_cat/</span>segments/&#123;index&#125;</span><br><span class="line"><span class="regexp">/_cat/</span>count</span><br><span class="line"><span class="regexp">/_cat/</span>count/&#123;index&#125;</span><br><span class="line"><span class="regexp">/_cat/</span>recovery</span><br><span class="line"><span class="regexp">/_cat/</span>recovery/&#123;index&#125;</span><br><span class="line"><span class="regexp">/_cat/</span>health</span><br><span class="line"><span class="regexp">/_cat/</span>pending_tasks</span><br><span class="line"><span class="regexp">/_cat/</span>aliases</span><br><span class="line"><span class="regexp">/_cat/</span>aliases/&#123;alias&#125;</span><br><span class="line"><span class="regexp">/_cat/</span>thread_pool</span><br><span class="line"><span class="regexp">/_cat/</span>thread_pool/&#123;thread_pools&#125;</span><br><span class="line"><span class="regexp">/_cat/</span>plugins</span><br><span class="line"><span class="regexp">/_cat/</span>fielddata</span><br><span class="line"><span class="regexp">/_cat/</span>fielddata/&#123;fields&#125;</span><br><span class="line"><span class="regexp">/_cat/</span>nodeattrs</span><br><span class="line"><span class="regexp">/_cat/</span>repositories</span><br><span class="line"><span class="regexp">/_cat/</span>snapshots/&#123;repository&#125;</span><br><span class="line"><span class="regexp">/_cat/</span>templates</span><br><span class="line">[elasticsearch<span class="meta">@elasticsearch</span> elasticsearch<span class="number">-6.0</span><span class="number">.0</span>]$</span><br></pre></td></tr></table></figure>
+
+<p>使用AD域账户martin登录</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">[elasticsearch<span class="meta">@elasticsearch</span> elasticsearch<span class="number">-6.0</span><span class="number">.0</span>]$ curl <span class="string">http:</span><span class="comment">//10.59.30.96:9200/_cat?pretty -u martin:AD.123456</span></span><br><span class="line">=^.^=</span><br><span class="line"><span class="regexp">/_cat/</span>allocation</span><br><span class="line"><span class="regexp">/_cat/</span>shards</span><br><span class="line"><span class="regexp">/_cat/</span>shards/&#123;index&#125;</span><br><span class="line"><span class="regexp">/_cat/</span>master</span><br><span class="line"><span class="regexp">/_cat/</span>nodes</span><br><span class="line"><span class="regexp">/_cat/</span>tasks</span><br><span class="line"><span class="regexp">/_cat/</span>indices</span><br><span class="line"><span class="regexp">/_cat/</span>indices/&#123;index&#125;</span><br><span class="line"><span class="regexp">/_cat/</span>segments</span><br><span class="line"><span class="regexp">/_cat/</span>segments/&#123;index&#125;</span><br><span class="line"><span class="regexp">/_cat/</span>count</span><br><span class="line"><span class="regexp">/_cat/</span>count/&#123;index&#125;</span><br><span class="line"><span class="regexp">/_cat/</span>recovery</span><br><span class="line"><span class="regexp">/_cat/</span>recovery/&#123;index&#125;</span><br><span class="line"><span class="regexp">/_cat/</span>health</span><br><span class="line"><span class="regexp">/_cat/</span>pending_tasks</span><br><span class="line"><span class="regexp">/_cat/</span>aliases</span><br><span class="line"><span class="regexp">/_cat/</span>aliases/&#123;alias&#125;</span><br><span class="line"><span class="regexp">/_cat/</span>thread_pool</span><br><span class="line"><span class="regexp">/_cat/</span>thread_pool/&#123;thread_pools&#125;</span><br><span class="line"><span class="regexp">/_cat/</span>plugins</span><br><span class="line"><span class="regexp">/_cat/</span>fielddata</span><br><span class="line"><span class="regexp">/_cat/</span>fielddata/&#123;fields&#125;</span><br><span class="line"><span class="regexp">/_cat/</span>nodeattrs</span><br><span class="line"><span class="regexp">/_cat/</span>repositories</span><br><span class="line"><span class="regexp">/_cat/</span>snapshots/&#123;repository&#125;</span><br><span class="line"><span class="regexp">/_cat/</span>templates</span><br><span class="line">[elasticsearch<span class="meta">@elasticsearch</span> elasticsearch<span class="number">-6.0</span><span class="number">.0</span>]$</span><br></pre></td></tr></table></figure>
+
+<h2 id="为域账户信息映射角色"><a href="#为域账户信息映射角色" class="headerlink" title="为域账户信息映射角色"></a><a href="#为域账户信息映射角色" title="为域账户信息映射角色"></a>为域账户信息映射角色</h2><p>接口为：POST /_xpack/security/role_mapping/<name></name></p>
+<p>下述为映射user1*账户为管理员角色的操作步骤</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">[elasticsearch<span class="meta">@elasticsearch</span> elasticsearch<span class="number">-6.0</span><span class="number">.0</span>]$ curl -<span class="type">XPOST</span> -<span class="type">H</span> <span class="symbol">‘Content</span>-<span class="class"><span class="keyword">type</span></span>: application/json’ -u elastic:elastic <span class="symbol">‘http</span>:<span class="comment">//10.59.30.96:9200/_xpack/security/role_mapping/ldap_user_admin?pretty’ -d ‘&#123;</span></span><br><span class="line">&gt;   <span class="string">“roles”</span>: [ <span class="string">“admin”</span> ],</span><br><span class="line">&gt;   <span class="string">“enabled”</span>: <span class="literal">true</span>,</span><br><span class="line">&gt;   <span class="string">“rules”</span>: &#123;</span><br><span class="line">&gt;     <span class="string">“any”</span>: [</span><br><span class="line">&gt;       &#123;</span><br><span class="line">&gt;         <span class="string">“field”</span>: &#123;</span><br><span class="line">&gt;           <span class="string">“username”</span>: <span class="string">“/user1<em>/“</em></span></span><br><span class="line">&gt;         &#125;</span><br><span class="line">&gt;       &#125;</span><br><span class="line">&gt;     ]</span><br><span class="line">&gt;   &#125;</span><br><span class="line">&gt; &#125;’</span><br><span class="line">&#123;</span><br><span class="line">  <span class="string">“role_mapping”</span> : &#123;</span><br><span class="line">    <span class="string">“created”</span> : <span class="literal">true</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">[elasticsearch<span class="meta">@elasticsearch</span> elasticsearch<span class="number">-6.0</span><span class="number">.0</span>]$ curl -<span class="type">XGET</span> -<span class="type">H</span> <span class="symbol">‘Content</span>-<span class="class"><span class="keyword">type</span></span>: application/json’ -u elastic:elastic <span class="symbol">‘http</span>:<span class="comment">//10.59.30.96:9200/_xpack/security/role_mapping/ldap_user_admin?pretty’</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="string">“ldap_user_admin”</span> : &#123;</span><br><span class="line">    <span class="string">“enabled”</span> : <span class="literal">true</span>,</span><br><span class="line">    <span class="string">“roles”</span> : [</span><br><span class="line">      <span class="string">“admin”</span></span><br><span class="line">    ],</span><br><span class="line">    <span class="string">“rules”</span> : &#123;</span><br><span class="line">      <span class="string">“any”</span> : [</span><br><span class="line">        &#123;</span><br><span class="line">          <span class="string">“field”</span> : &#123;</span><br><span class="line">            <span class="string">“username”</span> : <span class="string">“/user1/“</span></span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">      ]</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="string">“metadata”</span> : &#123; &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">[elasticsearch<span class="meta">@elasticsearch</span> elasticsearch<span class="number">-6.0</span><span class="number">.0</span>]$</span><br></pre></td></tr></table></figure>
+
+<p>验证域账户权限，使用user01无权访问indices接口，使用user11可以访问；</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">[elasticsearch@elasticsearch elasticsearch-<span class="number">6.0</span>.<span class="number">0</span>]$ curl -XGET -u user01:user01 <span class="string">‘<a href="http://10.59.30.96:9200/_cat/indices?pretty&#39;" target="_blank" rel="noopener">http://10.59.30.96:9200/_cat/indices?pretty&#39;</a></span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="string">“error”</span> : &#123;</span><br><span class="line">    <span class="string">“root_cause”</span> : [</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="string">“type”</span> : <span class="string">“security_exception”</span>,</span><br><span class="line">        <span class="string">“reason”</span> : <span class="string">“action [cluster:monitor/state] is unauthorized for user [user01]”</span></span><br><span class="line">      &#125;</span><br><span class="line">    ],</span><br><span class="line">    <span class="string">“type”</span> : <span class="string">“security_exception”</span>,</span><br><span class="line">    <span class="string">“reason”</span> : <span class="string">“action [cluster:monitor/state] is unauthorized for user [user01]”</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="string">“status”</span> : <span class="number">403</span></span><br><span class="line">&#125;</span><br><span class="line">[elasticsearch@elasticsearch elasticsearch-<span class="number">6.0</span>.<span class="number">0</span>]$ curl -XGET -u user11:user11 <span class="string">‘<a href="http://10.59.30.96:9200/_cat/indices?pretty&#39;" target="_blank" rel="noopener">http://10.59.30.96:9200/_cat/indices?pretty&#39;</a></span></span><br><span class="line">yellow open <span class="selector-class">.monitoring-es-6-2018</span>.<span class="number">01.10</span>   nND6-i_rR5iLEYVccBGj8w <span class="number">1</span> <span class="number">1</span> <span class="number">6178</span> <span class="number">44</span>  <span class="number">5.9</span>mb  <span class="number">5.9</span>mb</span><br><span class="line">yellow open <span class="selector-class">.triggered_watches</span>            BtygGZisSDqiL3Y2TaQGqQ <span class="number">1</span> <span class="number">1</span>    <span class="number">0</span>  <span class="number">0</span> <span class="number">11.7</span>kb <span class="number">11.7</span>kb</span><br><span class="line">green  open <span class="selector-class">.security-6</span>                   QVRL1mcFSAilryHGEhen7Q <span class="number">1</span> <span class="number">0</span>                      </span><br><span class="line">yellow open <span class="selector-class">.watcher-history-6-2018</span>.<span class="number">01.10</span> SBGiHDAnTPiXFoHU65VY_g <span class="number">1</span> <span class="number">1</span>  <span class="number">777</span>  <span class="number">0</span>  <span class="number">1.1</span>mb  <span class="number">1.1</span>mb</span><br><span class="line">yellow open <span class="selector-class">.watches</span>                      kMzN4j5cQySZQQSDVPww8w <span class="number">1</span> <span class="number">1</span>    <span class="number">5</span>  <span class="number">0</span> <span class="number">40.2</span>kb <span class="number">40.2</span>kb</span><br><span class="line">yellow open <span class="selector-class">.monitoring-alerts-6</span>          VygY6VN9R3S0PR_jrGy50Q <span class="number">1</span> <span class="number">1</span>    <span class="number">1</span>  <span class="number">0</span> <span class="number">12.8</span>kb <span class="number">12.8</span>kb</span><br><span class="line">[elasticsearch@elasticsearch elasticsearch-<span class="number">6.0</span>.<span class="number">0</span>]$</span><br></pre></td></tr></table></figure>
+
+<h2 id="常见报错"><a href="#常见报错" class="headerlink" title="常见报错"></a><a href="#常见报错" title="常见报错"></a>常见报错</h2><p>No subject alternative names matching IP address</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[2018-01-10T19:19:35,483][WARN ][o.e.x.s.t.n.SecurityNetty4Transport] [fzP4t-4] exception caught on transport layer [[id: 0x5d97fe48, L:/0:0:0:0:0:0:0:1:49121 ! R:/0:0:0:0:0:0:0:1:9300]], closing connection</span><br><span class="line">    io.netty.handler.codec.DecoderException: javax.net.ssl.SSLHandshakeException: General SSLEngine problem</span><br><span class="line"><span class="built_in">..</span><span class="built_in">..</span><span class="built_in">..</span></span><br><span class="line">Caused by: java.security.cert.CertificateException: <span class="literal">No</span> subject alternative names matching<span class="built_in"> IP address </span>0:0:0:0:0:0:0:1 found</span><br></pre></td></tr></table></figure>
+
+<p>解决方案为一种是关闭IPv6地址，另一种是修改ES_HOME/config/elasticsearch.yml中的network.host值为本机eth0的IP</p>
+<h2 id="参考文档"><a href="#参考文档" class="headerlink" title="参考文档"></a><a href="#参考文档" title="参考文档"></a>参考文档</h2><ul>
+<li>官方安装步骤：<a href="https://www.elastic.co/guide/.." target="_blank" rel="noopener">https://www.elastic.co/guide/..</a>.</li>
+<li>配置内置账户密码：<br><a href="https://www.elastic.co/guide/.." target="_blank" rel="noopener">https://www.elastic.co/guide/..</a>.</li>
+<li>修改账户密码：<br><a href="https://www.elastic.co/guide/.." target="_blank" rel="noopener">https://www.elastic.co/guide/..</a>.</li>
+<li>用户相关操作：<br><a href="https://www.elastic.co/guide/.." target="_blank" rel="noopener">https://www.elastic.co/guide/..</a>.</li>
+<li>使用LDAP认证： <a href="https://www.elastic.co/guide/.." target="_blank" rel="noopener">https://www.elastic.co/guide/..</a>.</li>
+<li>用户角色映射： <a href="https://www.elastic.co/guide/.." target="_blank" rel="noopener">https://www.elastic.co/guide/..</a>.</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/ELK/" rel="tag"># ELK</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/08/19/crontab、anacron、logrotate-relationship/" rel="next" title="crontab、anacron、logrotate relationship">
+                <i class="fa fa-chevron-left"></i> crontab、anacron、logrotate relationship
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/08/19/ElasticSearch-索引查询使用指南/" rel="prev" title="ElasticSearch 索引查询使用指南">
+                ElasticSearch 索引查询使用指南 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">褚成志</p>
+              <p class="site-description motion-element" itemprop="description">关注互联网的科技博客</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">67</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-name">分类</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">38</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#自定义内置账号"><span class="nav-number">1.</span> <span class="nav-text">自定义内置账号</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#验证内置账户访问"><span class="nav-number">2.</span> <span class="nav-text">验证内置账户访问</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#添加自定义角色"><span class="nav-number">3.</span> <span class="nav-text">添加自定义角色</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#添加自定义账户"><span class="nav-number">4.</span> <span class="nav-text">添加自定义账户</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#修改账户密码"><span class="nav-number">5.</span> <span class="nav-text">修改账户密码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置ldap帐号认证"><span class="nav-number">6.</span> <span class="nav-text">配置ldap帐号认证</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置AD域帐号认证"><span class="nav-number">7.</span> <span class="nav-text">配置AD域帐号认证</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#为域账户信息映射角色"><span class="nav-number">8.</span> <span class="nav-text">为域账户信息映射角色</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#常见报错"><span class="nav-number">9.</span> <span class="nav-text">常见报错</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考文档"><span class="nav-number">10.</span> <span class="nav-text">参考文档</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">褚成志</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

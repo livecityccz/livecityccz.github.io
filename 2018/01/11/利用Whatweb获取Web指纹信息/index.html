@@ -1,1 +1,734 @@
-<!-- build time:Wed Oct 17 2018 05:57:13 GMT+0000 (Coordinated Universal Time) --><!DOCTYPE html><html class="theme-next muse use-motion" lang="zh-Hans"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"><meta name="theme-color" content="#222"><meta http-equiv="Cache-Control" content="no-transform"><meta http-equiv="Cache-Control" content="no-siteapp"><link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"><link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css"><link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css"><link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4"><link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4"><link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4"><link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222"><meta name="keywords" content="编程之道,whatweb,"><link rel="alternate" href="/atom.xml" title="褚成志的博客" type="application/atom+xml"><meta name="description" content="我都寂寞多久了还是没好感觉全世界都在窃窃嘲笑又是很久没有更新博客啦，为啥呢？因为在忙开发、开发、开发。我最近在研究指纹扫描以及漏洞扫描方面的设计与开发，从前端、后端到数据存储、消息队列再到分布式部署，感觉自己简直快成全栈了。不过开发过程中也有很多收获，有时间我会写博客分享一下。那么今天写点啥呢？就分享个很老的安全工具吧——whatweb，相信很多朋友应该知道，用来扫web指纹的。为啥会用到它，因为"><meta name="keywords" content="编程之道,whatweb"><meta property="og:type" content="article"><meta property="og:title" content="利用Whatweb获取Web指纹信息"><meta property="og:url" content="http://www.chucz.club/2018/01/11/利用Whatweb获取Web指纹信息/index.html"><meta property="og:site_name" content="褚成志的博客"><meta property="og:description" content="我都寂寞多久了还是没好感觉全世界都在窃窃嘲笑又是很久没有更新博客啦，为啥呢？因为在忙开发、开发、开发。我最近在研究指纹扫描以及漏洞扫描方面的设计与开发，从前端、后端到数据存储、消息队列再到分布式部署，感觉自己简直快成全栈了。不过开发过程中也有很多收获，有时间我会写博客分享一下。那么今天写点啥呢？就分享个很老的安全工具吧——whatweb，相信很多朋友应该知道，用来扫web指纹的。为啥会用到它，因为"><meta property="og:locale" content="zh-Hans"><meta property="og:updated_time" content="2018-09-28T08:51:24.508Z"><meta name="twitter:card" content="summary"><meta name="twitter:title" content="利用Whatweb获取Web指纹信息"><meta name="twitter:description" content="我都寂寞多久了还是没好感觉全世界都在窃窃嘲笑又是很久没有更新博客啦，为啥呢？因为在忙开发、开发、开发。我最近在研究指纹扫描以及漏洞扫描方面的设计与开发，从前端、后端到数据存储、消息队列再到分布式部署，感觉自己简直快成全栈了。不过开发过程中也有很多收获，有时间我会写博客分享一下。那么今天写点啥呢？就分享个很老的安全工具吧——whatweb，相信很多朋友应该知道，用来扫web指纹的。为啥会用到它，因为"><script type="text/javascript" id="hexo.configurations">var NexT=window.NexT||{},CONFIG={root:"/",scheme:"Muse",version:"5.1.4",sidebar:{position:"left",display:"post",offset:12,b2t:!1,scrollpercent:!1,onmobile:!1},fancybox:!0,tabs:!0,motion:{enable:!0,async:!1,transition:{post_block:"fadeIn",post_header:"slideDownIn",post_body:"slideDownIn",coll_header:"slideLeftIn",sidebar:"slideUpIn"}},duoshuo:{userId:"0",author:"博主"},algolia:{applicationID:"ZM9CKN0W4R",apiKey:"5bc5819b162e1cd440b44b16ef207a44",indexName:"chucz.club",hits:{per_page:10},labels:{input_placeholder:"Search for Posts",hits_empty:"We didn't find any results for the search: ${query}",hits_stats:"${hits} results found in ${time} ms"}}}</script><link rel="canonical" href="http://www.chucz.club/2018/01/11/利用Whatweb获取Web指纹信息/"><title>利用Whatweb获取Web指纹信息 | 褚成志的博客</title></head><body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans"><div class="container sidebar-position-left page-post-detail"><div class="headband"></div><header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="header-inner"><div class="site-brand-wrapper"><div class="site-meta"><div class="custom-logo-site-title"><a href="/" class="brand" rel="start"><span class="logo-line-before"><i></i></span> <span class="site-title">褚成志的博客</span> <span class="logo-line-after"><i></i></span></a></div><p class="site-subtitle">青青子衿, 悠悠我心</p></div><div class="site-nav-toggle"><button><span class="btn-bar"></span> <span class="btn-bar"></span> <span class="btn-bar"></span></button></div></div><nav class="site-nav"><ul id="menu" class="menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i><br>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i><br>归档</a></li></ul></nav></div></header><main id="main" class="main"><div class="main-inner"><div class="content-wrap"><div id="content" class="content"><div id="posts" class="posts-expand"><article class="post post-type-normal" itemscope itemtype="http://schema.org/Article"><div class="post-block"><link itemprop="mainEntityOfPage" href="http://www.chucz.club/2018/01/11/利用Whatweb获取Web指纹信息/"><span hidden itemprop="author" itemscope itemtype="http://schema.org/Person"><meta itemprop="name" content="褚成志"><meta itemprop="description" content=""><meta itemprop="image" content="/images/avatar.gif"></span><span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization"><meta itemprop="name" content="褚成志的博客"></span><header class="post-header"><h1 class="post-title" itemprop="name headline">利用Whatweb获取Web指纹信息</h1><div class="post-meta"><span class="post-time"><span class="post-meta-item-icon"><i class="fa fa-calendar-o"></i> </span><span class="post-meta-item-text">发表于</span> <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-11T04:29:30+00:00">2018-01-11</time></span></div></header><div class="post-body" itemprop="articleBody"><blockquote><p>我都寂寞多久了还是没好<br>感觉全世界都在窃窃嘲笑</p></blockquote><p>又是很久没有更新博客啦，为啥呢？因为在忙开发、开发、开发。我最近在研究指纹扫描以及漏洞扫描方面的设计与开发，从前端、后端到数据存储、消息队列再到分布式部署，感觉自己简直快成全栈了。不过开发过程中也有很多收获，有时间我会写博客分享一下。<br><a id="more"></a><br>那么今天写点啥呢？就分享个很老的安全工具吧——whatweb，相信很多朋友应该知道，用来扫web指纹的。为啥会用到它，因为项目需要啊，其实也可以不用，因为我自己写了很多扫描指纹的插件，这个只是作为备案选择而已。但既然用到了，那就理所当然要为它打call。好了，照旧先介绍如何安装，再介绍如何使用，本文重点在于环境安装，以及如何在python代码中比较<code>优雅</code>的使用whatweb。</p><h3 id="安装升级ruby"><a href="#安装升级ruby" class="headerlink" title="安装升级ruby"></a><a href="#安装升级ruby" title="安装升级ruby"></a>安装升级ruby</h3><p>whatweb是用ruby开发的，因此服务器上需要安装ruby，且对版本有要求，貌似必须2.0以上（没记错的话）。目前很多服务器内置的ruby是1.8的，或者用yum install ruby安装的也是1.8的，因此需要安装或者升级版本到2.0以上才行。</p><h4 id="升级方案one（推荐）"><a href="#升级方案one（推荐）" class="headerlink" title="升级方案one（推荐）"></a><a href="#升级方案one（推荐）" title="升级方案one（推荐）"></a>升级方案one（推荐）</h4><p>先删除原来的ruby：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">yum remove ruby ruby-devel</div></pre></td></tr></table></figure><p>下载ruby安装包，并进行编译安装：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">wget <a href="http://cache.ruby-lang.org/pub/ruby/2.1/ruby-2.1.2.tar.gz" target="_blank" rel="noopener">http://cache.ruby-lang.org/pub/ruby/2.1/ruby-2.1.2.tar.gz</a></div><div class="line">tar xvfvz ruby-2.1.2.tar.gz</div><div class="line">./configure</div><div class="line">make</div><div class="line">sudo make install</div></pre></td></tr></table></figure><p>将ruby添加到环境变量，ruby安装在/usr/local/bin/目录下，因此编辑 ~/.bash_profile文件，添加一下内容：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">PATH=<span class="variable">$PATH</span>:/usr/<span class="built_in">local</span>/bin/</div></pre></td></tr></table></figure><p>不要忘了生效一下：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">source</span> ~/.bash_profile</div></pre></td></tr></table></figure><p>参考：<a href="http://ask.xmodulo.com/upgrade-ruby-centos.html" target="_blank" rel="noopener">http://ask.xmodulo.com/upgrade-ruby-centos.html</a></p><h4 id="升级方案two"><a href="#升级方案two" class="headerlink" title="升级方案two"></a><a href="#升级方案two" title="升级方案two"></a>升级方案two</h4><p>先安装rvm，这是ruby的包管理器:</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$ curl -L get.rvm.io | bash -s stable  </div><div class="line">$ <span class="built_in">source</span> ~/.bash_profile</div></pre></td></tr></table></figure><p>测试是否安装成功:</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">rvm -v</div></pre></td></tr></table></figure><p>利用rvm升级ruby:</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">ruby -v  <span class="comment">#查看当前ruby版本  </span></div><div class="line">rvm list known  <span class="comment">#列出已知的ruby版本</span></div><div class="line">rvm install 2.0 <span class="comment">#安装ruby 2.0</span></div></pre></td></tr></table></figure><h3 id="安装whatweb"><a href="#安装whatweb" class="headerlink" title="安装whatweb"></a><a href="#安装whatweb" title="安装whatweb"></a>安装whatweb</h3><p>说起来这个就很简单，直接去github上clone下项目：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">git <span class="built_in">clone</span> <a href="https://github.com/urbanadventurer/WhatWeb.git" target="_blank" rel="noopener">https://github.com/urbanadventurer/WhatWeb.git</a></div></pre></td></tr></table></figure><p>项目内已经有编译好的可执行文件，whatweb，只需要添加个环境变量：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">PATH=<span class="variable">$PATH</span>:/root/WhatWeb-master/</div></pre></td></tr></table></figure><h3 id="使用whatweb"><a href="#使用whatweb" class="headerlink" title="使用whatweb"></a><a href="#使用whatweb" title="使用whatweb"></a>使用whatweb</h3><p>具体详细的使用方式就要参考<a href="https://github.com/urbanadventurer/WhatWeb" target="_blank" rel="noopener">github</a>了，我这边只介绍怎么在python中使用whatweb。</p><p>废话不多说，直接上代码：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#! -<em>- coding:utf-8 -</em>-</span></div><div class="line"></div><div class="line">import commands</div><div class="line">import re</div><div class="line"></div><div class="line"><span class="comment"># 正则表达式</span></div><div class="line">p_httpserver=re.compile(r<span class="string">“HTTPServer\x1b[0m[\x1b[1m\x1b[36m([^,]+?)\x1b[0m]“</span>)</div><div class="line">p_title=re.compile(r<span class="string">“Title\x1b[0m[\x1b[1m\x1b[33m(.+?)\x1b[0m]“</span>)</div><div class="line">p_ip=re.compile(r<span class="string">“IP\x1b[0m[\x1b[37m([^,]+?)\x1b[0m]“</span>)</div><div class="line">p_country=re.compile(r<span class="string">“Country\x1b[0m[\x1b[37m([^,]+?)\x1b[0m]“</span>)</div><div class="line">p_cookies=re.compile(r<span class="string">“Cookies\x1b[0m[\x1b[37m([^,]+?)\x1b[0m]“</span>)</div><div class="line">p_x_powered_by=re.compile(r<span class="string">“X-Powered-By\x1b[0m[\x1b[37m([^,]+?)\x1b[0m]“</span>)</div><div class="line"></div><div class="line">def re_grep(p,content):</div><div class="line">  <span class="comment"># 正则处理</span></div><div class="line">  L=p.findall(content)</div><div class="line">  <span class="keyword">if</span> len(L)&gt;0:</div><div class="line">    <span class="built_in">return</span> L[0]</div><div class="line">  <span class="keyword">else</span>:</div><div class="line">    <span class="built_in">return</span> <span class="string">“”</span></div><div class="line"></div><div class="line">def whatweb(url):</div><div class="line">    <span class="comment"># whatweb扫描</span></div><div class="line">    result=<span class="string">“”</span></div><div class="line">    httpserver=<span class="string">“”</span></div><div class="line">    title=<span class="string">“”</span></div><div class="line">    ip=<span class="string">“”</span></div><div class="line">    cookies=<span class="string">“”</span></div><div class="line">    country=<span class="string">“”</span></div><div class="line">    power_by=<span class="string">“”</span></div><div class="line"></div><div class="line">    try:</div><div class="line">        status,result=commands.getstatusoutput(<span class="string">‘whatweb ‘</span>+url)</div><div class="line">        <span class="comment"># print status,result</span></div><div class="line">    except IndexError,e:</div><div class="line">        <span class="built_in">print</span> e</div><div class="line">    <span class="keyword">else</span>:   </div><div class="line">        httpserver=re_grep(p_httpserver,result)</div><div class="line">        title=re_grep(p_title,result)</div><div class="line">        ip=re_grep(p_ip,result)</div><div class="line">        country=re_grep(p_country,result)</div><div class="line">        cookies=re_grep(p_cookies,result)</div><div class="line">        power_by=re_grep(p_x_powered_by,result)</div><div class="line"></div><div class="line">    <span class="built_in">return</span> httpserver,title,cookies,country,power_by</div><div class="line"></div><div class="line"></div><div class="line"><span class="keyword">if</span> <strong>name</strong>==<span class="string">“<strong>main</strong>“</span>:</div><div class="line"></div><div class="line">    result=whatweb(<span class="string">“thief.one”</span>)</div><div class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> result:</div><div class="line">        <span class="built_in">print</span> i</div></pre></td></tr></table></figure><p>说明：解释一下代码，主要就是一个正则表达式，因为运行whatweb会直接将结果打印，当然也有其他命令可以让其结果输出到文本等，但如果想要批量自动化扫描的话，需要实时获取whatweb的内容，生成文件的方式显然不行，因此我用了commands库，让python执行系统命令并获取返回结果，然后就是几个正则对结果的匹配。</p><p>结束之语：又水了一篇，嗯嗯！</p><p><code>如果有朋友有更好地在python代码中使用whatweb的方法，麻烦告知，我是被whatweb的输出折腾的够呛，因此才选择了用正则，无奈之举。</code></p></div><footer class="post-footer"><div class="post-tags"><a href="/tags/编程之道/" rel="tag"># 编程之道</a> <a href="/tags/whatweb/" rel="tag"># whatweb</a></div><div class="post-nav"><div class="post-nav-next post-nav-item"><a href="/2018/01/05/常用Git命令清单/" rel="next" title="常用Git命令清单"><i class="fa fa-chevron-left"></i> 常用Git命令清单</a></div><span class="post-nav-divider"></span><div class="post-nav-prev post-nav-item"><a href="/2018/02/04/记与某牛的一次饭局交流/" rel="prev" title="记与某牛的一次饭局交流">记与某牛的一次饭局交流 <i class="fa fa-chevron-right"></i></a></div></div></footer></div></article><div class="post-spread"></div></div></div></div><div class="sidebar-toggle"><div class="sidebar-toggle-line-wrap"><span class="sidebar-toggle-line sidebar-toggle-line-first"></span> <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span> <span class="sidebar-toggle-line sidebar-toggle-line-last"></span></div></div><aside id="sidebar" class="sidebar"><div class="sidebar-inner"><ul class="sidebar-nav motion-element"><li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">文章目录</li><li class="sidebar-nav-overview" data-target="site-overview-wrap">站点概览</li></ul><section class="site-overview-wrap sidebar-panel"><div class="site-overview"><div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person"><p class="site-author-name" itemprop="name">褚成志</p><p class="site-description motion-element" itemprop="description">关注互联网的科技博客</p></div><nav class="site-state motion-element"><div class="site-state-item site-state-posts"><a href="/archives/"><span class="site-state-item-count">67</span> <span class="site-state-item-name">日志</span></a></div><div class="site-state-item site-state-categories"><span class="site-state-item-count">1</span> <span class="site-state-item-name">分类</span></div><div class="site-state-item site-state-tags"><span class="site-state-item-count">38</span> <span class="site-state-item-name">标签</span></div></nav><div class="feed-link motion-element"><a href="/atom.xml" rel="alternate"><i class="fa fa-rss"></i> RSS</a></div></div></section><section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active"><div class="post-toc"><div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装升级ruby"><span class="nav-number">1.</span> <span class="nav-text">安装升级ruby</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#升级方案one（推荐）"><span class="nav-number">1.1.</span> <span class="nav-text">升级方案one（推荐）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#升级方案two"><span class="nav-number">1.2.</span> <span class="nav-text">升级方案two</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装whatweb"><span class="nav-number">2.</span> <span class="nav-text">安装whatweb</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用whatweb"><span class="nav-number">3.</span> <span class="nav-text">使用whatweb</span></a></li></ol></div></div></section></div></aside></div></main><footer id="footer" class="footer"><div class="footer-inner"><div class="copyright">&copy; <span itemprop="copyrightYear">2018</span> <span class="with-love"><i class="fa fa-user"></i> </span><span class="author" itemprop="copyrightHolder">褚成志</span></div><div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div><span class="post-meta-divider">|</span><div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div></div></footer><div class="back-to-top"><i class="fa fa-arrow-up"></i></div></div><script type="text/javascript">"[object Function]"!==Object.prototype.toString.call(window.Promise)&&(window.Promise=null)</script><script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script><script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script><script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script><script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script><script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script><script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script><script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script><script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script><script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script><script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script><script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script></body></html><!-- rebuild by neat -->
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="编程之道,whatweb," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="褚成志的博客" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="我都寂寞多久了还是没好感觉全世界都在窃窃嘲笑  　　又是很久没有更新博客啦，为啥呢？因为在忙开发、开发、开发。我最近在研究指纹扫描以及漏洞扫描方面的设计与开发，从前端、后端到数据存储、消息队列再到分布式部署，感觉自己简直快成全栈了。不过开发过程中也有很多收获，有时间我会写博客分享一下。　　那么今天写点啥呢？就分享个很老的安全工具吧——whatweb，相信很多朋友应该知道，用来扫web指纹的。为啥">
+<meta name="keywords" content="编程之道,whatweb">
+<meta property="og:type" content="article">
+<meta property="og:title" content="利用Whatweb获取Web指纹信息">
+<meta property="og:url" content="http://www.chucz.club/2018/01/11/利用Whatweb获取Web指纹信息/index.html">
+<meta property="og:site_name" content="褚成志的博客">
+<meta property="og:description" content="我都寂寞多久了还是没好感觉全世界都在窃窃嘲笑  　　又是很久没有更新博客啦，为啥呢？因为在忙开发、开发、开发。我最近在研究指纹扫描以及漏洞扫描方面的设计与开发，从前端、后端到数据存储、消息队列再到分布式部署，感觉自己简直快成全栈了。不过开发过程中也有很多收获，有时间我会写博客分享一下。　　那么今天写点啥呢？就分享个很老的安全工具吧——whatweb，相信很多朋友应该知道，用来扫web指纹的。为啥">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-09-28T08:51:24.508Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="利用Whatweb获取Web指纹信息">
+<meta name="twitter:description" content="我都寂寞多久了还是没好感觉全世界都在窃窃嘲笑  　　又是很久没有更新博客啦，为啥呢？因为在忙开发、开发、开发。我最近在研究指纹扫描以及漏洞扫描方面的设计与开发，从前端、后端到数据存储、消息队列再到分布式部署，感觉自己简直快成全栈了。不过开发过程中也有很多收获，有时间我会写博客分享一下。　　那么今天写点啥呢？就分享个很老的安全工具吧——whatweb，相信很多朋友应该知道，用来扫web指纹的。为啥">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'ZM9CKN0W4R',
+      apiKey: '5bc5819b162e1cd440b44b16ef207a44',
+      indexName: 'chucz.club',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.chucz.club/2018/01/11/利用Whatweb获取Web指纹信息/"/>
+
+
+
+
+
+  <title>利用Whatweb获取Web指纹信息 | 褚成志的博客</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">褚成志的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">青青子衿, 悠悠我心</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.chucz.club/2018/01/11/利用Whatweb获取Web指纹信息/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="褚成志">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="褚成志的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">利用Whatweb获取Web指纹信息</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-11T04:29:30+00:00">
+                2018-01-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>我都寂寞多久了还是没好<br>感觉全世界都在窃窃嘲笑</p>
+</blockquote>
+<p>　　又是很久没有更新博客啦，为啥呢？因为在忙开发、开发、开发。我最近在研究指纹扫描以及漏洞扫描方面的设计与开发，从前端、后端到数据存储、消息队列再到分布式部署，感觉自己简直快成全栈了。不过开发过程中也有很多收获，有时间我会写博客分享一下。<br><a id="more"></a><br>　　那么今天写点啥呢？就分享个很老的安全工具吧——whatweb，相信很多朋友应该知道，用来扫web指纹的。为啥会用到它，因为项目需要啊，其实也可以不用，因为我自己写了很多扫描指纹的插件，这个只是作为备案选择而已。但既然用到了，那就理所当然要为它打call。好了，照旧先介绍如何安装，再介绍如何使用，本文重点在于环境安装，以及如何在python代码中比较<code>优雅</code>的使用whatweb。</p>
+<h3 id="安装升级ruby"><a href="#安装升级ruby" class="headerlink" title="安装升级ruby"></a><a href="#安装升级ruby" title="安装升级ruby"></a>安装升级ruby</h3><p>whatweb是用ruby开发的，因此服务器上需要安装ruby，且对版本有要求，貌似必须2.0以上（没记错的话）。目前很多服务器内置的ruby是1.8的，或者用yum install ruby安装的也是1.8的，因此需要安装或者升级版本到2.0以上才行。</p>
+<h4 id="升级方案one（推荐）"><a href="#升级方案one（推荐）" class="headerlink" title="升级方案one（推荐）"></a><a href="#升级方案one（推荐）" title="升级方案one（推荐）"></a>升级方案one（推荐）</h4><p>先删除原来的ruby：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">yum remove ruby ruby-devel</div></pre></td></tr></table></figure>
+
+<p>下载ruby安装包，并进行编译安装：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">wget <a href="http://cache.ruby-lang.org/pub/ruby/2.1/ruby-2.1.2.tar.gz" target="_blank" rel="noopener">http://cache.ruby-lang.org/pub/ruby/2.1/ruby-2.1.2.tar.gz</a></div><div class="line">tar xvfvz ruby-2.1.2.tar.gz</div><div class="line">./configure</div><div class="line">make</div><div class="line">sudo make install</div></pre></td></tr></table></figure>
+
+<p>将ruby添加到环境变量，ruby安装在/usr/local/bin/目录下，因此编辑 ~/.bash_profile文件，添加一下内容：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">PATH=<span class="variable">$PATH</span>:/usr/<span class="built_in">local</span>/bin/</div></pre></td></tr></table></figure>
+
+<p>不要忘了生效一下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">source</span> ~/.bash_profile</div></pre></td></tr></table></figure>
+
+<p>参考：<a href="http://ask.xmodulo.com/upgrade-ruby-centos.html" target="_blank" rel="noopener">http://ask.xmodulo.com/upgrade-ruby-centos.html</a></p>
+<h4 id="升级方案two"><a href="#升级方案two" class="headerlink" title="升级方案two"></a><a href="#升级方案two" title="升级方案two"></a>升级方案two</h4><p>先安装rvm，这是ruby的包管理器:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$ curl -L get.rvm.io | bash -s stable  </div><div class="line">$ <span class="built_in">source</span> ~/.bash_profile</div></pre></td></tr></table></figure>
+
+<p>测试是否安装成功:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">rvm -v</div></pre></td></tr></table></figure>
+
+<p>利用rvm升级ruby:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">ruby -v  <span class="comment">#查看当前ruby版本  </span></div><div class="line">rvm list known  <span class="comment">#列出已知的ruby版本</span></div><div class="line">rvm install 2.0 <span class="comment">#安装ruby 2.0</span></div></pre></td></tr></table></figure>
+
+<h3 id="安装whatweb"><a href="#安装whatweb" class="headerlink" title="安装whatweb"></a><a href="#安装whatweb" title="安装whatweb"></a>安装whatweb</h3><p>说起来这个就很简单，直接去github上clone下项目：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">git <span class="built_in">clone</span> <a href="https://github.com/urbanadventurer/WhatWeb.git" target="_blank" rel="noopener">https://github.com/urbanadventurer/WhatWeb.git</a></div></pre></td></tr></table></figure>
+
+<p>项目内已经有编译好的可执行文件，whatweb，只需要添加个环境变量：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">PATH=<span class="variable">$PATH</span>:/root/WhatWeb-master/</div></pre></td></tr></table></figure>
+
+<h3 id="使用whatweb"><a href="#使用whatweb" class="headerlink" title="使用whatweb"></a><a href="#使用whatweb" title="使用whatweb"></a>使用whatweb</h3><p>具体详细的使用方式就要参考<a href="https://github.com/urbanadventurer/WhatWeb" target="_blank" rel="noopener">github</a>了，我这边只介绍怎么在python中使用whatweb。</p>
+<p>废话不多说，直接上代码：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#! -<em>- coding:utf-8 -</em>-</span></div><div class="line"></div><div class="line">import commands</div><div class="line">import re</div><div class="line"></div><div class="line"><span class="comment"># 正则表达式</span></div><div class="line">p_httpserver=re.compile(r<span class="string">“HTTPServer\x1b[0m[\x1b[1m\x1b[36m([^,]+?)\x1b[0m]“</span>)</div><div class="line">p_title=re.compile(r<span class="string">“Title\x1b[0m[\x1b[1m\x1b[33m(.+?)\x1b[0m]“</span>)</div><div class="line">p_ip=re.compile(r<span class="string">“IP\x1b[0m[\x1b[37m([^,]+?)\x1b[0m]“</span>)</div><div class="line">p_country=re.compile(r<span class="string">“Country\x1b[0m[\x1b[37m([^,]+?)\x1b[0m]“</span>)</div><div class="line">p_cookies=re.compile(r<span class="string">“Cookies\x1b[0m[\x1b[37m([^,]+?)\x1b[0m]“</span>)</div><div class="line">p_x_powered_by=re.compile(r<span class="string">“X-Powered-By\x1b[0m[\x1b[37m([^,]+?)\x1b[0m]“</span>)</div><div class="line"></div><div class="line">def re_grep(p,content):</div><div class="line">  <span class="comment"># 正则处理</span></div><div class="line">  L=p.findall(content)</div><div class="line">  <span class="keyword">if</span> len(L)&gt;0:</div><div class="line">    <span class="built_in">return</span> L[0]</div><div class="line">  <span class="keyword">else</span>:</div><div class="line">    <span class="built_in">return</span> <span class="string">“”</span></div><div class="line"></div><div class="line">def whatweb(url):</div><div class="line">    <span class="comment"># whatweb扫描</span></div><div class="line">    result=<span class="string">“”</span></div><div class="line">    httpserver=<span class="string">“”</span></div><div class="line">    title=<span class="string">“”</span></div><div class="line">    ip=<span class="string">“”</span></div><div class="line">    cookies=<span class="string">“”</span></div><div class="line">    country=<span class="string">“”</span></div><div class="line">    power_by=<span class="string">“”</span></div><div class="line"></div><div class="line">    try:</div><div class="line">        status,result=commands.getstatusoutput(<span class="string">‘whatweb ‘</span>+url)</div><div class="line">        <span class="comment"># print status,result</span></div><div class="line">    except IndexError,e:</div><div class="line">        <span class="built_in">print</span> e</div><div class="line">    <span class="keyword">else</span>:   </div><div class="line">        httpserver=re_grep(p_httpserver,result)</div><div class="line">        title=re_grep(p_title,result)</div><div class="line">        ip=re_grep(p_ip,result)</div><div class="line">        country=re_grep(p_country,result)</div><div class="line">        cookies=re_grep(p_cookies,result)</div><div class="line">        power_by=re_grep(p_x_powered_by,result)</div><div class="line"></div><div class="line">    <span class="built_in">return</span> httpserver,title,cookies,country,power_by</div><div class="line"></div><div class="line"></div><div class="line"><span class="keyword">if</span> <strong>name</strong>==<span class="string">“<strong>main</strong>“</span>:</div><div class="line"></div><div class="line">    result=whatweb(<span class="string">“thief.one”</span>)</div><div class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> result:</div><div class="line">        <span class="built_in">print</span> i</div></pre></td></tr></table></figure>
+
+<p>说明：解释一下代码，主要就是一个正则表达式，因为运行whatweb会直接将结果打印，当然也有其他命令可以让其结果输出到文本等，但如果想要批量自动化扫描的话，需要实时获取whatweb的内容，生成文件的方式显然不行，因此我用了commands库，让python执行系统命令并获取返回结果，然后就是几个正则对结果的匹配。</p>
+<p>结束之语：又水了一篇，嗯嗯！</p>
+<p><code>如果有朋友有更好地在python代码中使用whatweb的方法，麻烦告知，我是被whatweb的输出折腾的够呛，因此才选择了用正则，无奈之举。</code></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/编程之道/" rel="tag"># 编程之道</a>
+          
+            <a href="/tags/whatweb/" rel="tag"># whatweb</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/01/05/常用Git命令清单/" rel="next" title="常用Git命令清单">
+                <i class="fa fa-chevron-left"></i> 常用Git命令清单
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/02/04/记与某牛的一次饭局交流/" rel="prev" title="记与某牛的一次饭局交流">
+                记与某牛的一次饭局交流 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">褚成志</p>
+              <p class="site-description motion-element" itemprop="description">关注互联网的科技博客</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">67</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-name">分类</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">38</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装升级ruby"><span class="nav-number">1.</span> <span class="nav-text">安装升级ruby</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#升级方案one（推荐）"><span class="nav-number">1.1.</span> <span class="nav-text">升级方案one（推荐）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#升级方案two"><span class="nav-number">1.2.</span> <span class="nav-text">升级方案two</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装whatweb"><span class="nav-number">2.</span> <span class="nav-text">安装whatweb</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用whatweb"><span class="nav-number">3.</span> <span class="nav-text">使用whatweb</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">褚成志</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
