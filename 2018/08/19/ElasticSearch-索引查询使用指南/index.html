@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic|PT Mono:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="ELK," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="褚成志的博客" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="1.我们通常用用_cat API检测集群是否健康。 确保9200端口号可用:curl ‘localhost:9200/_cat/health?v’ 绿色表示一切正常, 黄色表示所有的数据可用但是部分副本还没有分配,红色表示部分数据因为某些原因不可用. 2.通过如下语句，我们可以获取集群的节点列表：curl ‘localhost:9200/_cat/nodes?v’ 3.通过如下语句，列出所有索引：">
+<meta name="keywords" content="ELK">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ElasticSearch 索引查询使用指南">
+<meta property="og:url" content="http://www.chucz.club/2018/08/19/ElasticSearch-索引查询使用指南/index.html">
+<meta property="og:site_name" content="褚成志的博客">
+<meta property="og:description" content="1.我们通常用用_cat API检测集群是否健康。 确保9200端口号可用:curl ‘localhost:9200/_cat/health?v’ 绿色表示一切正常, 黄色表示所有的数据可用但是部分副本还没有分配,红色表示部分数据因为某些原因不可用. 2.通过如下语句，我们可以获取集群的节点列表：curl ‘localhost:9200/_cat/nodes?v’ 3.通过如下语句，列出所有索引：">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://cos.leiyawu.com/img/elk_index_check_1.png">
+<meta property="og:image" content="http://cos.leiyawu.com/img/elk_index_check_2.png">
+<meta property="og:image" content="http://cos.leiyawu.com/img/elk_index_check_3.png">
+<meta property="og:image" content="http://cos.leiyawu.com/img/elk_index_check_4.png">
+<meta property="og:image" content="http://cos.leiyawu.com/img/elk_index_check_5.png">
+<meta property="og:image" content="http://cos.leiyawu.com/img/elk_index_check_6.png">
+<meta property="og:image" content="http://cos.leiyawu.com/img/elk_index_check_7.png">
+<meta property="og:image" content="http://cos.leiyawu.com/img/elk_index_check_8.png">
+<meta property="og:image" content="http://cos.leiyawu.com/img/elk_index_check_9.png">
+<meta property="og:image" content="http://cos.leiyawu.com/img/elk_index_check_10.png">
+<meta property="og:image" content="http://cos.leiyawu.com/img/elk_index_check_11.png">
+<meta property="og:updated_time" content="2018-09-28T08:25:28.616Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ElasticSearch 索引查询使用指南">
+<meta name="twitter:description" content="1.我们通常用用_cat API检测集群是否健康。 确保9200端口号可用:curl ‘localhost:9200/_cat/health?v’ 绿色表示一切正常, 黄色表示所有的数据可用但是部分副本还没有分配,红色表示部分数据因为某些原因不可用. 2.通过如下语句，我们可以获取集群的节点列表：curl ‘localhost:9200/_cat/nodes?v’ 3.通过如下语句，列出所有索引：">
+<meta name="twitter:image" content="http://cos.leiyawu.com/img/elk_index_check_1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'ZM9CKN0W4R',
+      apiKey: '5bc5819b162e1cd440b44b16ef207a44',
+      indexName: 'chucz.club',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.chucz.club/2018/08/19/ElasticSearch-索引查询使用指南/"/>
+
+
+
+
+
+  <title>ElasticSearch 索引查询使用指南 | 褚成志的博客</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?ec370060725333b3929ba080f40e7116";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">褚成志的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">青青子衿, 悠悠我心</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.chucz.club/2018/08/19/ElasticSearch-索引查询使用指南/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="褚成志">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="褚成志的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">ElasticSearch 索引查询使用指南</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-19T01:56:47+00:00">
+                2018-08-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>1.我们通常用用<a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/cat.html" target="_blank" rel="noopener">_cat API</a>检测集群是否健康。 确保9200端口号可用:<br>curl ‘localhost:9200/_cat/health?v’</p>
+<p>绿色表示一切正常, 黄色表示所有的数据可用但是部分副本还没有分配,红色表示部分数据因为某些原因不可用.</p>
+<p>2.通过如下语句，我们可以获取集群的节点列表：<br>curl ‘localhost:9200/_cat/nodes?v’</p>
+<p>3.通过如下语句，列出所有索引：<br>curl ‘localhost:9200/_cat/indices?v’<br>返回结果：</p>
+<p><img src="http://cos.leiyawu.com/img/elk_index_check_1.png" alt="图1"> 　　</p>
+<p>4.创建索引<br>现在我们创建一个名为“customer”的索引，然后再查看所有的索引：<br> curl -XPUT ‘localhost:9200/customer?pretty’<br> curl ‘localhost:9200/_cat/indices?v’</p>
+<p>结果如下：</p>
+<p><img src="http://cos.leiyawu.com/img/elk_index_check_2.png" alt="图2"></p>
+<p><img src="http://cos.leiyawu.com/img/elk_index_check_3.png" alt="图3"></p>
+<p>上图中红框所表示的是：我们有一个叫customer的索引，它有五个私有的分片以及一个副本，在它里面有0个文档。<br><a id="more"></a></p>
+<p>5.插入和获取<br>现在我么插入一些数据到集群索引。我们必须给ES指定所以的类型。如下语句：”external” type, ID：1:<br>主体为JSON格式的语句： { “name”: “John Doe” }</p>
+<figure class="highlight scilab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">curl -XPUT <span class="string">‘localhost:9200/customer/external/1?pretty’</span> -d <span class="string">‘</span></span><br><span class="line"><span class="string">&#123;</span></span><br><span class="line"><span class="string">     　　  “</span>name<span class="string">“: “</span>John Doe<span class="string">“</span></span><br><span class="line"><span class="string">&#125;’</span></span><br></pre></td></tr></table></figure>
+
+<p>返回结果为：create：true 表示插入成功。<br><img src="http://cos.leiyawu.com/img/elk_index_check_4.png" alt="图4"></p>
+<p>获取GET，语句如下：</p>
+<figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -XGET ‘localhost:<span class="number">9200</span>/customer/external/1?pretty’</span><br></pre></td></tr></table></figure>
+
+<p>其中含义为：获取customer索引下类型为external，id为1的数据，pretty参数表示返回结果格式美观。</p>
+<p><img src="http://cos.leiyawu.com/img/elk_index_check_5.png" alt="图5"></p>
+<p>6.删除索引 DELETE</p>
+<figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">curl -XDELETE ‘localhost:<span class="number">9200</span>/customer?pretty’</span><br><span class="line">curl ‘localhost:<span class="number">9200</span>/_cat/indices?v’</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://cos.leiyawu.com/img/elk_index_check_6.png" alt="图6"></p>
+<p>表示索引删除成功。</p>
+<p>7.通过以上命令语句的学习，我们发现索引的增删改查有一个类似的格式，总结如下：</p>
+<figure class="highlight elixir"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">curl -X&lt;REST Verb&gt; &lt;Node&gt;<span class="symbol">:&lt;Port&gt;/&lt;Index&gt;/&lt;Type&gt;/&lt;ID&gt;</span></span><br><span class="line">&lt;REST Verb&gt;：REST风格的语法谓词</span><br><span class="line">&lt;Node&gt;<span class="symbol">:</span>节点ip</span><br><span class="line">&lt;port&gt;<span class="symbol">:</span>节点端口号，默认<span class="number">9200</span></span><br><span class="line">&lt;Index&gt;<span class="symbol">:</span>索引名</span><br><span class="line">&lt;Type&gt;<span class="symbol">:</span>索引类型</span><br><span class="line">&lt;ID&gt;<span class="symbol">:</span>操作对象的ID号</span><br></pre></td></tr></table></figure>
+
+<p>8 修改数据</p>
+<figure class="highlight scilab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">curl -XPUT <span class="string">‘localhost:9200/customer/external/1?pretty’</span> -d <span class="string">‘</span></span><br><span class="line"><span class="string">&#123;</span></span><br><span class="line"><span class="string">  “</span>name<span class="string">“: “</span>John Doe<span class="string">“</span></span><br><span class="line"><span class="string">&#125;’</span></span><br><span class="line">curl -XPUT <span class="string">‘localhost:9200/customer/external/1?pretty’</span> -d <span class="string">‘</span></span><br><span class="line"><span class="string">&#123;</span></span><br><span class="line"><span class="string">  “</span>name<span class="string">“: “</span>Jane Doe<span class="string">“</span></span><br><span class="line"><span class="string">&#125;’</span></span><br></pre></td></tr></table></figure>
+
+<p>上述命令语句是：先新增id为1，name为John Doe的数据，然后将id为1的name修改为Jane Doe。</p>
+<p>9.更新数据<br>9.1 这个例子展示如何将id为1文档的name字段更新为Jane Doe：</p>
+<figure class="highlight scilab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">curl -XPOST <span class="string">‘localhost:9200/customer/external/1/_update?pretty’</span> -d <span class="string">‘</span></span><br><span class="line"><span class="string">&#123;</span></span><br><span class="line"><span class="string">  “</span>doc<span class="string">“: &#123; “</span>name<span class="string">“: “</span>Jane Doe<span class="string">“ &#125;</span></span><br><span class="line"><span class="string">&#125;’</span></span><br></pre></td></tr></table></figure>
+
+<p>9.2 这个例子展示如何将id为1数据的name字段更新为Jane Doe同时增加字段age为20:</p>
+<figure class="highlight scilab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">curl -XPOST <span class="string">‘localhost:9200/customer/external/1/_update?pretty’</span> -d <span class="string">‘</span></span><br><span class="line"><span class="string">&#123;</span></span><br><span class="line"><span class="string">  “</span>doc<span class="string">“: &#123; “</span>name<span class="string">“: “</span>Jane Doe<span class="string">“, “</span>age<span class="string">“: 20 &#125;</span></span><br><span class="line"><span class="string">&#125;’</span></span><br></pre></td></tr></table></figure>
+
+<p>9.3  也可以通过一些简单的scripts来执行更新。一下语句通过使用script将年龄增加5:</p>
+<figure class="highlight scilab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">curl -XPOST <span class="string">‘localhost:9200/customer/external/1/_update?pretty’</span> -d <span class="string">‘</span></span><br><span class="line"><span class="string">&#123;</span></span><br><span class="line"><span class="string">  “</span>script<span class="string">“ : “</span>ctx._source.age += <span class="number">5</span><span class="string">“</span></span><br><span class="line"><span class="string">&#125;’</span></span><br></pre></td></tr></table></figure>
+
+<p>10 删除数据<br>删除数据那是相当的直接. 下面的语句将执行删除Customer中ID为2的数据：</p>
+<figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -XDELETE ‘localhost:<span class="number">9200</span>/customer/external/2?pretty’</span><br></pre></td></tr></table></figure>
+
+<p>11 批处理<br>举例:<br>下面语句将在一个批量操作中执行创建索引：</p>
+<figure class="highlight scilab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">curl -XPOST <span class="string">‘localhost:9200/customer/external/_bulk?pretty’</span> -d <span class="string">‘</span></span><br><span class="line"><span class="string">&#123;”</span>index<span class="string">“:&#123;”</span>_id<span class="string">“:”</span><span class="number">1</span><span class="string">“&#125;&#125;</span></span><br><span class="line"><span class="string">&#123;”</span>name<span class="string">“: “</span>John Doe<span class="string">“ &#125;</span></span><br><span class="line"><span class="string">&#123;”</span>index<span class="string">“:&#123;”</span>_id<span class="string">“:”</span><span class="number">2</span><span class="string">“&#125;&#125;</span></span><br><span class="line"><span class="string">&#123;”</span>name<span class="string">“: “</span>Jane Doe<span class="string">“ &#125;</span></span><br><span class="line"><span class="string">‘</span></span><br></pre></td></tr></table></figure>
+
+<p>下面语句批处理执行更新id为1的数据然后执行删除id为2的数据</p>
+<figure class="highlight scilab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">curl -XPOST <span class="string">‘localhost:9200/customer/external/_bulk?pretty’</span> -d <span class="string">‘</span></span><br><span class="line"><span class="string">&#123;”</span>update<span class="string">“:&#123;”</span>_id<span class="string">“:”</span><span class="number">1</span><span class="string">“&#125;&#125;</span></span><br><span class="line"><span class="string">&#123;”</span>doc<span class="string">“: &#123; “</span>name<span class="string">“: “</span>John Doe becomes Jane Doe<span class="string">“ &#125; &#125;</span></span><br><span class="line"><span class="string">&#123;”</span>delete<span class="string">“:&#123;”</span>_id<span class="string">“:”</span><span class="number">2</span><span class="string">“&#125;&#125;</span></span><br><span class="line"><span class="string">‘</span></span><br></pre></td></tr></table></figure>
+
+<p>12.导入数据集<br>你可以点击这里下载示例数据集:accounts.json<br>其中每个数据都是如下格式:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">   　　  <span class="attr">“index”</span>:&#123;<span class="attr">“_id”</span>:<span class="string">“1”</span>&#125;</span><br><span class="line">&#125;</span><br><span class="line">&#123;</span><br><span class="line">    <span class="attr">“account_number”</span>: <span class="number">0</span>,</span><br><span class="line">  　 <span class="attr">“balance”</span>: <span class="number">16623</span>,</span><br><span class="line"> 　  <span class="attr">“firstname”</span>: <span class="string">“Bradshaw”</span>,</span><br><span class="line">  　 <span class="attr">“lastname”</span>: <span class="string">“Mckenzie”</span>,</span><br><span class="line">  　 <span class="attr">“age”</span>: <span class="number">29</span>,</span><br><span class="line">  　 <span class="attr">“gender”</span>: <span class="string">“F”</span>,</span><br><span class="line">    <span class="attr">“address”</span>: <span class="string">“244 Columbus Place”</span>,</span><br><span class="line"> 　  <span class="attr">“employer”</span>: <span class="string">“Euron”</span>,</span><br><span class="line">  　 <span class="attr">“email”</span>: <span class="string">“<a href="mailto:bradshawmckenzie@euron.com" target="_blank" rel="noopener">bradshawmckenzie@euron.com</a>“</span>,</span><br><span class="line">  　 <span class="attr">“city”</span>: <span class="string">“Hobucken”</span>,</span><br><span class="line">  　 <span class="attr">“state”</span>: <span class="string">“CO”</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>导入示例数据集:</p>
+<figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">curl -XPOST ‘localhost:<span class="number">9200</span>/bank/account/_bulk?pretty’ –data-binary <span class="string">“@accounts.json”</span></span><br><span class="line">curl ‘localhost:<span class="number">9200</span>/_cat/indices?v’</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://cos.leiyawu.com/img/elk_index_check_7.png" alt="图7"></p>
+<p>上图红框表示我们已经成功批量导入1000条数据索引到bank索引中。</p>
+<p>13.查询<br>Sample:</p>
+<figure class="highlight ada"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">curl <span class="symbol">‘localhost</span>:<span class="number">9200</span>/bank/_search?q=*&amp;pretty’</span><br><span class="line">&#123;</span><br><span class="line">　　  <span class="string">“took”</span> : 63,</span><br><span class="line"> 　　 <span class="string">“timed_out”</span> : <span class="type">false</span>,</span><br><span class="line"> 　　 <span class="string">“_shards”</span> : &#123;</span><br><span class="line">    <span class="string">“total”</span> : 5,</span><br><span class="line">    <span class="string">“successful”</span> : 5,</span><br><span class="line">    <span class="string">“failed”</span> : 0</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="string">“hits”</span> : &#123;</span><br><span class="line">  <span class="string">“total”</span> : 1000,</span><br><span class="line">  <span class="string">“max_score”</span> : 1.0,</span><br><span class="line">  <span class="string">“hits”</span> : [ &#123;</span><br><span class="line">    <span class="string">“_index”</span> : “<span class="type">bank</span><span class="string">“,</span></span><br><span class="line"><span class="string">    “</span>_type<span class="string">“ : “</span>account<span class="string">“,</span></span><br><span class="line"><span class="string">    “</span>_id<span class="string">“ : “</span><span class="number">1</span><span class="string">“,</span></span><br><span class="line"><span class="string">    “</span>_score<span class="string">“ : 1.0, “</span>_source<span class="string">“ : &#123;”</span>account_number<span class="string">“:1,”</span>balance<span class="string">“:39225,”</span>firstname<span class="string">“:”</span>Amber<span class="string">“,”</span>lastname<span class="string">“:”</span>Duke<span class="string">“,”</span>age<span class="string">“:32,”</span>gender<span class="string">“:”</span>M<span class="string">“,”</span>address<span class="string">“:”</span><span class="number">880</span> Holmes Lane<span class="string">“,”</span>employer<span class="string">“:”</span>Pyrami<span class="string">“,”</span>email<span class="string">“:”</span><a href="mailto:amberduke@pyrami.com" target="_blank" rel="noopener">amberduke@pyrami.com</a><span class="string">“,”</span>city<span class="string">“:”</span>Brogan<span class="string">“,”</span>state<span class="string">“:”</span>IL<span class="string">“&#125;</span></span><br><span class="line"><span class="string">  &#125;, &#123;</span></span><br><span class="line"><span class="string">    “</span>_index<span class="string">“ : “</span>bank<span class="string">“,</span></span><br><span class="line"><span class="string">    “</span>_type<span class="string">“ : “</span>account<span class="string">“,</span></span><br><span class="line"><span class="string">    “</span>_id<span class="string">“ : “</span><span class="number">6</span><span class="string">“,</span></span><br><span class="line"><span class="string">    “</span>_score<span class="string">“ : 1.0, “</span>_source<span class="string">“ : &#123;”</span>account_number<span class="string">“:6,”</span>balance<span class="string">“:5686,”</span>firstname<span class="string">“:”</span>Hattie<span class="string">“,”</span>lastname<span class="string">“:”</span>Bond<span class="string">“,”</span>age<span class="string">“:36,”</span>gender<span class="string">“:”</span>M<span class="string">“,”</span>address<span class="string">“:”</span><span class="number">671</span> Bristol Street<span class="string">“,”</span>employer<span class="string">“:”</span>Netagy<span class="string">“,”</span>email<span class="string">“:”</span><a href="mailto:hattiebond@netagy.com" target="_blank" rel="noopener">hattiebond@netagy.com</a><span class="string">“,”</span>city<span class="string">“:”</span>Dante<span class="string">“,”</span>state<span class="string">“:”</span>TN<span class="string">“&#125;</span></span><br><span class="line"><span class="string">  &#125;, &#123;</span></span><br><span class="line"><span class="string">    “</span>_index<span class="string">“ : “</span>bank<span class="string">“,</span></span><br><span class="line"><span class="string">    “</span>_type<span class="string">“ : “</span>account<span class="string">“,</span></span><br></pre></td></tr></table></figure>
+
+<p>上面示例返回所有bank中的索引数据。其中 q=*  表示匹配索引中所有的数据。</p>
+<p>等价于:</p>
+<figure class="highlight scilab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">curl -XPOST <span class="string">‘localhost:9200/bank/_search?pretty’</span> -d <span class="string">‘</span></span><br><span class="line"><span class="string">&#123;</span></span><br><span class="line"><span class="string">  “</span>query<span class="string">“: &#123; “</span>match_all<span class="string">“: &#123;&#125; &#125;</span></span><br><span class="line"><span class="string">&#125;’</span></span><br></pre></td></tr></table></figure>
+
+<p>14 查询语言</p>
+<p>匹配所有数据，但只返回1个:</p>
+<figure class="highlight scilab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">curl -XPOST <span class="string">‘localhost:9200/bank/_search?pretty’</span> -d <span class="string">‘</span></span><br><span class="line"><span class="string">&#123;</span></span><br><span class="line"><span class="string"> 　“</span>query<span class="string">“: &#123; “</span>match_all<span class="string">“: &#123;&#125; &#125;,</span></span><br><span class="line"><span class="string">  “</span><span class="built_in">size</span><span class="string">“: 1</span></span><br><span class="line"><span class="string">&#125;’</span></span><br></pre></td></tr></table></figure>
+
+<p>注意：如果siez不指定，则默认返回10条数据。</p>
+<figure class="highlight scilab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">curl -XPOST <span class="string">‘localhost:9200/bank/_search?pretty’</span> -d <span class="string">‘</span></span><br><span class="line"><span class="string">&#123;</span></span><br><span class="line"><span class="string"> 　“</span>query<span class="string">“: &#123; “</span>match_all<span class="string">“: &#123;&#125; &#125;,</span></span><br><span class="line"><span class="string">  “</span>from<span class="string">“: 10,</span></span><br><span class="line"><span class="string">  “</span><span class="built_in">size</span><span class="string">“: 10</span></span><br><span class="line"><span class="string">&#125;’</span></span><br></pre></td></tr></table></figure>
+
+<p>返回从11到20的数据。（索引下标从0开始）</p>
+<figure class="highlight scilab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">curl -XPOST <span class="string">‘localhost:9200/bank/_search?pretty’</span> -d <span class="string">‘</span></span><br><span class="line"><span class="string">&#123;</span></span><br><span class="line"><span class="string">  “</span>query<span class="string">“: &#123; “</span>match_all<span class="string">“: &#123;&#125; &#125;,</span></span><br><span class="line"><span class="string"> 　“</span>sort<span class="string">“: &#123; “</span>balance<span class="string">“: &#123; “</span>order<span class="string">“: “</span>desc<span class="string">“ &#125; &#125;</span></span><br><span class="line"><span class="string">&#125;’</span></span><br></pre></td></tr></table></figure>
+
+<p>上述示例匹配所有的索引中的数据，按照balance字段降序排序，并且返回前10条（如果不指定size，默认最多返回10条）。</p>
+<p>15.执行搜索</p>
+<p>下面例子展示如何返回两个字段（account_number balance）</p>
+<figure class="highlight scilab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">curl -XPOST <span class="string">‘localhost:9200/bank/_search?pretty’</span> -d <span class="string">‘</span></span><br><span class="line"><span class="string">&#123;</span></span><br><span class="line"><span class="string">  “</span>query<span class="string">“: &#123; “</span>match_all<span class="string">“: &#123;&#125; &#125;,</span></span><br><span class="line"><span class="string">  “</span>_source<span class="string">“: [“</span>account_number<span class="string">“, “</span>balance<span class="string">“]</span></span><br><span class="line"><span class="string">&#125;’</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="http://cos.leiyawu.com/img/elk_index_check_8.png" alt="图8"></p>
+<p>返回account_number 为20 的数据:</p>
+<figure class="highlight scilab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">curl -XPOST <span class="string">‘localhost:9200/bank/_search?pretty’</span> -d <span class="string">‘</span></span><br><span class="line"><span class="string">&#123;</span></span><br><span class="line"><span class="string">  “</span>query<span class="string">“: &#123; “</span>match<span class="string">“: &#123; “</span>account_number<span class="string">“: 20 &#125; &#125;</span></span><br><span class="line"><span class="string">&#125;’</span></span><br></pre></td></tr></table></figure>
+
+<p>返回address中包含mill的所有数据：</p>
+<figure class="highlight scilab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">curl -XPOST <span class="string">‘localhost:9200/bank/_search?pretty’</span> -d <span class="string">‘</span></span><br><span class="line"><span class="string">&#123;</span></span><br><span class="line"><span class="string">  “</span>query<span class="string">“: &#123; “</span>match<span class="string">“: &#123; “</span>address<span class="string">“: “</span>mill<span class="string">“ &#125; &#125;</span></span><br><span class="line"><span class="string">&#125;’</span></span><br></pre></td></tr></table></figure>
+
+<p>返回地址中包含mill或者lane的所有数据：</p>
+<figure class="highlight scilab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">curl -XPOST <span class="string">‘localhost:9200/bank/_search?pretty’</span> -d <span class="string">‘</span></span><br><span class="line"><span class="string">&#123;</span></span><br><span class="line"><span class="string"> 　“</span>query<span class="string">“: &#123; “</span>match<span class="string">“: &#123; “</span>address<span class="string">“: “</span>mill lane<span class="string">“ &#125; &#125;</span></span><br><span class="line"><span class="string">&#125;’</span></span><br></pre></td></tr></table></figure>
+
+<p>和上面匹配单个词语不同，下面这个例子是多匹配（match_phrase短语匹配），返回地址中包含短语 “mill lane”的所有数据：</p>
+<figure class="highlight scilab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">curl -XPOST <span class="string">‘localhost:9200/bank/_search?pretty’</span> -d <span class="string">‘</span></span><br><span class="line"><span class="string">&#123;</span></span><br><span class="line"><span class="string">  “</span>query<span class="string">“: &#123; “</span>match_phrase<span class="string">“: &#123; “</span>address<span class="string">“: “</span>mill lane<span class="string">“ &#125; &#125;</span></span><br><span class="line"><span class="string">&#125;’</span></span><br></pre></td></tr></table></figure>
+
+<p>以下是布尔查询，布尔查询允许我们将多个简单的查询组合成一个更复杂的布尔逻辑查询。<br>这个例子将两个查询组合，返回地址中含有mill和lane的所有记录数据：</p>
+<figure class="highlight scilab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">curl -XPOST <span class="string">‘localhost:9200/bank/_search?pretty’</span> -d <span class="string">‘</span></span><br><span class="line"><span class="string">&#123;</span></span><br><span class="line"><span class="string">  “</span>query<span class="string">“: &#123;</span></span><br><span class="line"><span class="string">    “</span>bool<span class="string">“: &#123;</span></span><br><span class="line"><span class="string">  　　  “</span>must<span class="string">“: [</span></span><br><span class="line"><span class="string">   　　   &#123; “</span>match<span class="string">“: &#123; “</span>address<span class="string">“: “</span>mill<span class="string">“ &#125; &#125;,</span></span><br><span class="line"><span class="string">   　　   &#123; “</span>match<span class="string">“: &#123; “</span>address<span class="string">“: “</span>lane<span class="string">“ &#125; &#125;</span></span><br><span class="line"><span class="string">  　　  ]</span></span><br><span class="line"><span class="string">  　　&#125;</span></span><br><span class="line"><span class="string"> 　&#125;</span></span><br><span class="line"><span class="string">&#125;’</span></span><br></pre></td></tr></table></figure>
+
+<p>上述例子中，must表示所有查询必须都为真才被认为匹配。</p>
+<p>相反, 这个例子组合两个查询，返回地址中含有mill或者lane的所有记录数据：</p>
+<figure class="highlight scilab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">curl -XPOST <span class="string">‘localhost:9200/bank/_search?pretty’</span> -d <span class="string">‘</span></span><br><span class="line"><span class="string">&#123;</span></span><br><span class="line"><span class="string"> 　“</span>query<span class="string">“: &#123;</span></span><br><span class="line"><span class="string"> 　  “</span>bool<span class="string">“: &#123;</span></span><br><span class="line"><span class="string">  　　  “</span>should<span class="string">“: [</span></span><br><span class="line"><span class="string">   　　   &#123; “</span>match<span class="string">“: &#123; “</span>address<span class="string">“: “</span>mill<span class="string">“ &#125; &#125;,</span></span><br><span class="line"><span class="string">    　　  &#123; “</span>match<span class="string">“: &#123; “</span>address<span class="string">“: “</span>lane<span class="string">“ &#125; &#125;</span></span><br><span class="line"><span class="string">   　　 ]</span></span><br><span class="line"><span class="string">  　 &#125;</span></span><br><span class="line"><span class="string"> 　&#125;</span></span><br><span class="line"><span class="string">&#125;’</span></span><br></pre></td></tr></table></figure>
+
+<p>上述例子中，bool表示查询列表中只要有任何一个为真则认为匹配。</p>
+<p>下面例子组合两个查询，返回地址中既没有mill也没有lane的所有数据：</p>
+<figure class="highlight scilab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">curl -XPOST <span class="string">‘localhost:9200/bank/_search?pretty’</span> -d <span class="string">‘</span></span><br><span class="line"><span class="string">&#123;</span></span><br><span class="line"><span class="string">  “</span>query<span class="string">“: &#123;</span></span><br><span class="line"><span class="string"> 　  “</span>bool<span class="string">“: &#123;</span></span><br><span class="line"><span class="string">  　　  “</span>must_not<span class="string">“: [</span></span><br><span class="line"><span class="string">    　　  &#123; “</span>match<span class="string">“: &#123; “</span>address<span class="string">“: “</span>mill<span class="string">“ &#125; &#125;,</span></span><br><span class="line"><span class="string">     　　 &#123; “</span>match<span class="string">“: &#123; “</span>address<span class="string">“: “</span>lane<span class="string">“ &#125; &#125;</span></span><br><span class="line"><span class="string">    　　]</span></span><br><span class="line"><span class="string">  　　&#125;</span></span><br><span class="line"><span class="string"> 　&#125;</span></span><br><span class="line"><span class="string">&#125;’</span></span><br></pre></td></tr></table></figure>
+
+<p>上述例子中,must_not表示查询列表中没有为真的（也就是全为假）时则认为匹配。</p>
+<p>我们可以组合must、should、must_not来实现更加复杂的多级逻辑查询。</p>
+<p>下面这个例子返回年龄大于40岁、不居住在ID的所有数据：</p>
+<figure class="highlight scilab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">curl -XPOST <span class="string">‘localhost:9200/bank/_search?pretty’</span> -d <span class="string">‘</span></span><br><span class="line"><span class="string">&#123;</span></span><br><span class="line"><span class="string">  “</span>query<span class="string">“: &#123;</span></span><br><span class="line"><span class="string">  　 “</span>bool<span class="string">“: &#123;</span></span><br><span class="line"><span class="string">  　　  “</span>must<span class="string">“: [</span></span><br><span class="line"><span class="string">     　　 &#123; “</span>match<span class="string">“: &#123; “</span>age<span class="string">“: “</span><span class="number">40</span><span class="string">“ &#125; &#125;</span></span><br><span class="line"><span class="string">   　　 ],</span></span><br><span class="line"><span class="string">   　　 “</span>must_not<span class="string">“: [</span></span><br><span class="line"><span class="string">     　　 &#123; “</span>match<span class="string">“: &#123; “</span>state<span class="string">“: “</span>ID<span class="string">“ &#125; &#125;</span></span><br><span class="line"><span class="string">    　　]</span></span><br><span class="line"><span class="string">  　　&#125;</span></span><br><span class="line"><span class="string">  &#125;</span></span><br><span class="line"><span class="string">&#125;’</span></span><br></pre></td></tr></table></figure>
+
+<p>16.过滤filter(查询条件设置)</p>
+<p>下面这个例子使用了布尔查询返回balance在20000到30000之间的所有数据。</p>
+<figure class="highlight scilab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">curl -XPOST <span class="string">‘localhost:9200/bank/_search?pretty’</span> -d <span class="string">‘</span></span><br><span class="line"><span class="string">&#123;</span></span><br><span class="line"><span class="string">　　  “</span>query<span class="string">“: &#123;</span></span><br><span class="line"><span class="string"> 　　　  “</span>bool<span class="string">“: &#123;</span></span><br><span class="line"><span class="string">  　　　　  “</span>must<span class="string">“: &#123; “</span>match_all<span class="string">“: &#123;&#125; &#125;,</span></span><br><span class="line"><span class="string">   　　　　 “</span>filter<span class="string">“: &#123;</span></span><br><span class="line"><span class="string">      　　　　“</span>range<span class="string">“: &#123;</span></span><br><span class="line"><span class="string">        　　“</span>balance<span class="string">“: &#123;</span></span><br><span class="line"><span class="string">        　　  “</span>gte<span class="string">“: 20000,</span></span><br><span class="line"><span class="string">         　　 “</span>lte<span class="string">“: 30000</span></span><br><span class="line"><span class="string">       　　 &#125;</span></span><br><span class="line"><span class="string">     　　 &#125;</span></span><br><span class="line"><span class="string">   　　 &#125;</span></span><br><span class="line"><span class="string">  　 &#125;</span></span><br><span class="line"><span class="string"> 　&#125;</span></span><br><span class="line"><span class="string">&#125;’</span></span><br></pre></td></tr></table></figure>
+
+<p>17 聚合 Aggregations<br>下面这个例子： 将所有的数据按照state分组（group），然后按照分组记录数从大到小排序，返回前十条（默认）：</p>
+<figure class="highlight scilab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">curl -XPOST <span class="string">‘localhost:9200/bank/_search?pretty’</span> -d <span class="string">‘</span></span><br><span class="line"><span class="string">&#123;</span></span><br><span class="line"><span class="string"> 　“</span><span class="built_in">size</span><span class="string">“: 0,</span></span><br><span class="line"><span class="string">  “</span>aggs<span class="string">“: &#123;</span></span><br><span class="line"><span class="string">  　 “</span>group_by_state<span class="string">“: &#123;</span></span><br><span class="line"><span class="string">  　　  “</span>terms<span class="string">“: &#123;</span></span><br><span class="line"><span class="string">   　　　   “</span>field<span class="string">“: “</span>state<span class="string">“</span></span><br><span class="line"><span class="string">  　　  &#125;</span></span><br><span class="line"><span class="string">  　 &#125;</span></span><br><span class="line"><span class="string"> 　&#125;</span></span><br><span class="line"><span class="string">&#125;’</span></span><br></pre></td></tr></table></figure>
+
+<p>注意：我们设置size=0，不显示查询hits，因为我们只想看返回的聚合结果。<br><img src="http://cos.leiyawu.com/img/elk_index_check_9.png" alt="图9"></p>
+<p><img src="http://cos.leiyawu.com/img/elk_index_check_10.png" alt="图10"></p>
+<p>上述语句类似于以下SQL语句：<br>SELECT state, COUNT(<em>) FROM bank GROUP BY state ORDER BY COUNT(</em>) DESC</p>
+<p>下面这个实例按照state分组，降序排序，返回balance的平均值：</p>
+<figure class="highlight scilab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">curl -XPOST <span class="string">‘localhost:9200/bank/_search?pretty’</span> -d <span class="string">‘</span></span><br><span class="line"><span class="string">&#123;</span></span><br><span class="line"><span class="string"> 　“</span><span class="built_in">size</span><span class="string">“: 0,</span></span><br><span class="line"><span class="string"> 　“</span>aggs<span class="string">“: &#123;</span></span><br><span class="line"><span class="string">  　 “</span>group_by_state<span class="string">“: &#123;</span></span><br><span class="line"><span class="string">  　　  “</span>terms<span class="string">“: &#123;</span></span><br><span class="line"><span class="string">     　　 “</span>field<span class="string">“: “</span>state<span class="string">“</span></span><br><span class="line"><span class="string">   　　 &#125;,</span></span><br><span class="line"><span class="string">  　　  “</span>aggs<span class="string">“: &#123;</span></span><br><span class="line"><span class="string">     　　 “</span>average_balance<span class="string">“: &#123;</span></span><br><span class="line"><span class="string">      　　  “</span>avg<span class="string">“: &#123;</span></span><br><span class="line"><span class="string">       　　   “</span>field<span class="string">“: “</span>balance<span class="string">“</span></span><br><span class="line"><span class="string">       　　 &#125;</span></span><br><span class="line"><span class="string">     　　 &#125;</span></span><br><span class="line"><span class="string">   　　 &#125;</span></span><br><span class="line"><span class="string">  　　&#125;</span></span><br><span class="line"><span class="string"> 　&#125;</span></span><br><span class="line"><span class="string">&#125;’</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="http://cos.leiyawu.com/img/elk_index_check_11.png" alt="图11"></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>Donate comment here</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechatpay.jpg" alt="褚成志 微信支付"/>
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipay.jpg" alt="褚成志 支付宝"/>
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/ELK/" rel="tag"># ELK</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/08/19/ES内置账号密码修改、自定义角色自定义账号、ldap及AD认证/" rel="next" title="ES内置账号密码修改、自定义角色自定义账号、ldap及AD认证">
+                <i class="fa fa-chevron-left"></i> ES内置账号密码修改、自定义角色自定义账号、ldap及AD认证
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/08/19/23种非常有用的ElasticSearch查询例子/" rel="prev" title="23种非常有用的ElasticSearch查询例子">
+                23种非常有用的ElasticSearch查询例子 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.gif"
+                alt="褚成志" />
+            
+              <p class="site-author-name" itemprop="name">褚成志</p>
+              <p class="site-description motion-element" itemprop="description">关注互联网的科技博客</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">67</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-name">分类</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">38</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/livecityccz" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:livecityccz@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://plus.google.com/livecityccz" target="_blank" title="Google">
+                      
+                        <i class="fa fa-fw fa-google"></i>Google</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://twitter.com/livecityccz" target="_blank" title="Twitter">
+                      
+                        <i class="fa fa-fw fa-twitter"></i>Twitter</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.facebook.com/livecityccz" target="_blank" title="FB Page">
+                      
+                        <i class="fa fa-fw fa-facebook"></i>FB Page</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://youtube.com/livecityccz" target="_blank" title="YouTube">
+                      
+                        <i class="fa fa-fw fa-youtube"></i>YouTube</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://instagram.com/livecityccz" target="_blank" title="Instagram">
+                      
+                        <i class="fa fa-fw fa-instagram"></i>Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://weibo.com/livecityccz" target="_blank" title="微博">
+                      
+                        <i class="fa fa-fw fa-globe"></i>微博</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://douban.com/people/livecityccz" target="_blank" title="豆瓣">
+                      
+                        <i class="fa fa-fw fa-globe"></i>豆瓣</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.zhihu.com/people/livecityccz" target="_blank" title="知乎">
+                      
+                        <i class="fa fa-fw fa-globe"></i>知乎</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://blog.sina.com.cn/blog782081987" title="Title" target="_blank">Title</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">褚成志</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/three.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/canvas_sphere.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+
+<script type="text/javascript" src="http://tajs.qq.com/stats?sId=66074130" charset="UTF-8"></script>
+
+</body>
+</html>

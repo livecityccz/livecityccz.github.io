@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Monda:300,300italic,400,400italic,700,700italic|Roboto Slab:300,300italic,400,400italic,700,700italic|Lobster Two:300,300italic,400,400italic,700,700italic|PT Mono:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="编程之道," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="褚成志的博客" type="application/atom+xml" />
+
+
+
+
+
+
+<meta name="description" content="这雨夜太漫长 失眠的我 在谁梦里 歌唱　　搞安全的应该都知道端口扫描在渗透测试、漏洞扫描过程中的重要性，其与URL爬虫等技术构成了漏洞扫描的第一阶段，即目标信息收集。因此能否开发出一款高效稳定的端口扫描器，往往决定了漏洞扫描器的好坏。那么说到端口扫描器，我们往往会先想到nmap、masscan等神器，它们是这个领域的标杆。但本篇并不是为了介绍这几款工具，而是谈谈如何自研一款高效稳定的端口扫描器。">
+<meta name="keywords" content="编程之道">
+<meta property="og:type" content="article">
+<meta property="og:title" content="端口扫描器的几种代码实现方案">
+<meta property="og:url" content="http://www.chucz.club/2018/05/20/端口扫描器的几种代码实现方案/index.html">
+<meta property="og:site_name" content="褚成志的博客">
+<meta property="og:description" content="这雨夜太漫长 失眠的我 在谁梦里 歌唱　　搞安全的应该都知道端口扫描在渗透测试、漏洞扫描过程中的重要性，其与URL爬虫等技术构成了漏洞扫描的第一阶段，即目标信息收集。因此能否开发出一款高效稳定的端口扫描器，往往决定了漏洞扫描器的好坏。那么说到端口扫描器，我们往往会先想到nmap、masscan等神器，它们是这个领域的标杆。但本篇并不是为了介绍这几款工具，而是谈谈如何自研一款高效稳定的端口扫描器。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://www.chucz.club/upload_image/20180517/socket_tcp.png">
+<meta property="og:image" content="http://www.chucz.club/upload_image/20180517/socket_syn.png">
+<meta property="og:image" content="http://www.chucz.club/upload_image/20180517/scapy_syn.png">
+<meta property="og:image" content="http://www.chucz.club/upload_image/20180517/nmap_scan.png">
+<meta property="og:image" content="http://www.chucz.club/upload_image/20180517/go_tcp.png">
+<meta property="og:image" content="http://www.chucz.club/upload_image/20180517/go_syn.png">
+<meta property="og:image" content="http://www.chucz.club/upload_image/20180517/python_go_syn_scan.png">
+<meta property="og:updated_time" content="2018-09-28T08:51:24.508Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="端口扫描器的几种代码实现方案">
+<meta name="twitter:description" content="这雨夜太漫长 失眠的我 在谁梦里 歌唱　　搞安全的应该都知道端口扫描在渗透测试、漏洞扫描过程中的重要性，其与URL爬虫等技术构成了漏洞扫描的第一阶段，即目标信息收集。因此能否开发出一款高效稳定的端口扫描器，往往决定了漏洞扫描器的好坏。那么说到端口扫描器，我们往往会先想到nmap、masscan等神器，它们是这个领域的标杆。但本篇并不是为了介绍这几款工具，而是谈谈如何自研一款高效稳定的端口扫描器。">
+<meta name="twitter:image" content="http://www.chucz.club/upload_image/20180517/socket_tcp.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: 'ZM9CKN0W4R',
+      apiKey: '5bc5819b162e1cd440b44b16ef207a44',
+      indexName: 'chucz.club',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://www.chucz.club/2018/05/20/端口扫描器的几种代码实现方案/"/>
+
+
+
+
+
+  <title>端口扫描器的几种代码实现方案 | 褚成志的博客</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?ec370060725333b3929ba080f40e7116";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">褚成志的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">青青子衿, 悠悠我心</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://www.chucz.club/2018/05/20/端口扫描器的几种代码实现方案/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="褚成志">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="褚成志的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">端口扫描器的几种代码实现方案</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-20T18:13:36+00:00">
+                2018-05-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>这雨夜太漫长 失眠的我 在谁梦里 歌唱<br>　　搞安全的应该都知道端口扫描在渗透测试、漏洞扫描过程中的重要性，其与URL爬虫等技术构成了漏洞扫描的第一阶段，即目标信息收集。因此能否开发出一款高效稳定的端口扫描器，往往决定了漏洞扫描器的好坏。那么说到端口扫描器，我们往往会先想到nmap、masscan等神器，它们是这个领域的标杆。但本篇并不是为了介绍这几款工具，而是谈谈如何自研一款高效稳定的端口扫描器。<br><a id="more"></a><br>　　端口扫描器，顾名思义就是为了探测服务器上的某个端口是否开放，究其原理可以分为很多种探测方式，比如tcp三次握手扫描，syn扫描等等，本篇并不打算详细介绍这些扫描方式的区别，有兴趣的可以看下nmap的文档，对这几种扫描方式有详细的介绍。<br>　　那么说下本文重点，基于这几天我研究并尝试利用python、go开发tcp扫描器、tcp-syn扫描器，以及对比它们之间的速度性能、稳定性差异情况，将测试结果在此做个记录，并分享一下代码以及方案。</p>
+</blockquote>
+<p>说明：文章结尾将给出本篇所使用代码的Github地址，可供大家测试，代码测试环境为centos7。</p>
+<h3 id="scan-for-Python-Socket"><a href="#scan-for-Python-Socket" class="headerlink" title="scan for Python Socket"></a><a href="#scan-for-Python-Socket" title="scan for Python Socket"></a>scan for Python Socket</h3><p>Python的Socket模块可以创建套接字，创建tcp三次握手连接，以此探测目标端口是否存活。本篇将使用socket模块编写tcp扫描以及syn扫描，并对比两者的差异。</p>
+<h4 id="tcp-scan"><a href="#tcp-scan" class="headerlink" title="tcp scan"></a><a href="#tcp-scan" title="tcp scan"></a>tcp scan</h4><p>快来看代码：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#! -<em>- coding:utf-8 -</em>-</span></div><div class="line"></div><div class="line">import time</div><div class="line">import socket</div><div class="line"></div><div class="line">socket_timeout = 0.1</div><div class="line"></div><div class="line">def tcp_scan(ip,port):</div><div class="line">    try:</div><div class="line">        s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)</div><div class="line">        s.settimeout(socket_timeout)</div><div class="line">        c=s.connect_ex((ip,port))</div><div class="line">        <span class="keyword">if</span> c==0:</div><div class="line">            <span class="built_in">print</span> <span class="string">“%s:%s is open”</span> % (ip,port)</div><div class="line">        <span class="keyword">else</span>:</div><div class="line">            <span class="comment"># print “%s:%s is not open” % (ip,port)</span></div><div class="line">            pass</div><div class="line">    except Exception,e:</div><div class="line">        <span class="built_in">print</span> e</div><div class="line">    </div><div class="line">    s.close()</div><div class="line"></div><div class="line"></div><div class="line"><span class="keyword">if</span> <strong>name</strong>==<span class="string">“<strong>main</strong>“</span>:</div><div class="line">    s_time = time.time()</div><div class="line">    ip = <span class="string">“14.215.177.38”</span></div><div class="line">    <span class="keyword">for</span> port <span class="keyword">in</span> range(0,1024):</div><div class="line">        <span class="string">‘’</span><span class="string">‘ 此处可用协作 ‘</span><span class="string">‘’</span></div><div class="line">        tcp_scan(ip,port)   </div><div class="line">    e_time = time.time()</div><div class="line">    <span class="built_in">print</span> <span class="string">“scan time is “</span>,e_time-s_time</div></pre></td></tr></table></figure>
+
+<p>运行结果：<br><img src="/upload_image/20180517/socket_tcp.png" alt=""></p>
+<p>说明一下：可以看到此代码扫描1024个端口用了102s，当然代码并没有用多线程、协程等方式提高扫描效率（使用协程测试过扫65535个端口用时400s左右），因为python在这方面的能力比较弱；由于扫描过程中会建立tcp三次握手，因此比较消耗资源。</p>
+<h4 id="tcp-syn-scan"><a href="#tcp-syn-scan" class="headerlink" title="tcp syn scan"></a><a href="#tcp-syn-scan" title="tcp syn scan"></a>tcp syn scan</h4><p>　　相对tcp扫描，tcp syn扫描方式更为隐蔽，也更节省资源，那么如何利用socket模块实现tcp syn扫描呢？这里需要用到SOCK_RAW，这个在socket编程中相对少用，资料也不多。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div><div class="line">133</div><div class="line">134</div><div class="line">135</div><div class="line">136</div><div class="line">137</div><div class="line">138</div><div class="line">139</div><div class="line">140</div><div class="line">141</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># -<em>- coding: UTF-8 -</em>- </span></div><div class="line"></div><div class="line">import time</div><div class="line">import random</div><div class="line">import socket</div><div class="line">import sys</div><div class="line">from struct import <em></em></div><div class="line"></div><div class="line"><span class="string">‘’</span><span class="string">‘</span></div><div class="line">Warning:must run it as root</div><div class="line"></div><div class="line">yum install python-devel libpcap-devel</div><div class="line">pip install pcap</div><div class="line"></div><div class="line">‘<span class="string">‘’</span></div><div class="line"></div><div class="line">def checksum(msg):</div><div class="line">    <span class="string">‘’</span><span class="string">‘ Check Summing ‘</span><span class="string">‘’</span></div><div class="line"></div><div class="line">    s = 0</div><div class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(0,len(msg),2):</div><div class="line">        w = (ord(msg[i]) &lt;&lt; 8) + (ord(msg[i+1]))</div><div class="line">        s = s+w</div><div class="line"></div><div class="line">    s = (s&gt;&gt;16) + (s &amp; 0xffff)</div><div class="line">    s = ~s &amp; 0xffff</div><div class="line"></div><div class="line">    <span class="built_in">return</span> s</div><div class="line"></div><div class="line"></div><div class="line">def CreateSocket(source_ip,dest_ip):</div><div class="line">    <span class="string">‘’</span><span class="string">‘ create socket connection ‘</span><span class="string">‘’</span></div><div class="line"></div><div class="line">    try:</div><div class="line">        s = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.IPPROTO_TCP)</div><div class="line">    except socket.error, msg:</div><div class="line">        <span class="built_in">print</span> <span class="string">‘Socket create error: ‘</span>,str(msg[0]),<span class="string">‘message: ‘</span>,msg[1]</div><div class="line">        sys.exit()</div><div class="line"></div><div class="line">    <span class="string">‘’</span><span class="string">‘ Set the IP header manually ‘</span><span class="string">‘’</span></div><div class="line"></div><div class="line">    s.setsockopt(socket.IPPROTO_IP, socket.IP_HDRINCL, 1)</div><div class="line">    </div><div class="line">    <span class="built_in">return</span> s</div><div class="line"></div><div class="line"></div><div class="line">def CreateIpHeader(source_ip, dest_ip):</div><div class="line">    <span class="string">‘’</span><span class="string">‘ create ip header ‘</span><span class="string">‘’</span></div><div class="line"></div><div class="line">    <span class="comment"># packet = ‘’</span></div><div class="line"></div><div class="line">    <span class="comment"># ip header option</span></div><div class="line"></div><div class="line">    headerlen = 5</div><div class="line">    version = 4</div><div class="line">    tos = 0</div><div class="line">    tot_len = 20 + 20</div><div class="line">    id = random.randrange(18000,65535,1)</div><div class="line">    frag_off = 0</div><div class="line">    ttl = 255</div><div class="line">    protocol = socket.IPPROTO_TCP</div><div class="line">    check = 10</div><div class="line">    saddr = socket.inet_aton ( source_ip )</div><div class="line">    daddr = socket.inet_aton ( dest_ip )</div><div class="line">    hl_version = (version &lt;&lt; 4) + headerlen</div><div class="line">    ip_header = pack(<span class="string">‘!BBHHHBBH4s4s’</span>, hl_version, tos, tot_len, id, frag_off, ttl, protocol, check, saddr, daddr)</div><div class="line"></div><div class="line">    <span class="built_in">return</span> ip_header</div><div class="line"></div><div class="line"></div><div class="line">def create_tcp_syn_header(source_ip, dest_ip, dest_port):</div><div class="line">    <span class="string">‘’</span><span class="string">‘ create tcp syn header function ‘</span><span class="string">‘’</span></div><div class="line"></div><div class="line">    <span class="built_in">source</span> = random.randrange(32000,62000,1) <span class="comment"># randon select one source_port </span></div><div class="line">    seq = 0</div><div class="line">    ack_seq = 0</div><div class="line">    doff = 5</div><div class="line">    </div><div class="line">    <span class="string">‘’</span><span class="string">‘ tcp flags ‘</span><span class="string">‘’</span></div><div class="line">    fin = 0</div><div class="line">    syn = 1</div><div class="line">    rst = 0</div><div class="line">    psh = 0</div><div class="line">    ack = 0</div><div class="line">    urg = 0</div><div class="line">    window = socket.htons (8192)    <span class="comment"># max windows size</span></div><div class="line">    check = 0</div><div class="line">    urg_ptr = 0</div><div class="line">    offset_res = (doff &lt;&lt; 4) + 0</div><div class="line">    tcp_flags = fin + (syn&lt;&lt;1) + (rst&lt;&lt;2) + (psh&lt;&lt;3) + (ack&lt;&lt;4) + (urg&lt;&lt;5)</div><div class="line">    tcp_header = pack(<span class="string">‘!HHLLBBHHH’</span>, <span class="built_in">source</span>, dest_port, seq, ack_seq, offset_res, tcp_flags, window, check, urg_ptr)</div><div class="line">    </div><div class="line">    <span class="string">‘’</span><span class="string">‘ headers option ‘</span><span class="string">‘’</span></div><div class="line">    source_address = socket.inet_aton( source_ip )</div><div class="line">    dest_address = socket.inet_aton( dest_ip )</div><div class="line">    placeholder = 0</div><div class="line">    protocol = socket.IPPROTO_TCP</div><div class="line">    tcp_length = len(tcp_header)</div><div class="line">    psh = pack(<span class="string">‘!4s4sBBH’</span>, source_address, dest_address, placeholder, protocol, tcp_length);</div><div class="line">    psh = psh + tcp_header;</div><div class="line">    tcp_checksum = checksum(psh)</div><div class="line"></div><div class="line">    <span class="string">‘’</span><span class="string">‘ Repack the TCP header and fill in the correct checksum ‘</span><span class="string">‘’</span></div><div class="line">    tcp_header = pack(<span class="string">‘!HHLLBBHHH’</span>, <span class="built_in">source</span>, dest_port, seq, ack_seq, offset_res, tcp_flags, window, tcp_checksum, urg_ptr)</div><div class="line">    </div><div class="line">    <span class="built_in">return</span> tcp_header</div><div class="line"></div><div class="line"></div><div class="line">def syn_scan(source_ip, dest_ip, des_port) :</div><div class="line"></div><div class="line">    s = CreateSocket(source_ip, dest_ip)</div><div class="line">    ip_header = CreateIpHeader(source_ip, dest_ip)</div><div class="line">    tcp_header = create_tcp_syn_header(source_ip, dest_ip, des_port)</div><div class="line">    packet = ip_header + tcp_header</div><div class="line"></div><div class="line">    s.sendto(packet, (dest_ip, 0))</div><div class="line">    data = s.recvfrom(1024) [0][0:]</div><div class="line"></div><div class="line">    ip_header_len = (ord(data[0]) &amp; 0x0f)  4</div><div class="line">    <span class="comment"># ip_header_ret = data[0: ip_header_len - 1]</span></div><div class="line">    tcp_header_len = (ord(data[32]) &amp; 0xf0)&gt;&gt;2</div><div class="line"></div><div class="line">    tcp_header_ret = data[ip_header_len:ip_header_len+tcp_header_len - 1]</div><div class="line"></div><div class="line">    <span class="string">‘’</span><span class="string">‘ SYN/ACK flags ‘</span><span class="string">‘’</span></div><div class="line">    <span class="keyword">if</span> ord(tcp_header_ret[13]) == 0x12:</div><div class="line">        <span class="built_in">print</span>  <span class="string">“%s:%s is open”</span> % (dest_ip,des_port)</div><div class="line">    <span class="keyword">else</span>:</div><div class="line">        <span class="built_in">print</span> <span class="string">“%s:%s is not open”</span> % (dest_ip,des_port)</div><div class="line"></div><div class="line"><span class="keyword">if</span> <strong>name</strong>==<span class="string">“<strong>main</strong>“</span>:</div><div class="line"></div><div class="line">    t_s = time.time()</div><div class="line">    source_ip = <span class="string">‘’</span> <span class="comment"># 填写本机ip</span></div><div class="line">    dest_ip = <span class="string">‘14.215.177.38’</span></div><div class="line"></div><div class="line">    <span class="keyword">for</span> des_port <span class="keyword">in</span> range(1024):</div><div class="line">        syn_scan(source_ip, dest_ip, des_port)</div><div class="line"></div><div class="line">    t_e = time.time()</div><div class="line">    <span class="built_in">print</span> <span class="string">“time is “</span>,(t_e-t_s)</div></pre></td></tr></table></figure>
+
+<p>有一点需要注意的，运行这段代码前，需要在系统上安装依赖:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">yum install python-devel libpcap-devel</div><div class="line">pip install pcap</div></pre></td></tr></table></figure>
+
+<p>运行结果：<br><img src="/upload_image/20180517/socket_syn.png" alt=""></p>
+<p>说明：从运行结果上来看，并没有很准确，而且速度也不快，不清楚是不是代码上有问题。</p>
+<h3 id="scan-for-Python-scapy"><a href="#scan-for-Python-scapy" class="headerlink" title="scan for Python scapy"></a><a href="#scan-for-Python-scapy" title="scan for Python scapy"></a>scan for Python scapy</h3><p>除了socket模块外，python还有一个scapy模块，可以用来模拟发包，但只能在linux下使用，其他操作系统不建议使用此模块。</p>
+<h4 id="tcp-syn-csan"><a href="#tcp-syn-csan" class="headerlink" title="tcp syn csan"></a><a href="#tcp-syn-csan" title="tcp syn csan"></a>tcp syn csan</h4><p>代码在这里：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#! -<em>- coding:utf-8 -</em>-</span></div><div class="line"></div><div class="line">import time</div><div class="line">from scapy.all import *</div><div class="line"></div><div class="line"></div><div class="line">ip = <span class="string">“14.215.177.38”</span></div><div class="line">TIMEOUT = 0.5</div><div class="line">threads = 500</div><div class="line">port_range = 1024</div><div class="line">retry = 1</div><div class="line"></div><div class="line"></div><div class="line">def is_up(ip):</div><div class="line">    <span class="string">“”</span><span class="string">“ Tests if host is up “</span><span class="string">“”</span></div><div class="line"></div><div class="line">    icmp = IP(dst=ip)/ICMP()</div><div class="line">    resp = sr1(icmp, timeout=TIMEOUT)</div><div class="line">    <span class="keyword">if</span> resp == None:</div><div class="line">        <span class="built_in">return</span> False</div><div class="line">    <span class="keyword">else</span>:</div><div class="line">        <span class="built_in">return</span> True</div><div class="line"></div><div class="line">def reset_half_open(ip, ports):</div><div class="line">    <span class="comment"># Reset the connection to stop half-open connections from pooling up</span></div><div class="line"></div><div class="line">    sr(IP(dst=ip)/TCP(dport=ports, flags=<span class="string">‘AR’</span>), timeout=TIMEOUT)</div><div class="line"></div><div class="line"></div><div class="line">def is_open(ip, ports):</div><div class="line"></div><div class="line">    to_reset = []</div><div class="line">    results = []</div><div class="line"></div><div class="line">    p = IP(dst=ip)/TCP(dport=ports, flags=<span class="string">‘S’</span>)  <span class="comment"># Forging SYN packet</span></div><div class="line">    answers, un_answered = sr(p, verbose=False, retry=retry ,timeout=TIMEOUT) <span class="comment"># Send the packets</span></div><div class="line"></div><div class="line">    <span class="keyword">for</span> req, resp <span class="keyword">in</span> answers:</div><div class="line">        <span class="keyword">if</span> not resp.haslayer(TCP):</div><div class="line">            <span class="built_in">continue</span></div><div class="line">        tcp_layer = resp.getlayer(TCP)</div><div class="line">        <span class="keyword">if</span> tcp_layer.flags == 0x12:</div><div class="line">            <span class="comment"># port is open</span></div><div class="line">            to_reset.append(tcp_layer.sport)</div><div class="line">            results.append(tcp_layer.sport)</div><div class="line"></div><div class="line">        <span class="keyword">elif</span> tcp_layer.flags == 0x14:</div><div class="line">            <span class="comment"># port is open</span></div><div class="line">            pass</div><div class="line"></div><div class="line">    reset_half_open(ip, to_reset)</div><div class="line">    </div><div class="line">    <span class="built_in">return</span> results</div><div class="line"></div><div class="line"></div><div class="line">def chunks(l, n):</div><div class="line">    <span class="string">“”</span><span class="string">“Yield successive n-sized chunks from l.”</span><span class="string">“”</span></div><div class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(0, len(l), n):</div><div class="line">        yield l[i:i + n]</div><div class="line"></div><div class="line"></div><div class="line"><span class="keyword">if</span> <strong>name</strong> == <span class="string">‘<strong>main</strong>‘</span>:</div><div class="line"></div><div class="line">    start_time = time.time()</div><div class="line">    open_port_list = []</div><div class="line"></div><div class="line">    <span class="keyword">for</span> ports <span class="keyword">in</span> chunks(list(range(port_range)), threads):</div><div class="line">        results = is_open(ip, ports)</div><div class="line">        <span class="keyword">if</span> results:</div><div class="line">           open_port_list += results</div><div class="line">                </div><div class="line">    end_time = time.time()</div><div class="line">    <span class="built_in">print</span> <span class="string">“%s %s”</span> % (ip,open_port_list)</div><div class="line">    <span class="built_in">print</span> <span class="string">“%s Scan Completed in %fs”</span> % (ip, end_time-start_time)</div></pre></td></tr></table></figure>
+
+<p>运行结果：<br><img src="/upload_image/20180517/scapy_syn.png" alt=""></p>
+<p>说明：由于scapy可以一次性发多个syn包，因此速度相对socket更快一些，但稳定性没有很好。</p>
+<h3 id="scan-for-python-nmap"><a href="#scan-for-python-nmap" class="headerlink" title="scan for python+nmap"></a><a href="#scan-for-python-nmap" title="scan for python+nmap"></a>scan for python+nmap</h3><p>文章开头提到了nmap，其实在python中也可以直接调用nmap，看代码：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#! -<em>- coding:utf-8 -</em>-</span></div><div class="line"></div><div class="line"><span class="string">‘’</span><span class="string">‘</span></div><div class="line">pip install python-nmap</div><div class="line">‘<span class="string">‘’</span></div><div class="line"></div><div class="line">import nmap</div><div class="line">nm =nmap.PortScanner()</div><div class="line"></div><div class="line">def scan(ip,port,arg):</div><div class="line">    try:</div><div class="line">        nm.scan(ip, arguments=arg+str(port))</div><div class="line">    except nmap.nmap.PortScannerError:</div><div class="line">        <span class="built_in">print</span> <span class="string">“Please run -O method for root privileges”</span></div><div class="line">    <span class="keyword">else</span>:</div><div class="line">        <span class="keyword">for</span> host <span class="keyword">in</span> nm.all_hosts():</div><div class="line">            <span class="keyword">for</span> proto <span class="keyword">in</span> nm[host].all_protocols():</div><div class="line">                lport = nm[host][proto].keys()</div><div class="line">                lport.sort()</div><div class="line">                <span class="keyword">for</span> port <span class="keyword">in</span> lport:</div><div class="line">                    <span class="built_in">print</span> (<span class="string">‘port : %s\tstate : %s’</span> % (port, nm[host][proto][port][<span class="string">‘state’</span>]))</div><div class="line"></div><div class="line"><span class="keyword">if</span> <strong>name</strong>==<span class="string">“<strong>main</strong>“</span>:</div><div class="line">    port=<span class="string">“80,443,22,21”</span></div><div class="line">    scan(ip=<span class="string">“14.215.177.38”</span>,port=port,arg=<span class="string">“-sS -Pn -p”</span>)</div><div class="line">    <span class="comment"># tcp scan -sT</span></div><div class="line">    <span class="comment"># tcp syn scan -sS</span></div></pre></td></tr></table></figure>
+
+<p>运行结果：<br><img src="/upload_image/20180517/nmap_scan.png" alt=""><br>由于nmap扫描速度相对比较慢，因此这里只演示扫描4个端口，不做速度的对比，当然其稳定性还是可以的。</p>
+<h3 id="scan-for-go"><a href="#scan-for-go" class="headerlink" title="scan for go"></a><a href="#scan-for-go" title="scan for go"></a>scan for go</h3><p>　　前文一直在介绍使用python语言开发端口扫描器，然而由于python在多线程方面的弱势，扫描器的性能可想而知，因此我又利用go语言的高并发性优势，尝试开发端口扫描器。（题外话：为此我花了半天时间看了下go语言的基础，勉强看懂了扫描代码，并做了一些修改）</p>
+<h4 id="tcp-scan-1"><a href="#tcp-scan-1" class="headerlink" title="tcp scan"></a><a href="#tcp-scan-1" title="tcp scan"></a>tcp scan</h4><p>直接看代码吧：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div></pre></td><td class="code"><pre><div class="line">package main</div><div class="line"></div><div class="line">// port tcp scan</div><div class="line"></div><div class="line">import (</div><div class="line">    <span class="string">“fmt”</span></div><div class="line">    <span class="string">“net”</span></div><div class="line">    <span class="string">“os”</span></div><div class="line">    <span class="string">“runtime”</span></div><div class="line">    <span class="string">“strconv”</span></div><div class="line">    <span class="string">“sync”</span></div><div class="line">    <span class="string">“time”</span></div><div class="line">)</div><div class="line"></div><div class="line">func loop(inport chan int, startport, endport int) &#123;</div><div class="line">    <span class="keyword">for</span> i := startport; i &lt;= endport; i++ &#123;</div><div class="line">        inport &lt;- i</div><div class="line">    &#125;</div><div class="line">    close(inport)</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="built_in">type</span> ScanSafeCount struct &#123;</div><div class="line">    // 结构体</div><div class="line">    count int</div><div class="line">    mux   sync.Mutex</div><div class="line">&#125;</div><div class="line"></div><div class="line">var scanCount ScanSafeCount</div><div class="line"></div><div class="line"></div><div class="line">func scanner(inport int, outport chan int, ip string, endport int) &#123;</div><div class="line">    // 扫描函数</div><div class="line"></div><div class="line">    <span class="keyword">in</span> := inport // 定义要扫描的端口号</div><div class="line">    // fmt.Printf(<span class="string">“ %d “</span>, <span class="keyword">in</span>) // 输出扫描的端口</div><div class="line"></div><div class="line">    host := fmt.Sprintf(<span class="string">“%s:%d”</span>, ip, <span class="keyword">in</span>) // 类似（ip,port）</div><div class="line"></div><div class="line">    tcpAddr, err := net.ResolveTCPAddr(<span class="string">“tcp4”</span>, host) // 根据域名查找ip</div><div class="line"></div><div class="line">    <span class="keyword">if</span> err != nil &#123;</div><div class="line">        // 域名解析ip失败</div><div class="line">        outport &lt;- 0</div><div class="line">    &#125; <span class="keyword">else</span> &#123;</div><div class="line">        conn, err := net.DialTimeout(<span class="string">“tcp”</span>, tcpAddr.String(), 10<em>time.Second) //建立tcp连接</em></div><div class="line">        <span class="keyword">if</span> err != nil &#123;</div><div class="line">            // tcp连接失败</div><div class="line">            outport &lt;- 0</div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line">            // tcp连接成功</div><div class="line">            outport &lt;- <span class="keyword">in</span> // 将端口写入outport信号</div><div class="line">            fmt.Printf(<span class="string">“\n <strong><strong><em>**</em></strong></strong>( %d 可以 )<strong><strong><strong><strong>*</strong></strong></strong></strong>\n”</span>, <span class="keyword">in</span>)</div><div class="line">            conn.Close()</div><div class="line">        &#125;</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line">    // 线程锁</div><div class="line">    scanCount.mux.Lock()</div><div class="line">    scanCount.count = scanCount.count - 1</div><div class="line">    <span class="keyword">if</span> scanCount.count &lt;= 0 &#123;</div><div class="line">        close(outport)</div><div class="line">    &#125;</div><div class="line">    scanCount.mux.Unlock()</div><div class="line"></div><div class="line">&#125;</div><div class="line"></div><div class="line">func <span class="function"><span class="title">main</span></span>() &#123;</div><div class="line">    runtime.GOMAXPROCS(runtime.NumCPU()) // 设置最大可使用的cpu核数</div><div class="line"></div><div class="line">    // 定义变量</div><div class="line">    inport := make(chan int) // 信号变量，类似python中的queue</div><div class="line">    outport := make(chan int)</div><div class="line">    collect := []int&#123;&#125; // 定义一个切片变量，类似python中的list</div><div class="line"></div><div class="line">    // fmt.Println(os.Args, len(os.Args)) // 获取命令行参数并输出</div><div class="line"></div><div class="line">    <span class="keyword">if</span> len(os.Args) != 4 &#123;</div><div class="line">        // 命令行参数个数有误</div><div class="line">        fmt.Println(<span class="string">“使用方式： port_scanner IP startport endport”</span>)</div><div class="line">        os.Exit(0)</div><div class="line">    &#125;</div><div class="line">    s_time := time.Now().Unix()</div><div class="line"></div><div class="line">    // fmt.Println(<span class="string">“扫描开始：”</span>) // 获取当前时间</div><div class="line"></div><div class="line">    ip := string(os.Args[1]) // 获取参数中的ip</div><div class="line">    startport, _ := strconv.Atoi(os.Args[2]) // 获取参数中的启始端口</div><div class="line">    endport, _ := strconv.Atoi(os.Args[3]) // 获取参数中的结束端口</div><div class="line"></div><div class="line">    <span class="keyword">if</span> startport &gt; endport &#123;</div><div class="line">        fmt.Println(<span class="string">“Usage: scanner IP startport endport”</span>)</div><div class="line">        fmt.Println(<span class="string">“Endport must be larger than startport”</span>)</div><div class="line">        os.Exit(0)</div><div class="line">    &#125; <span class="keyword">else</span> &#123;</div><div class="line">        // 定义scanCount变量为ScanSafeCount结构体，即计算扫描的端口数量</div><div class="line">        scanCount = ScanSafeCount&#123;count: (endport - startport + 1)&#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    fmt.Printf(<span class="string">“扫描 %s：%d———-%d\n”</span>, ip, startport, endport)</div><div class="line"></div><div class="line">    go loop(inport, startport, endport)  // 执行loop函数将端口写入input信号</div><div class="line"></div><div class="line">    <span class="keyword">for</span> v := range inport &#123;</div><div class="line">        // 开始循环input</div><div class="line">        go scanner(v, outport, ip, endport)</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    // 输出结果</div><div class="line">    <span class="keyword">for</span> port := range outport &#123;</div><div class="line">        <span class="keyword">if</span> port != 0 &#123;</div><div class="line">            collect = append(collect, port)</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    fmt.Println(<span class="string">“–”</span>)</div><div class="line">    fmt.Println(collect)</div><div class="line">    e_time := time.Now().Unix()</div><div class="line">    fmt.Println(<span class="string">“扫描时间:”</span>, e_time-s_time)</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+
+<p>　　代码我就不解释了（我在代码中加了些注释，应该大致可以看懂），本文也不打算介绍go的用法，毕竟自己也是刚开始学习go，有兴趣的可以看看go的文档，然后再回过头来看看这段代码。</p>
+<p>代码运行结果：<br><img src="/upload_image/20180517/go_tcp.png" alt=""></p>
+<p>说明：由于是tcp扫描，所以多少还是占资源的，而且测试发现稳定性不是很好。</p>
+<h4 id="tcp-syn-scan-1"><a href="#tcp-syn-scan-1" class="headerlink" title="tcp syn scan"></a><a href="#tcp-syn-scan-1" title="tcp syn scan"></a>tcp syn scan</h4><p>看代码看代码：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div><div class="line">133</div><div class="line">134</div><div class="line">135</div><div class="line">136</div><div class="line">137</div><div class="line">138</div><div class="line">139</div><div class="line">140</div><div class="line">141</div><div class="line">142</div><div class="line">143</div><div class="line">144</div><div class="line">145</div><div class="line">146</div><div class="line">147</div><div class="line">148</div><div class="line">149</div><div class="line">150</div><div class="line">151</div><div class="line">152</div><div class="line">153</div><div class="line">154</div><div class="line">155</div><div class="line">156</div><div class="line">157</div><div class="line">158</div><div class="line">159</div><div class="line">160</div><div class="line">161</div><div class="line">162</div><div class="line">163</div><div class="line">164</div><div class="line">165</div><div class="line">166</div><div class="line">167</div><div class="line">168</div><div class="line">169</div><div class="line">170</div><div class="line">171</div><div class="line">172</div><div class="line">173</div><div class="line">174</div><div class="line">175</div><div class="line">176</div><div class="line">177</div><div class="line">178</div><div class="line">179</div><div class="line">180</div><div class="line">181</div><div class="line">182</div><div class="line">183</div><div class="line">184</div><div class="line">185</div><div class="line">186</div><div class="line">187</div><div class="line">188</div><div class="line">189</div><div class="line">190</div><div class="line">191</div><div class="line">192</div><div class="line">193</div><div class="line">194</div><div class="line">195</div><div class="line">196</div><div class="line">197</div><div class="line">198</div><div class="line">199</div><div class="line">200</div><div class="line">201</div><div class="line">202</div><div class="line">203</div><div class="line">204</div><div class="line">205</div><div class="line">206</div><div class="line">207</div><div class="line">208</div><div class="line">209</div><div class="line">210</div><div class="line">211</div><div class="line">212</div><div class="line">213</div><div class="line">214</div><div class="line">215</div><div class="line">216</div><div class="line">217</div><div class="line">218</div><div class="line">219</div><div class="line">220</div><div class="line">221</div><div class="line">222</div><div class="line">223</div><div class="line">224</div><div class="line">225</div><div class="line">226</div><div class="line">227</div><div class="line">228</div><div class="line">229</div><div class="line">230</div><div class="line">231</div><div class="line">232</div><div class="line">233</div><div class="line">234</div><div class="line">235</div><div class="line">236</div><div class="line">237</div><div class="line">238</div><div class="line">239</div><div class="line">240</div><div class="line">241</div><div class="line">242</div><div class="line">243</div><div class="line">244</div><div class="line">245</div><div class="line">246</div><div class="line">247</div><div class="line">248</div><div class="line">249</div><div class="line">250</div><div class="line">251</div><div class="line">252</div><div class="line">253</div><div class="line">254</div><div class="line">255</div><div class="line">256</div><div class="line">257</div><div class="line">258</div><div class="line">259</div><div class="line">260</div><div class="line">261</div><div class="line">262</div><div class="line">263</div><div class="line">264</div><div class="line">265</div><div class="line">266</div><div class="line">267</div><div class="line">268</div><div class="line">269</div><div class="line">270</div><div class="line">271</div><div class="line">272</div><div class="line">273</div><div class="line">274</div><div class="line">275</div><div class="line">276</div><div class="line">277</div><div class="line">278</div><div class="line">279</div><div class="line">280</div><div class="line">281</div><div class="line">282</div><div class="line">283</div><div class="line">284</div><div class="line">285</div><div class="line">286</div><div class="line">287</div><div class="line">288</div><div class="line">289</div><div class="line">290</div><div class="line">291</div></pre></td><td class="code"><pre><div class="line">package main</div><div class="line"></div><div class="line">// port tcp syn scan</div><div class="line"></div><div class="line">import (</div><div class="line">    <span class="string">“bytes”</span></div><div class="line">    <span class="string">“encoding/binary”</span></div><div class="line">    <span class="string">“flag”</span></div><div class="line">    <span class="string">“fmt”</span></div><div class="line">    <span class="string">“log”</span></div><div class="line">    <span class="string">“math/rand”</span></div><div class="line">    <span class="string">“net”</span></div><div class="line">    <span class="string">“os”</span></div><div class="line">    <span class="string">“strconv”</span></div><div class="line">    <span class="string">“strings”</span></div><div class="line">    <span class="string">“time”</span></div><div class="line">    <span class="string">“errors”</span></div><div class="line">)</div><div class="line"></div><div class="line">//TCPHeader <span class="built_in">test</span></div><div class="line"><span class="built_in">type</span> TCPHeader struct &#123;</div><div class="line">    SrcPort       uint16</div><div class="line">    DstPort       uint16</div><div class="line">    SeqNum        uint32</div><div class="line">    AckNum        uint32</div><div class="line">    Flags         uint16</div><div class="line">    Window        uint16</div><div class="line">    ChkSum        uint16</div><div class="line">    UrgentPointer uint16</div><div class="line">&#125;</div><div class="line"></div><div class="line">//TCPOption <span class="built_in">test</span></div><div class="line"><span class="built_in">type</span> TCPOption struct &#123;</div><div class="line">    Kind   uint8</div><div class="line">    Length uint8</div><div class="line">    Data   []byte</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="built_in">type</span> scanResult struct &#123;</div><div class="line">    Port   uint16</div><div class="line">    Opened bool</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="built_in">type</span> scanJob struct &#123;</div><div class="line">    Laddr string</div><div class="line">    Raddr string</div><div class="line">    SPort uint16</div><div class="line">    DPort uint16</div><div class="line">    Stop  uint8</div><div class="line">&#125;</div><div class="line"></div><div class="line">var stopFlag = make(chan uint8, 1)</div><div class="line"></div><div class="line">func <span class="function"><span class="title">main</span></span>() &#123;</div><div class="line"></div><div class="line">    rate := time.Second / 400</div><div class="line">    throttle := time.Tick(rate)</div><div class="line">    <span class="built_in">jobs</span> := make(chan <em>scanJob, 65536)</em></div><div class="line">    results := make(chan scanResult, 1000)</div><div class="line">    <span class="keyword">for</span> w := 0; w &lt; 10; w++ &#123;</div><div class="line">        go worker(w, <span class="built_in">jobs</span>, throttle, results)</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    // 获取命令行参数</div><div class="line"></div><div class="line">    ifaceName := flag.String(<span class="string">“i”</span>, <span class="string">“eth0”</span>, <span class="string">“Specify network”</span>)</div><div class="line">    remote := flag.String(<span class="string">“r”</span>, <span class="string">“”</span>, <span class="string">“remote address”</span>)</div><div class="line">    portRange := flag.String(<span class="string">“p”</span>, <span class="string">“1-1024”</span>, <span class="string">“port range: -p 1-1024”</span>)</div><div class="line">    flag.Parse()</div><div class="line"></div><div class="line">    // ifaceName := &amp;interfaceName_</div><div class="line">    // remote := &amp;remote_</div><div class="line">    // portRange := &amp;portRange_</div><div class="line"></div><div class="line">    s_time := time.Now().Unix()</div><div class="line"></div><div class="line">    laddr := interfaceAddress(<em>ifaceName) //</em></div><div class="line">    raddr := remote</div><div class="line">    minPort , maxPort := portSplit(portRange)</div><div class="line"></div><div class="line">    // fmt.Println(laddr, raddr) // 输出源ip地址，目标ip地址</div><div class="line"></div><div class="line">    go func(num int)&#123;</div><div class="line">        <span class="keyword">for</span> i := 0; i &lt; num; i++ &#123;</div><div class="line">            recvSynAck(laddr, raddr, results)</div><div class="line">        &#125;</div><div class="line">    &#125;(10)</div><div class="line"></div><div class="line">    go func(jobLength int) &#123;</div><div class="line">        <span class="keyword">for</span> j := minPort; j &lt; maxPort + 1; j++ &#123;</div><div class="line">            s := scanJob&#123;</div><div class="line">                Laddr: laddr,</div><div class="line">                Raddr: raddr,</div><div class="line">                SPort: uint16(random(10000, 65535)),</div><div class="line">                DPort: uint16(j + 1),</div><div class="line">            &#125;</div><div class="line">            <span class="built_in">jobs</span> &lt;- &amp;s</div><div class="line">        &#125;</div><div class="line">        <span class="built_in">jobs</span> &lt;- &amp;scanJob&#123;Stop: 1&#125;</div><div class="line">    &#125;(1024)</div><div class="line"></div><div class="line">    <span class="keyword">for</span> &#123;</div><div class="line">        select &#123;</div><div class="line">        <span class="keyword">case</span> res := &lt;-results:</div><div class="line">            fmt.Println(<span class="string">“扫描到开放的端口:”</span>,res.Port)</div><div class="line">        <span class="keyword">case</span> &lt;-stopFlag:</div><div class="line">            e_time := time.Now().Unix()</div><div class="line">            fmt.Println(<span class="string">“总共用了多少时间(s):”</span>,e_time-s_time)</div><div class="line">            os.Exit(0)</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">func worker(id int, <span class="built_in">jobs</span> &lt;-chan <em>scanJob, th &lt;-chan time.Time, results chan&lt;- </em>scanResult) &#123;</div><div class="line">    <span class="keyword">for</span> j := range <span class="built_in">jobs</span> &#123;</div><div class="line">        <span class="keyword">if</span> j.Stop != 1 &#123;</div><div class="line">            sendSyn(j.Laddr, j.Raddr, j.SPort, j.DPort)</div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line">            stopFlag &lt;- j.Stop</div><div class="line">        &#125;</div><div class="line">        &lt;-th</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">func checkError(err error) &#123;</div><div class="line">    // 错误check</div><div class="line">    <span class="keyword">if</span> err != nil &#123;</div><div class="line">        log.Println(err)</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">//CheckSum <span class="built_in">test</span></div><div class="line">func CheckSum(data []byte, src, dst [4]byte) uint16 &#123;</div><div class="line">    pseudoHeader := []byte&#123;</div><div class="line">        src[0], src[1], src[2], src[3],</div><div class="line">        dst[0], dst[1], dst[2], dst[3],</div><div class="line">        0,</div><div class="line">        6,</div><div class="line">        0,</div><div class="line">        byte(len(data)),</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    totalLength := len(pseudoHeader) + len(data)</div><div class="line">    <span class="keyword">if</span> totalLength%2 != 0 &#123;</div><div class="line">        totalLength++</div><div class="line">    &#125;</div><div class="line">    d := make([]byte, 0, totalLength)</div><div class="line">    d = append(d, pseudoHeader…)</div><div class="line">    d = append(d, data…)</div><div class="line"></div><div class="line">    <span class="built_in">return</span> ^mySum(d)</div><div class="line">&#125;</div><div class="line"></div><div class="line">func mySum(data []byte) uint16 &#123;</div><div class="line">    var sum uint32</div><div class="line">    <span class="keyword">for</span> i := 0; i &lt; len(data)-1; i += 2 &#123;</div><div class="line">        sum += uint32(uint16(data[i])&lt;&lt;8 | uint16(data[i+1]))</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    sum = (sum &gt;&gt; 16) + (sum &amp; 0xffff)</div><div class="line">    sum = sum + (sum &gt;&gt; 16)</div><div class="line">    <span class="built_in">return</span> uint16(sum)</div><div class="line">&#125;</div><div class="line"></div><div class="line">func sendSyn(laddr, raddr string, sport, dport uint16) &#123;</div><div class="line">    conn, err := net.Dial(<span class="string">“ip4:tcp”</span>, raddr)</div><div class="line">    checkError(err)</div><div class="line">    defer conn.Close()</div><div class="line">    op := []TCPOption&#123;</div><div class="line">        TCPOption&#123;</div><div class="line">            Kind:   2,</div><div class="line">            Length: 4,</div><div class="line">            Data:   []byte&#123;0x05, 0xb4&#125;,</div><div class="line">        &#125;,</div><div class="line">        TCPOption&#123;</div><div class="line">            Kind: 0,</div><div class="line">        &#125;,</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    tcpH := TCPHeader&#123;</div><div class="line">        SrcPort:       sport,</div><div class="line">        DstPort:       dport,</div><div class="line">        SeqNum:        rand.Uint32(),</div><div class="line">        AckNum:        0,</div><div class="line">        Flags:         0x8002,</div><div class="line">        Window:        8192,</div><div class="line">        ChkSum:        0,</div><div class="line">        UrgentPointer: 0,</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    buff := new(bytes.Buffer)</div><div class="line"></div><div class="line">    err = binary.Write(buff, binary.BigEndian, tcpH)</div><div class="line">    checkError(err)</div><div class="line">    <span class="keyword">for</span> i := range op &#123;</div><div class="line">        binary.Write(buff, binary.BigEndian, op[i].Kind)</div><div class="line">        binary.Write(buff, binary.BigEndian, op[i].Length)</div><div class="line">        binary.Write(buff, binary.BigEndian, op[i].Data)</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    binary.Write(buff, binary.BigEndian, [6]byte&#123;&#125;)</div><div class="line"></div><div class="line">    data := buff.Bytes()</div><div class="line">    checkSum := CheckSum(data, ipstr2Bytes(laddr), ipstr2Bytes(raddr))</div><div class="line">    //fmt.Printf(<span class="string">“CheckSum 0x%X\n”</span>, checkSum)</div><div class="line">    tcpH.ChkSum = checkSum</div><div class="line"></div><div class="line">    buff = new(bytes.Buffer)</div><div class="line">    binary.Write(buff, binary.BigEndian, tcpH)</div><div class="line">    <span class="keyword">for</span> i := range op &#123;</div><div class="line">        binary.Write(buff, binary.BigEndian, op[i].Kind)</div><div class="line">        binary.Write(buff, binary.BigEndian, op[i].Length)</div><div class="line">        binary.Write(buff, binary.BigEndian, op[i].Data)</div><div class="line">    &#125;</div><div class="line">    binary.Write(buff, binary.BigEndian, [6]byte&#123;&#125;)</div><div class="line">    data = buff.Bytes()</div><div class="line"></div><div class="line">    //fmt.Printf(<span class="string">“% X\n”</span>, data)</div><div class="line">    _, err = conn.Write(data)</div><div class="line">    checkError(err)</div><div class="line">&#125;</div><div class="line"></div><div class="line">func recvSynAck(laddr, raddr string, res chan&lt;- <em>scanResult) error &#123;</em></div><div class="line">    listenAddr, err := net.ResolveIPAddr(<span class="string">“ip4”</span>, laddr) // 解析域名为ip</div><div class="line">    checkError(err)</div><div class="line">    conn, err := net.ListenIP(<span class="string">“ip4:tcp”</span>, listenAddr)</div><div class="line">    defer conn.Close()</div><div class="line">    checkError(err)</div><div class="line">    <span class="keyword">for</span> &#123;</div><div class="line">        buff := make([]byte, 1024)</div><div class="line">        _, addr, err := conn.ReadFrom(buff)</div><div class="line">        <span class="keyword">if</span> err != nil &#123;</div><div class="line">            <span class="built_in">continue</span></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="keyword">if</span> addr.String() != raddr || buff[13] != 0x12 &#123;</div><div class="line">            <span class="built_in">continue</span></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        var port uint16</div><div class="line">        binary.Read(bytes.NewReader(buff), binary.BigEndian, &amp;port)</div><div class="line">        res &lt;- &amp;scanResult&#123;</div><div class="line">            Port:   port,</div><div class="line">            Opened: <span class="literal">true</span>,</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">func ipstr2Bytes(addr string) [4]byte &#123;</div><div class="line">    s := strings.Split(addr, <span class="string">“.”</span>)</div><div class="line">    b0, _ := strconv.Atoi(s[0])</div><div class="line">    b1, _ := strconv.Atoi(s[1])</div><div class="line">    b2, _ := strconv.Atoi(s[2])</div><div class="line">    b3, _ := strconv.Atoi(s[3])</div><div class="line">    <span class="built_in">return</span> [4]byte&#123;byte(b0), byte(b1), byte(b2), byte(b3)&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">func random(min, max int) int &#123;</div><div class="line">    <span class="built_in">return</span> rand.Intn(max-min) + min</div><div class="line">&#125;</div><div class="line"></div><div class="line">func interfaceAddress(ifaceName string ) string &#123;</div><div class="line">    iface, err:= net.InterfaceByName(ifaceName)</div><div class="line">    <span class="keyword">if</span> err != nil &#123;</div><div class="line">        panic(err)</div><div class="line">    &#125;</div><div class="line">    addr, err := iface.Addrs()</div><div class="line">    <span class="keyword">if</span> err != nil &#123;</div><div class="line">        panic(err)</div><div class="line">    &#125;</div><div class="line">    addrStr := strings.Split(addr[0].String(), <span class="string">“/“</span>)[0]</div><div class="line">    <span class="built_in">return</span> addrStr</div><div class="line">&#125;</div><div class="line"></div><div class="line">func portSplit(portRange string) (uint16, uint16) &#123;</div><div class="line">    ports := strings.Split(*portRange, <span class="string">“-“</span>)</div><div class="line">    minPort, err := strconv.ParseUint(ports[0], 10, 16)</div><div class="line">    <span class="keyword">if</span> err !=nil &#123;</div><div class="line">        panic(err)</div><div class="line">    &#125;</div><div class="line">    maxPort, err := strconv.ParseUint(ports[1], 10, 16)</div><div class="line">    <span class="keyword">if</span> err != nil &#123;</div><div class="line">        panic(err)</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">if</span> minPort &gt; maxPort &#123;</div><div class="line">        panic(errors.New(<span class="string">“minPort must greater than maxPort”</span>))</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="built_in">return</span> uint16(minPort), uint16(maxPort)</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+
+<p>代码运行结果：<br><img src="/upload_image/20180517/go_syn.png" alt=""><br>没错，就是2s！我测试了扫描全端口（0-65535），大概120s左右，而且稳定性不错。</p>
+<h3 id="scan-for-go-python"><a href="#scan-for-go-python" class="headerlink" title="scan for go+python"></a><a href="#scan-for-go-python" title="scan for go+python"></a>scan for go+python</h3><p>　　经过前面的测试我们不难发现，在并发的性能上，go完胜python，但go不适合做复杂的逻辑处理，以及web开发之类的。因此如何整合python跟go呢？这里我想了两种方案，第一种将go语言打包成.so动态连接库，利用python的ctypes模块可以调用；第二种是go写成接口，提供python调用。写成接口的方式相对简单一些，因此这里不介绍了，说说如何打包go，即如何利用python调用go的方法或者说函数。</p>
+<p>先看下修改过后的tcp_syn_scan.go代码：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div><div class="line">133</div><div class="line">134</div><div class="line">135</div><div class="line">136</div><div class="line">137</div><div class="line">138</div><div class="line">139</div><div class="line">140</div><div class="line">141</div><div class="line">142</div><div class="line">143</div><div class="line">144</div><div class="line">145</div><div class="line">146</div><div class="line">147</div><div class="line">148</div><div class="line">149</div><div class="line">150</div><div class="line">151</div><div class="line">152</div><div class="line">153</div><div class="line">154</div><div class="line">155</div><div class="line">156</div><div class="line">157</div><div class="line">158</div><div class="line">159</div><div class="line">160</div><div class="line">161</div><div class="line">162</div><div class="line">163</div><div class="line">164</div><div class="line">165</div><div class="line">166</div><div class="line">167</div><div class="line">168</div><div class="line">169</div><div class="line">170</div><div class="line">171</div><div class="line">172</div><div class="line">173</div><div class="line">174</div><div class="line">175</div><div class="line">176</div><div class="line">177</div><div class="line">178</div><div class="line">179</div><div class="line">180</div><div class="line">181</div><div class="line">182</div><div class="line">183</div><div class="line">184</div><div class="line">185</div><div class="line">186</div><div class="line">187</div><div class="line">188</div><div class="line">189</div><div class="line">190</div><div class="line">191</div><div class="line">192</div><div class="line">193</div><div class="line">194</div><div class="line">195</div><div class="line">196</div><div class="line">197</div><div class="line">198</div><div class="line">199</div><div class="line">200</div><div class="line">201</div><div class="line">202</div><div class="line">203</div><div class="line">204</div><div class="line">205</div><div class="line">206</div><div class="line">207</div><div class="line">208</div><div class="line">209</div><div class="line">210</div><div class="line">211</div><div class="line">212</div><div class="line">213</div><div class="line">214</div><div class="line">215</div><div class="line">216</div><div class="line">217</div><div class="line">218</div><div class="line">219</div><div class="line">220</div><div class="line">221</div><div class="line">222</div><div class="line">223</div><div class="line">224</div><div class="line">225</div><div class="line">226</div><div class="line">227</div><div class="line">228</div><div class="line">229</div><div class="line">230</div><div class="line">231</div><div class="line">232</div><div class="line">233</div><div class="line">234</div><div class="line">235</div><div class="line">236</div><div class="line">237</div><div class="line">238</div><div class="line">239</div><div class="line">240</div><div class="line">241</div><div class="line">242</div><div class="line">243</div><div class="line">244</div><div class="line">245</div><div class="line">246</div><div class="line">247</div><div class="line">248</div><div class="line">249</div><div class="line">250</div><div class="line">251</div><div class="line">252</div><div class="line">253</div><div class="line">254</div><div class="line">255</div><div class="line">256</div><div class="line">257</div><div class="line">258</div><div class="line">259</div><div class="line">260</div><div class="line">261</div><div class="line">262</div><div class="line">263</div><div class="line">264</div><div class="line">265</div><div class="line">266</div><div class="line">267</div><div class="line">268</div><div class="line">269</div><div class="line">270</div><div class="line">271</div><div class="line">272</div><div class="line">273</div><div class="line">274</div><div class="line">275</div><div class="line">276</div><div class="line">277</div><div class="line">278</div><div class="line">279</div><div class="line">280</div><div class="line">281</div><div class="line">282</div><div class="line">283</div><div class="line">284</div><div class="line">285</div><div class="line">286</div><div class="line">287</div><div class="line">288</div><div class="line">289</div><div class="line">290</div><div class="line">291</div><div class="line">292</div><div class="line">293</div><div class="line">294</div><div class="line">295</div><div class="line">296</div><div class="line">297</div><div class="line">298</div><div class="line">299</div></pre></td><td class="code"><pre><div class="line">package main</div><div class="line"></div><div class="line">// port tcp syn scan</div><div class="line"></div><div class="line">import (</div><div class="line">    <span class="string">“C”</span></div><div class="line">    <span class="string">“os”</span></div><div class="line">    <span class="string">“bytes”</span></div><div class="line">    <span class="string">“encoding/binary”</span></div><div class="line">    <span class="string">“fmt”</span></div><div class="line">    <span class="string">“log”</span></div><div class="line">    <span class="string">“math/rand”</span></div><div class="line">    <span class="string">“net”</span></div><div class="line">    <span class="string">“strconv”</span></div><div class="line">    <span class="string">“strings”</span></div><div class="line">    <span class="string">“time”</span></div><div class="line">    <span class="string">“errors”</span></div><div class="line">)</div><div class="line"></div><div class="line">//TCPHeader <span class="built_in">test</span></div><div class="line"><span class="built_in">type</span> TCPHeader struct &#123;</div><div class="line">    SrcPort       uint16</div><div class="line">    DstPort       uint16</div><div class="line">    SeqNum        uint32</div><div class="line">    AckNum        uint32</div><div class="line">    Flags         uint16</div><div class="line">    Window        uint16</div><div class="line">    ChkSum        uint16</div><div class="line">    UrgentPointer uint16</div><div class="line">&#125;</div><div class="line"></div><div class="line">//TCPOption <span class="built_in">test</span></div><div class="line"><span class="built_in">type</span> TCPOption struct &#123;</div><div class="line">    Kind   uint8</div><div class="line">    Length uint8</div><div class="line">    Data   []byte</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="built_in">type</span> scanResult struct &#123;</div><div class="line">    Port   uint16</div><div class="line">    Opened bool</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="built_in">type</span> scanJob struct &#123;</div><div class="line">    Laddr string</div><div class="line">    Raddr string</div><div class="line">    SPort uint16</div><div class="line">    DPort uint16</div><div class="line">    Stop  uint8</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line">var stopFlag = make(chan uint8, 1)</div><div class="line"></div><div class="line">//<span class="built_in">export</span> Scan</div><div class="line">func Scan(remote_ <em>C.char, portRange_ </em>C.char, interfaceName_ <em>C.char) &#123;</em></div><div class="line">    </div><div class="line">    rate := time.Second / 400</div><div class="line">    throttle := time.Tick(rate)</div><div class="line">    <span class="built_in">jobs</span> := make(chan scanJob, 65536)</div><div class="line">    results := make(chan <em>scanResult, 1000)</em></div><div class="line">    <span class="keyword">for</span> w := 0; w &lt; 10; w++ &#123;</div><div class="line">        go worker(w, <span class="built_in">jobs</span>, throttle, results)</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    // 获取命令行参数</div><div class="line"></div><div class="line">    // ifaceName := flag.String(<span class="string">“i”</span>, <span class="string">“eth0”</span>, <span class="string">“Specify network”</span>)</div><div class="line">    // remote := flag.String(<span class="string">“r”</span>, <span class="string">“”</span>, <span class="string">“remote address”</span>)</div><div class="line">    // portRange := flag.String(<span class="string">“p”</span>, <span class="string">“1-1024”</span>, <span class="string">“port range: -p 1-1024”</span>)</div><div class="line">    // flag.Parse()</div><div class="line">    </div><div class="line">    interfaceName_1 := C.GoString(interfaceName_)</div><div class="line">    remote_1 := C.GoString(remote_)</div><div class="line">    portRange_1 := C.GoString(portRange_) </div><div class="line"></div><div class="line">    ifaceName := &amp;interfaceName_1</div><div class="line">    remote := &amp;remote_1</div><div class="line">    portRange := &amp;portRange_1</div><div class="line"></div><div class="line">    s_time := time.Now().Unix()</div><div class="line">    </div><div class="line">    laddr := interfaceAddress(ifaceName) //</div><div class="line">    raddr := <em>remote</em></div><div class="line">    minPort , maxPort := portSplit(portRange)</div><div class="line"></div><div class="line">    fmt.Println(laddr, raddr) // 输出源ip地址，目标ip地址</div><div class="line"></div><div class="line">    go func(num int)&#123;</div><div class="line">        <span class="keyword">for</span> i := 0; i &lt; num; i++ &#123;</div><div class="line">            recvSynAck(laddr, raddr, results)</div><div class="line">        &#125;</div><div class="line">    &#125;(10)</div><div class="line"></div><div class="line">    go func(jobLength int) &#123;</div><div class="line">        <span class="keyword">for</span> j := minPort; j &lt; maxPort + 1; j++ &#123;</div><div class="line">            s := scanJob&#123;</div><div class="line">                Laddr: laddr,</div><div class="line">                Raddr: raddr,</div><div class="line">                SPort: uint16(random(10000, 65535)),</div><div class="line">                DPort: uint16(j + 1),</div><div class="line">            &#125;</div><div class="line">            <span class="built_in">jobs</span> &lt;- &amp;s</div><div class="line">        &#125;</div><div class="line">        <span class="built_in">jobs</span> &lt;- &amp;scanJob&#123;Stop: 1&#125;</div><div class="line">    &#125;(1024)</div><div class="line"></div><div class="line">    <span class="keyword">for</span> &#123;</div><div class="line">        select &#123;</div><div class="line">        <span class="keyword">case</span> res := &lt;-results:</div><div class="line">            fmt.Println(<span class="string">“扫描到开放的端口：”</span>,res.Port) //输出开放的端口号</div><div class="line">        <span class="keyword">case</span> &lt;-stopFlag:</div><div class="line">            e_time := time.Now().Unix()</div><div class="line">            fmt.Println(<span class="string">“本次扫描总共耗时(s):”</span>,e_time-s_time)</div><div class="line">            os.Exit(0)</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">func worker(id int, <span class="built_in">jobs</span> &lt;-chan scanJob, th &lt;-chan time.Time, results chan&lt;- <em>scanResult) &#123;</em></div><div class="line">    <span class="keyword">for</span> j := range <span class="built_in">jobs</span> &#123;</div><div class="line">        <span class="keyword">if</span> j.Stop != 1 &#123;</div><div class="line">            sendSyn(j.Laddr, j.Raddr, j.SPort, j.DPort)</div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line">            stopFlag &lt;- j.Stop</div><div class="line">        &#125;</div><div class="line">        &lt;-th</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">func checkError(err error) &#123;</div><div class="line">    // 错误check</div><div class="line">    <span class="keyword">if</span> err != nil &#123;</div><div class="line">        log.Println(err)</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">//CheckSum <span class="built_in">test</span></div><div class="line">func CheckSum(data []byte, src, dst [4]byte) uint16 &#123;</div><div class="line">    pseudoHeader := []byte&#123;</div><div class="line">        src[0], src[1], src[2], src[3],</div><div class="line">        dst[0], dst[1], dst[2], dst[3],</div><div class="line">        0,</div><div class="line">        6,</div><div class="line">        0,</div><div class="line">        byte(len(data)),</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    totalLength := len(pseudoHeader) + len(data)</div><div class="line">    <span class="keyword">if</span> totalLength%2 != 0 &#123;</div><div class="line">        totalLength++</div><div class="line">    &#125;</div><div class="line">    d := make([]byte, 0, totalLength)</div><div class="line">    d = append(d, pseudoHeader…)</div><div class="line">    d = append(d, data…)</div><div class="line"></div><div class="line">    <span class="built_in">return</span> ^mySum(d)</div><div class="line">&#125;</div><div class="line"></div><div class="line">func mySum(data []byte) uint16 &#123;</div><div class="line">    var sum uint32</div><div class="line">    <span class="keyword">for</span> i := 0; i &lt; len(data)-1; i += 2 &#123;</div><div class="line">        sum += uint32(uint16(data[i])&lt;&lt;8 | uint16(data[i+1]))</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    sum = (sum &gt;&gt; 16) + (sum &amp; 0xffff)</div><div class="line">    sum = sum + (sum &gt;&gt; 16)</div><div class="line">    <span class="built_in">return</span> uint16(sum)</div><div class="line">&#125;</div><div class="line"></div><div class="line">func sendSyn(laddr, raddr string, sport, dport uint16) &#123;</div><div class="line">    conn, err := net.Dial(<span class="string">“ip4:tcp”</span>, raddr)</div><div class="line">    checkError(err)</div><div class="line">    defer conn.Close()</div><div class="line">    op := []TCPOption&#123;</div><div class="line">        TCPOption&#123;</div><div class="line">            Kind:   2,</div><div class="line">            Length: 4,</div><div class="line">            Data:   []byte&#123;0x05, 0xb4&#125;,</div><div class="line">        &#125;,</div><div class="line">        TCPOption&#123;</div><div class="line">            Kind: 0,</div><div class="line">        &#125;,</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    tcpH := TCPHeader&#123;</div><div class="line">        SrcPort:       sport,</div><div class="line">        DstPort:       dport,</div><div class="line">        SeqNum:        rand.Uint32(),</div><div class="line">        AckNum:        0,</div><div class="line">        Flags:         0x8002,</div><div class="line">        Window:        8192,</div><div class="line">        ChkSum:        0,</div><div class="line">        UrgentPointer: 0,</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    buff := new(bytes.Buffer)</div><div class="line"></div><div class="line">    err = binary.Write(buff, binary.BigEndian, tcpH)</div><div class="line">    checkError(err)</div><div class="line">    <span class="keyword">for</span> i := range op &#123;</div><div class="line">        binary.Write(buff, binary.BigEndian, op[i].Kind)</div><div class="line">        binary.Write(buff, binary.BigEndian, op[i].Length)</div><div class="line">        binary.Write(buff, binary.BigEndian, op[i].Data)</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    binary.Write(buff, binary.BigEndian, [6]byte&#123;&#125;)</div><div class="line"></div><div class="line">    data := buff.Bytes()</div><div class="line">    checkSum := CheckSum(data, ipstr2Bytes(laddr), ipstr2Bytes(raddr))</div><div class="line">    //fmt.Printf(<span class="string">“CheckSum 0x%X\n”</span>, checkSum)</div><div class="line">    tcpH.ChkSum = checkSum</div><div class="line"></div><div class="line">    buff = new(bytes.Buffer)</div><div class="line">    binary.Write(buff, binary.BigEndian, tcpH)</div><div class="line">    <span class="keyword">for</span> i := range op &#123;</div><div class="line">        binary.Write(buff, binary.BigEndian, op[i].Kind)</div><div class="line">        binary.Write(buff, binary.BigEndian, op[i].Length)</div><div class="line">        binary.Write(buff, binary.BigEndian, op[i].Data)</div><div class="line">    &#125;</div><div class="line">    binary.Write(buff, binary.BigEndian, [6]byte&#123;&#125;)</div><div class="line">    data = buff.Bytes()</div><div class="line"></div><div class="line">    //fmt.Printf(<span class="string">“% X\n”</span>, data)</div><div class="line">    _, err = conn.Write(data)</div><div class="line">    checkError(err)</div><div class="line">&#125;</div><div class="line"></div><div class="line">func recvSynAck(laddr, raddr string, res chan&lt;- scanResult) error &#123;</div><div class="line">    listenAddr, err := net.ResolveIPAddr(<span class="string">“ip4”</span>, laddr) // 解析域名为ip</div><div class="line">    checkError(err)</div><div class="line">    conn, err := net.ListenIP(<span class="string">“ip4:tcp”</span>, listenAddr)</div><div class="line">    defer conn.Close()</div><div class="line">    checkError(err)</div><div class="line">    <span class="keyword">for</span> &#123;</div><div class="line">        buff := make([]byte, 1024)</div><div class="line">        _, addr, err := conn.ReadFrom(buff)</div><div class="line">        <span class="keyword">if</span> err != nil &#123;</div><div class="line">            <span class="built_in">continue</span></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        <span class="keyword">if</span> addr.String() != raddr || buff[13] != 0x12 &#123;</div><div class="line">            <span class="built_in">continue</span></div><div class="line">        &#125;</div><div class="line"></div><div class="line">        var port uint16</div><div class="line">        binary.Read(bytes.NewReader(buff), binary.BigEndian, &amp;port)</div><div class="line">        res &lt;- &amp;scanResult&#123;</div><div class="line">            Port:   port,</div><div class="line">            Opened: <span class="literal">true</span>,</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">func ipstr2Bytes(addr string) [4]byte &#123;</div><div class="line">    s := strings.Split(addr, <span class="string">“.”</span>)</div><div class="line">    b0, _ := strconv.Atoi(s[0])</div><div class="line">    b1, _ := strconv.Atoi(s[1])</div><div class="line">    b2, _ := strconv.Atoi(s[2])</div><div class="line">    b3, _ := strconv.Atoi(s[3])</div><div class="line">    <span class="built_in">return</span> [4]byte&#123;byte(b0), byte(b1), byte(b2), byte(b3)&#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">func random(min, max int) int &#123;</div><div class="line">    <span class="built_in">return</span> rand.Intn(max-min) + min</div><div class="line">&#125;</div><div class="line"></div><div class="line">func interfaceAddress(ifaceName string ) string &#123;</div><div class="line">    iface, err:= net.InterfaceByName(ifaceName)</div><div class="line">    <span class="keyword">if</span> err != nil &#123;</div><div class="line">        panic(err)</div><div class="line">    &#125;</div><div class="line">    addr, err := iface.Addrs()</div><div class="line">    <span class="keyword">if</span> err != nil &#123;</div><div class="line">        panic(err)</div><div class="line">    &#125;</div><div class="line">    addrStr := strings.Split(addr[0].String(), <span class="string">“/“</span>)[0]</div><div class="line">    <span class="built_in">return</span> addrStr</div><div class="line">&#125;</div><div class="line"></div><div class="line">func portSplit(portRange <em>string) (uint16, uint16) &#123;</em></div><div class="line">    ports := strings.Split(portRange, <span class="string">“-“</span>)</div><div class="line">    minPort, err := strconv.ParseUint(ports[0], 10, 16)</div><div class="line">    <span class="keyword">if</span> err !=nil &#123;</div><div class="line">        panic(err)</div><div class="line">    &#125;</div><div class="line">    maxPort, err := strconv.ParseUint(ports[1], 10, 16)</div><div class="line">    <span class="keyword">if</span> err != nil &#123;</div><div class="line">        panic(err)</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">if</span> minPort &gt; maxPort &#123;</div><div class="line">        panic(errors.New(<span class="string">“minPort must greater than maxPort”</span>))</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="built_in">return</span> uint16(minPort), uint16(maxPort)</div><div class="line">&#125;</div><div class="line"></div><div class="line">func <span class="function"><span class="title">main</span></span>() &#123; &#125;</div></pre></td></tr></table></figure>
+
+<p>然后利用go自身的build命令，将其打包成.so库：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">go build -buildmode=c-shared -o tcp_syn_scan.so tcp_syn_scan.go</div></pre></td></tr></table></figure>
+
+<p>打包后会得到一个tcp_syn_scan.so和一个tcp_syn_scan.h。然后利用下面的python代码就可以调用Go代码中的Scan()函数了，创建一个tcp_syn_scan.py文件。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="comment">#! -<em>- coding:utf-8 -</em>-</span></div><div class="line"></div><div class="line">from ctypes import *</div><div class="line">lib = cdll.LoadLibrary(u<span class="string">‘./scan.so’</span>)</div><div class="line">lib.Scan(<span class="string">“14.215.177.38”</span>,<span class="string">“1-1024”</span>,<span class="string">“eth0”</span>) <span class="comment"># ip,端口范围，网卡</span></div></pre></td></tr></table></figure>
+
+<p>代码运行结果：<br><img src="/upload_image/20180517/python_go_syn_scan.png" alt=""></p>
+<p>说明：相当原生的go，利用python去调用go会损耗一些性能，但总体上还可以。</p>
+<h3 id="后记"><a href="#后记" class="headerlink" title="后记"></a><a href="#后记" title="后记"></a>后记</h3><p>本文结论就是可以利用go开发扫描模块（性能更佳），并结合python调用。<br>本文代码项目地址：<a href="https://github.com/tengzhangchao/PortScan" target="_blank" rel="noopener">https://github.com/tengzhangchao/PortScan</a></p>
+<h3 id="参考文章"><a href="#参考文章" class="headerlink" title="参考文章"></a><a href="#参考文章" title="参考文章"></a>参考文章</h3><p><a href="https://blog.csdn.net/pwc1996/article/details/73469850" target="_blank" rel="noopener">https://blog.csdn.net/pwc1996/article/details/73469850</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+      <div>
+        <div style="padding: 10px 0; margin: 20px auto; width: 90%; text-align: center;">
+  <div>Donate comment here</div>
+  <button id="rewardButton" disable="enable" onclick="var qr = document.getElementById('QR'); if (qr.style.display === 'none') {qr.style.display='block';} else {qr.style.display='none'}">
+    <span>打赏</span>
+  </button>
+  <div id="QR" style="display: none;">
+
+    
+      <div id="wechat" style="display: inline-block">
+        <img id="wechat_qr" src="/images/wechatpay.jpg" alt="褚成志 微信支付"/>
+        <p>微信支付</p>
+      </div>
+    
+
+    
+      <div id="alipay" style="display: inline-block">
+        <img id="alipay_qr" src="/images/alipay.jpg" alt="褚成志 支付宝"/>
+        <p>支付宝</p>
+      </div>
+    
+
+    
+
+  </div>
+</div>
+
+      </div>
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/编程之道/" rel="tag"># 编程之道</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/05/07/利用python开发app实战/" rel="next" title="利用python开发app实战">
+                <i class="fa fa-chevron-left"></i> 利用python开发app实战
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/05/20/ELK-Sentinl/" rel="prev" title="ELK Sentinl">
+                ELK Sentinl <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.gif"
+                alt="褚成志" />
+            
+              <p class="site-author-name" itemprop="name">褚成志</p>
+              <p class="site-description motion-element" itemprop="description">关注互联网的科技博客</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">67</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">1</span>
+                  <span class="site-state-item-name">分类</span>
+                
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                
+                  <span class="site-state-item-count">38</span>
+                  <span class="site-state-item-name">标签</span>
+                
+              </div>
+            
+
+          </nav>
+
+          
+            <div class="feed-link motion-element">
+              <a href="/atom.xml" rel="alternate">
+                <i class="fa fa-rss"></i>
+                RSS
+              </a>
+            </div>
+          
+
+          
+            <div class="links-of-author motion-element">
+                
+                  <span class="links-of-author-item">
+                    <a href="https://github.com/livecityccz" target="_blank" title="GitHub">
+                      
+                        <i class="fa fa-fw fa-github"></i>GitHub</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="mailto:livecityccz@gmail.com" target="_blank" title="E-Mail">
+                      
+                        <i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://plus.google.com/livecityccz" target="_blank" title="Google">
+                      
+                        <i class="fa fa-fw fa-google"></i>Google</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://twitter.com/livecityccz" target="_blank" title="Twitter">
+                      
+                        <i class="fa fa-fw fa-twitter"></i>Twitter</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://www.facebook.com/livecityccz" target="_blank" title="FB Page">
+                      
+                        <i class="fa fa-fw fa-facebook"></i>FB Page</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://youtube.com/livecityccz" target="_blank" title="YouTube">
+                      
+                        <i class="fa fa-fw fa-youtube"></i>YouTube</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="https://instagram.com/livecityccz" target="_blank" title="Instagram">
+                      
+                        <i class="fa fa-fw fa-instagram"></i>Instagram</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://weibo.com/livecityccz" target="_blank" title="微博">
+                      
+                        <i class="fa fa-fw fa-globe"></i>微博</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://douban.com/people/livecityccz" target="_blank" title="豆瓣">
+                      
+                        <i class="fa fa-fw fa-globe"></i>豆瓣</a>
+                  </span>
+                
+                  <span class="links-of-author-item">
+                    <a href="http://www.zhihu.com/people/livecityccz" target="_blank" title="知乎">
+                      
+                        <i class="fa fa-fw fa-globe"></i>知乎</a>
+                  </span>
+                
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://blog.sina.com.cn/blog782081987" title="Title" target="_blank">Title</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#scan-for-Python-Socket"><span class="nav-number">1.</span> <span class="nav-text">scan for Python Socket</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#tcp-scan"><span class="nav-number">1.1.</span> <span class="nav-text">tcp scan</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#tcp-syn-scan"><span class="nav-number">1.2.</span> <span class="nav-text">tcp syn scan</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#scan-for-Python-scapy"><span class="nav-number">2.</span> <span class="nav-text">scan for Python scapy</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#tcp-syn-csan"><span class="nav-number">2.1.</span> <span class="nav-text">tcp syn csan</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#scan-for-python-nmap"><span class="nav-number">3.</span> <span class="nav-text">scan for python+nmap</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#scan-for-go"><span class="nav-number">4.</span> <span class="nav-text">scan for go</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#tcp-scan-1"><span class="nav-number">4.1.</span> <span class="nav-text">tcp scan</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#tcp-syn-scan-1"><span class="nav-number">4.2.</span> <span class="nav-text">tcp syn scan</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#scan-for-go-python"><span class="nav-number">5.</span> <span class="nav-text">scan for go+python</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#后记"><span class="nav-number">6.</span> <span class="nav-text">后记</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考文章"><span class="nav-number">7.</span> <span class="nav-text">参考文章</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">褚成志</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/three.min.js"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/three/canvas_sphere.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+
+<script type="text/javascript" src="http://tajs.qq.com/stats?sId=66074130" charset="UTF-8"></script>
+
+</body>
+</html>
